@@ -1,0 +1,131 @@
+version: '3.3'
+
+services:
+
+   postgres:
+   
+      image: postgres:14-alpine
+      
+      restart: always
+
+      ports:
+         - 44:5432
+         
+      volumes:
+         - ~/Desktop/Baselocal/postgresdata:/var/lib/postgresql/data
+         
+      env_file:
+         - .env.postgres
+   
+   dbmaker:
+   
+      image: ivanduque0/dbmakermanager:V0.2
+      
+      volumes:
+         - ./dbmaker:/app
+         
+      command: python3 codigo.py
+         
+      env_file:
+         - .env.maker
+         
+      depends_on:
+         - postgres
+
+   dbmanagerfotos:
+   
+      image: ivanduque0/dbmakermanager:V0.2
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ~/Desktop/Baselocal/dbmanagerfotos:/app
+         
+      env_file:
+         - .env.manager
+         
+      depends_on:
+         - postgres
+         
+   dbmanagerusuarios:
+   
+      image: ivanduque0/dbmakermanager:V0.2
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ~/Desktop/Baselocal/dbmanagerusuarios:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+         
+   dbmanagerhorarios:
+   
+      image: ivanduque0/dbmakermanager:V0.2
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ~/Desktop/Baselocal/dbmanagerhorarios:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+         
+   dbmanagerinteracciones:
+   
+      image: ivanduque0/dbmakermanager:V0.2
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ~/Desktop/Baselocal/dbmanagerinteracciones:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+         
+   facerecognition:
+
+      image: ivanduque0/dockermpfrpsy:v1
+      
+      environment:
+         - DISPLAY=unix$DISPLAY
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ~/Desktop/Baselocal/facerecognition:/app
+         - ~/Desktop/Baselocal/dbmanagerfotos/media/personas:/app/personas
+         - /tmp/.X11-unix:/tmp/.X11-unix
+         - /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+
+
+   
+
+   
+      
+   
