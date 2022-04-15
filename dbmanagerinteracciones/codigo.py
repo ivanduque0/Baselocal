@@ -58,8 +58,8 @@ while True:
             nro_int_local = len(interacciones_local)
 
             if nro_int_local > nro_int_local_old and total>1:
-
                 diferencia_rango=nro_int_local-nro_int_local_old
+                nro_int_local_old = nro_int_local
                 diferencia= list(range(diferencia_rango))
                 interacciones_local = interacciones_local[::-1]
 
@@ -79,7 +79,6 @@ while True:
                 
                 cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s', (CONTRATO,))
                 interacciones_local= cursorlocal.fetchall()
-                nro_int_local_old = len(interacciones_local)
                 diferencia=0
                 diferencia_rango=0
                 nombre=None
