@@ -28,7 +28,7 @@ while True:
 
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_usuarios (cedula integer, nombre varchar(150), contrato_id varchar(150))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_interacciones (nombre varchar(150), fecha date, hora time without time zone, razon varchar(150), contrato varchar(150), cedula_id integer)')
-        cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_horariospermitidos (entrada time without time zone, salida time without time zone, cedula_id integer, dia_id varchar(180))')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_horariospermitidos (entrada time without time zone, salida time without time zone, cedula_id integer, dia varchar(180))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_fotos (foto varchar(150), cedula_id integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS led (onoff integer)')
         connlocal.commit()

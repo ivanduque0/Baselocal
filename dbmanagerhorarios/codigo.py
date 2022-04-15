@@ -61,7 +61,7 @@ while True:
                         listausuarioslocal.append(cedula)
                 
                 for usuario in listausuarioslocal:
-                    cursorheroku.execute('SELECT entrada, salida, cedula_id, dia_id FROM web_horariospermitidos WHERE cedula_id=%s',(usuario,))
+                    cursorheroku.execute('SELECT entrada, salida, cedula_id, dia FROM web_horariospermitidos WHERE cedula_id=%s',(usuario,))
                     diasheroku= cursorheroku.fetchall()
                     
                     cursorlocal.execute('SELECT * FROM web_horariospermitidos WHERE cedula_id=%s',(usuario,))
@@ -76,7 +76,7 @@ while True:
                                 salida=diasherokuiterar[1]
                                 cedula=diasherokuiterar[2]
                                 dia=diasherokuiterar[3]
-                                cursorlocal.execute('''INSERT INTO web_horariospermitidos (entrada, salida, cedula_id, dia_id)
+                                cursorlocal.execute('''INSERT INTO web_horariospermitidos (entrada, salida, cedula, dia)
                                 VALUES (%s, %s, %s, %s);''', (entrada, salida, cedula, dia))
                                 connlocal.commit()
 
@@ -89,7 +89,7 @@ while True:
                                 salida=diaslocaliterar[1]
                                 cedula=diaslocaliterar[2]
                                 dia=diaslocaliterar[3]
-                                cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE entrada=%s AND salida=%s AND cedula_id=%s AND dia_id=%s',(entrada, salida, cedula, dia))
+                                cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE entrada=%s AND salida=%s AND cedula_id=%s AND dia=%s',(entrada, salida, cedula, dia))
                                 connlocal.commit()
                 diaslocal=[]
                 diasheroku=[]
