@@ -76,7 +76,7 @@ while True:
                                 salida=diasherokuiterar[1]
                                 cedula=diasherokuiterar[2]
                                 dia=diasherokuiterar[3]
-                                cursorlocal.execute('''INSERT INTO web_horariospermitidos (entrada, salida, cedula, dia)
+                                cursorlocal.execute('''INSERT INTO web_horariospermitidos (entrada, salida, cedula_id, dia)
                                 VALUES (%s, %s, %s, %s);''', (entrada, salida, cedula, dia))
                                 connlocal.commit()
 
