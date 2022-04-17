@@ -16,7 +16,7 @@ primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 flaghorario = 0 #1 para dar acceso y 0 para denegarlo
 directorio=os.environ.get("DIRECTORIO")
 imagenes = os.listdir(directorio)
-imagenesold=imagenes
+imagenesold=[]
 nombres = []
 caras = []
 mp_face_detection = mp.solutions.face_detection
@@ -330,7 +330,6 @@ while True:
                         razon = "salida"
 
                     imagenes = os.listdir(directorio)
-
                     if len(imagenesold) > len(imagenes):
 
                         for img in nombres:
@@ -352,10 +351,10 @@ while True:
 
                     if len(imagenes) > len(imagenesold):
                         for img in imagenes:
-                            try:
-                                nombrecarpeta=os.path.splitext(img)[0]         
+                            nombrecarpeta=os.path.splitext(img)[0]
+                            fotoconsulta = f'media/{directorio}/{nombrecarpeta}'
+                            try:      
                                 comprobar = nombres.index(nombrecarpeta)
-
                             except ValueError:
                                 ruta=os.path.join(directorio,img)
                                 subir_foto = face_recognition.load_image_file(ruta)
@@ -365,8 +364,11 @@ while True:
                                     caras.append(decodificar)
                                     nombre = os.path.splitext(img)[0]
                                     nombres.append(nombre)
-                                    #print(f"rostro {nombre} registrado con exito!")
-                                #print(nombres)
+                                    cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
+                                    conn.commit()
+                                else:
+                                    cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
+                                    conn.commit()
                                 imagenes = os.listdir(directorio)
                                     
                         for img in imagenes:
@@ -383,7 +385,7 @@ while True:
                         caras2 = np.array(caras)
                         #print(caras2.shape)
                         
-                    cv2.imshow('imagen', vista_previa)
+                    #cv2.imshow('imagen', vista_previa)
                     cv2.imshow('imagenn', video)
                     
 

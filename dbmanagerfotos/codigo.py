@@ -12,9 +12,8 @@ connlocal = None
 connheroku = None
 cursorheroku=None
 cursorlocal=None
-usuarios_faltantes_foto=[]
-listausuariosheroku=[]
 listausuarioslocal=[]
+listausuariosheroku=[]
 total=0
 DIRECTORIO=os.environ.get("DIRECTORIO", "media/personas")
 if not os.path.exists(DIRECTORIO): 
@@ -64,6 +63,13 @@ while True:
 
             if total>3:
                 
+                for usuario in usuarios_local:
+                    cedula=usuario[0]
+                    try:
+                        listausuarioslocal.index(cedula)
+                    except ValueError:
+                        listausuarioslocal.append(cedula)
+
                 for usuario in usuarios_heroku:
                     cedula=usuario[0]
                     try:
@@ -71,48 +77,68 @@ while True:
                     except ValueError:
                         listausuariosheroku.append(cedula)
                 
-                for usuario in usuarios_local:
-                    cedula=usuario[0]
-                    try:
-                        listausuarioslocal.index(cedula)
-                    except ValueError:
-                        listausuarioslocal.append(cedula)
+                if len(usuarios_local) == len(usuarios_heroku):
                 
 
-                for usuario in listausuarioslocal:
-                    cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (usuario,))
-                    fotos_local= cursorlocal.fetchall()
-                    if len(fotos_local) == 1:
-                        foto=fotos_local[0][0]
+                    for usuario in listausuarioslocal:
+                        cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (usuario,))
+                        fotos_local= cursorlocal.fetchall()
                         cursorheroku.execute('SELECT * FROM web_fotos where cedula_id=%s', (usuario,))
-                        foto_heroku= cursorheroku.fetchall()
-                        if len(foto_heroku) == 0:
-                            cursorlocal.execute('DELETE FROM web_fotos where cedula_id=%s', (usuario,))
-                            connlocal.commit()
-                            print(f'{foto}.jpg')
-                            os.remove(f'{foto}.jpg')
+                        fotos_heroku= cursorheroku.fetchall()
 
-                    if len(fotos_local) == 0:
-                        cursorheroku.execute('SELECT * FROM web_fotos where cedula_id=%s', (usuario,))
-                        foto_heroku= cursorheroku.fetchall()
-                        if len(foto_heroku) == 1:
-                            foto=foto_heroku[0][1]
-                            cedula=foto_heroku[0][2]
-                            cursorlocal.execute('''INSERT INTO web_fotos (foto, cedula_id)
-                            VALUES (%s, %s);''', (foto, cedula))
-                            connlocal.commit()
-                            url = cloudinary.utils.cloudinary_url(foto)
-                            url=url[0]
-                            imagenurl = urllib.request.urlopen (url) #abrimos el URL
-                            imagenarray = np.array(bytearray(imagenurl.read()),dtype=np.uint8)
-                            fotovisible = cv2.imdecode (imagenarray,-1)
-                            cv2.imwrite(f"{foto}.jpg",fotovisible)
+                        #eliminar fotos no validadas de forma local
+
+                        for fotolocal in fotos_local:
+                            estado=fotolocal[2]
+                            id=fotolocal[0]
+                            foto=fotolocal[1]
+                            if estado==2:
+                                cursorheroku.execute('UPDATE web_fotos SET estado=2 WHERE id=%s', (id,))
+                                connheroku.commit()
+                            if estado==1:
+                                cursorheroku.execute('UPDATE web_fotos SET estado=1 WHERE id=%s', (id,))
+                                connheroku.commit()
+                                
+                        #eliminar fotos de la base de datos local que no esten en la base de datos de heroku
+                        if len(fotos_local) > len(fotos_heroku):
+                            for fotolocal in fotos_local:
+                                id=fotolocal[0]
+                                foto=fotolocal[1]
+                                try:
+                                    fotos_heroku.index(fotolocal)
+                                except ValueError:
+                                    cursorlocal.execute('DELETE FROM web_fotos where id=%s', (id,))
+                                    connlocal.commit()
+                                    os.remove(f'{foto}.jpg')
+
+
+                        #agregar fotos que no estan en la base de datos local pero que si estan en la de heroku
+                        if len(fotos_local) < len(fotos_heroku):
+                            for fotoheroku in fotos_heroku:
+                                try:
+                                    fotos_local.index(fotoheroku)
+                                except ValueError:
+                                    id=fotoheroku[0]
+                                    foto=fotoheroku[1]
+                                    estado=fotoheroku[2]
+                                    cedula=fotoheroku[3]
+                                    cursorlocal.execute('''INSERT INTO web_fotos (id, foto, estado, cedula_id)
+                                    VALUES (%s, %s, %s, %s);''', (id, foto, estado, cedula))
+                                    connlocal.commit()
+                                    url = cloudinary.utils.cloudinary_url(foto)
+                                    url=url[0]
+                                    imagenurl = urllib.request.urlopen (url) #abrimos el URL
+                                    imagenarray = np.array(bytearray(imagenurl.read()),dtype=np.uint8)
+                                    fotovisible = cv2.imdecode (imagenarray,-1)
+                                    cv2.imwrite(f"{foto}.jpg",fotovisible)
 
                     
-                total=0
-                listausuariosheroku=[]
-                listausuarioslocal=[]
-                t1=time.perf_counter()
+
+                        
+                    total=0
+                    listausuariosheroku=[]
+                    listausuarioslocal=[]
+                    t1=time.perf_counter()
 
     except (Exception, psycopg2.Error) as error:
         print("fallo en hacer las consultas")
