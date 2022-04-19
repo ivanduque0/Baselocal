@@ -226,8 +226,8 @@ while True:
 
                                 
 
-                                #if t2-t1 >= 0.7 and (x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10):
-                                if x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10:
+                                if t2-t1 >= 0.7 and (x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10):
+                                #if x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10:
                                     yref = y_1
                                     xref = x_1
                                 
