@@ -177,14 +177,14 @@ while True:
                             for face_landmarks in results2.multi_face_landmarks:
 
                                 #puntos de los parpados 
-                                y_386 = int(face_landmarks.landmark[386].y * alto) 
-                                y_374 = int(face_landmarks.landmark[374].y * alto) 
-                                y_159 = int(face_landmarks.landmark[159].y * alto)
-                                y_145 = int(face_landmarks.landmark[145].y * alto)
-                                x_386 = int(face_landmarks.landmark[386].x * ancho) 
-                                x_374 = int(face_landmarks.landmark[374].x * ancho) 
-                                x_159 = int(face_landmarks.landmark[159].x * ancho)
-                                x_145 = int(face_landmarks.landmark[145].x * ancho)
+                                y_386 = int(face_landmarks.landmark[386].y * alto*10) 
+                                y_374 = int(face_landmarks.landmark[374].y * alto*10) 
+                                y_159 = int(face_landmarks.landmark[159].y * alto*10)
+                                y_145 = int(face_landmarks.landmark[145].y * alto*10)
+                                x_386 = int(face_landmarks.landmark[386].x * ancho*10) 
+                                x_374 = int(face_landmarks.landmark[374].x * ancho*10) 
+                                x_159 = int(face_landmarks.landmark[159].x * ancho*10)
+                                x_145 = int(face_landmarks.landmark[145].x * ancho*10)
 
                                 y_1 = int(face_landmarks.landmark[1].y * alto)
                                 x_1 = int(face_landmarks.landmark[1].x * ancho)
@@ -208,6 +208,8 @@ while True:
                             if y_10 >=20 and x_227 >= 20:
                                 vista_previa = alinear[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
                                 vista_previargb = cv2.cvtColor(vista_previa, cv2.COLOR_BGR2RGB)
+                                altog, anchog, _ = vista_previargb.shape
+                                vista_previargb = cv2.resize(vista_previargb, (anchog+100,altog+100))
                             
 
                                 p1 = np.array([x_386, y_386])
@@ -223,7 +225,7 @@ while True:
 
                                 
 
-                                if t2-t1 >= 0.7 and (x_1 >= xref+5 or x_1 <= xref-5 or y_1 >= yref+5 or y_1 <= yref-5):
+                                if t2-t1 >= 0.7 and (x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10):
                                     yref = y_1
                                     xref = x_1
                                 
