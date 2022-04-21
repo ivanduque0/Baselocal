@@ -16,7 +16,6 @@ primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 flaghorario = 0 #1 para dar acceso y 0 para denegarlo
 directorio=os.environ.get("DIRECTORIO")
 imagenes = os.listdir(directorio)
-imagenesold=[]
 nombres = []
 caras = []
 mp_face_detection = mp.solutions.face_detection
@@ -42,15 +41,15 @@ etapadia=0
 intento=0
 total=0
 
-for imagen in imagenes:
-    ruta=os.path.join(directorio,imagen)
-    subir_foto = face_recognition.load_image_file(ruta)
-    decodificar = face_recognition.face_encodings(subir_foto)
-    if decodificar != []:
-        decodificar = face_recognition.face_encodings(subir_foto)[0]
-        caras.append(decodificar)
-        nombre = os.path.splitext(imagen)[0]
-        nombres.append(nombre)
+# for imagen in imagenes:
+#     ruta=os.path.join(directorio,imagen)
+#     subir_foto = face_recognition.load_image_file(ruta)
+#     decodificar = face_recognition.face_encodings(subir_foto)
+#     if decodificar != []:
+#         decodificar = face_recognition.face_encodings(subir_foto)[0]
+#         caras.append(decodificar)
+#         nombre = os.path.splitext(imagen)[0]
+#         nombres.append(nombre)
 
 #caras2 = np.array(caras)
 #print(caras2.shape)
@@ -334,8 +333,8 @@ while True:
                         razon = "salida"
 
                     imagenes = os.listdir(directorio)
-                    if len(imagenesold) > len(imagenes):
 
+                    if len(nombres) > len(imagenes):
                         for img in nombres:
                             try:
                                 nombreencarpeta=f'{img}.jpg'  
@@ -347,13 +346,13 @@ while True:
                                 #print(nombres)
                                 #print(nombres)
                                 
-                        imagenes = os.listdir(directorio)
-                        imagenesold=imagenes
-                        #print(nombres)
-                        #caras2 = np.array(caras)
-                        #print(caras2.shape)
+                        #imagenes = os.listdir(directorio)
+                        
+                        # print(nombres)
+                        # caras2 = np.array(caras)
+                        # print(caras2.shape)
 
-                    if len(imagenes) > len(imagenesold):
+                    if len(imagenes) > len(nombres):
                         for img in imagenes:
                             nombrecarpeta=os.path.splitext(img)[0]
                             fotoconsulta = f'media/{directorio}/{nombrecarpeta}'
@@ -373,7 +372,6 @@ while True:
                                 else:
                                     cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
                                     conn.commit()
-                                imagenes = os.listdir(directorio)
                                     
                         for img in imagenes:
                             nombre=os.path.splitext(img)[0]
@@ -382,12 +380,12 @@ while True:
                             except ValueError:
                                 ruta=os.path.join(directorio,img)
                                 os.remove(ruta)
-                                imagenes = os.listdir(directorio)
+                                #imagenes = os.listdir(directorio)
                                 #print(f"rostro {nombre} no registrado!")
-                        imagenesold=imagenes
-                        #print(nombres)
-                        caras2 = np.array(caras)
-                        #print(caras2.shape)
+                        
+                        # print(nombres)
+                        # caras2 = np.array(caras)
+                        # print(caras2.shape)
                         
                     #cv2.imshow('imagen', vista_previa)
                     cv2.imshow('imagenn', video)
