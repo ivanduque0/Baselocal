@@ -106,7 +106,7 @@ while True:
             while True:
                 tz = pytz.timezone('America/Caracas')
                 caracas_now = datetime.now(tz)
-                vista_previa = 0  
+                #vista_previa = 0  
                 ret,video = camara.read()
                 if video is None:
                     camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
@@ -387,7 +387,8 @@ while True:
                         # caras2 = np.array(caras)
                         # print(caras2.shape)
                         
-                    #cv2.imshow('imagen', vista_previa)
+                    #cv2.imshow('imagenp', vista_previa)
+                    #cv2.imshow('imageng', vista_previargb)
                     cv2.imshow('imagenn', video)
                     
 

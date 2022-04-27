@@ -59,7 +59,7 @@ while True:
 
             if nro_int_local > nro_int_local_old and total>1:
                 diferencia_rango=nro_int_local-nro_int_local_old
-                nro_int_local_old = nro_int_local
+                #nro_int_local_old = nro_int_local
                 diferencia= list(range(diferencia_rango))
                 interacciones_local = interacciones_local[::-1]
 
@@ -88,6 +88,7 @@ while True:
                 cedula=None
                 total=0
                 t1=time.perf_counter()
+                nro_int_local_old = nro_int_local
 
     except (Exception, psycopg2.Error) as error:
         print("fallo en hacer las consultas")
