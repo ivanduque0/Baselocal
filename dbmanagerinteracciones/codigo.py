@@ -12,8 +12,6 @@ connlocal = None
 connheroku = None
 cursorheroku=None
 cursorlocal=None
-listausuariosheroku=[]
-listausuarioslocal=[]
 total=0
 nro_int_local_old=0
 
