@@ -60,20 +60,21 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
     connf.commit()
     
-    cursorf.execute('SELECT * FROM led')
-    estado_led= cursorf.fetchall()
-    while estado_led[0][0]==1:
-        cursorf.execute('SELECT * FROM led')
-        estado_led= cursor.fetchall()
+    #cursorf.execute('SELECT * FROM led')
+    #estado_led= cursorf.fetchall()
+    #while estado_led[0][0]==1:
+    #    cursorf.execute('SELECT * FROM led')
+    #    estado_led= cursor.fetchall()
 
 def aperturadenegada(cursorf, connf):
     cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
     connf.commit()
-    cursorf.execute('SELECT * FROM led')
-    estado_led= cursorf.fetchall()
-    while estado_led[0][0]==2:
-        cursorf.execute('SELECT * FROM led')
-        estado_led= cursorf.fetchall()
+    
+    #cursorf.execute('SELECT * FROM led')
+    #estado_led= cursorf.fetchall()
+    #while estado_led[0][0]==2:
+    #    cursorf.execute('SELECT * FROM led')
+    #    estado_led= cursorf.fetchall()
 
 while True:
     
