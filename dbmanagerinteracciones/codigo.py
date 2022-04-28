@@ -77,8 +77,6 @@ while True:
                     VALUES (%s, %s, %s, %s, %s, %s);''', (nombre, fecha, hora, razon, CONTRATO, cedula))
                     connheroku.commit()
                 
-                cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s', (CONTRATO,))
-                interacciones_local= cursorlocal.fetchall()
                 diferencia=0
                 diferencia_rango=0
                 nombre=None
