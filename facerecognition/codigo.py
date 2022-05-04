@@ -115,6 +115,12 @@ while True:
                     cv2.destroyAllWindows()
                 #video = cv2.flip(video, 0)
                 #print(video)
+
+                # Si se usa un sensor se deben descomentar estas lineas de abajo
+                # cursor.execute('SELECT * FROM sensor')
+                # sensor_onoff = cursor.fetchall()
+                # if video is not None and sensor_onoff[0][0] == 1:
+
                 if video is not None:
                     
                     alto, ancho, _ = video.shape

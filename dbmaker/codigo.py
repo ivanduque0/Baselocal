@@ -31,13 +31,18 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_horariospermitidos (entrada time without time zone, salida time without time zone, cedula_id integer, dia varchar(180))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_fotos (id integer, foto varchar(150), estado integer, cedula_id integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS led (onoff integer)')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS sensor (onoff integer)')
         connlocal.commit()
         cursorlocal.execute('SELECT*FROM led')
         tablaled= cursorlocal.fetchall()
+        cursorlocal.execute('SELECT*FROM sensor')
+        tablasensor= cursorlocal.fetchall()
         if len(tablaled) < 1:
             cursorlocal.execute('INSERT INTO led values(0)')
             connlocal.commit()
-
+        if len(tablasensor) < 1:
+            cursorlocal.execute('INSERT INTO sensor values(0)')
+            connlocal.commit()
 
     except (Exception, psycopg2.Error) as error:
         print("fallo en hacer las consultas")
