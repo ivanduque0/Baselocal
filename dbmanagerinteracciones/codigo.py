@@ -5,6 +5,8 @@ import time
 import cloudinary
 import urllib.request
 import numpy as np
+import pytz
+from datetime import datetime
 import cv2
 
 CONTRATO=os.environ.get("CONTRATO")
@@ -13,7 +15,7 @@ connheroku = None
 cursorheroku=None
 cursorlocal=None
 total=0
-nro_int_local_old=0
+fechahoy=None
 
 while True:
     
@@ -47,36 +49,34 @@ while True:
 
         t1=time.perf_counter()
         while True:
-            t2=time.perf_counter()
-            total=t2-t1
-
-            cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s', (CONTRATO,))
+            t2 = time.perf_counter()
+            total = t2-t1
+            tz = pytz.timezone('America/Caracas')
+            caracas_now = datetime.now(tz)
+            fechahoy=str(caracas_now)[:10]
+            cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
             interacciones_local= cursorlocal.fetchall()
-            
+            cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula_id FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
+            interacciones_heroku= cursorheroku.fetchall()
+
             nro_int_local = len(interacciones_local)
+            nro_int_heroku = len(interacciones_heroku)
 
-            if nro_int_local > nro_int_local_old and total>1:
-                diferencia_rango=nro_int_local-nro_int_local_old
-                #nro_int_local_old = nro_int_local
-                diferencia= list(range(diferencia_rango))
-                interacciones_local = interacciones_local[::-1]
+            if nro_int_local > nro_int_heroku and total>1:
 
-                for posicion in diferencia:
-
-                    interaccion = interacciones_local[posicion]
-
-                    nombre=interaccion[0]
-                    fecha=interaccion[1]
-                    hora=interaccion[2]
-                    razon=interaccion[3]
-                    cedula=interaccion[5]
-
-                    cursorheroku.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
-                    VALUES (%s, %s, %s, %s, %s, %s);''', (nombre, fecha, hora, razon, CONTRATO, cedula))
-                    connheroku.commit()
+                for interaccion in interacciones_local:
+                    try:
+                        interacciones_heroku.index(interaccion)
+                    except ValueError:
+                        nombre=interaccion[0]
+                        fecha=interaccion[1]
+                        hora=interaccion[2]
+                        razon=interaccion[3]
+                        cedula=interaccion[5]
+                        cursorheroku.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+                        VALUES (%s, %s, %s, %s, %s, %s);''', (nombre, fecha, hora, razon, CONTRATO, cedula))
+                        connheroku.commit()
                 
-                diferencia=0
-                diferencia_rango=0
                 nombre=None
                 fecha=None
                 hora=None
@@ -84,7 +84,6 @@ while True:
                 cedula=None
                 total=0
                 t1=time.perf_counter()
-                nro_int_local_old = nro_int_local
 
     except (Exception, psycopg2.Error) as error:
         print("fallo en hacer las consultas")

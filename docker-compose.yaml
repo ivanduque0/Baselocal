@@ -19,7 +19,7 @@ services:
    
    dbmaker:
    
-      image: ivanduque0/dbmakermanager:V0.2
+      image: ivanduque0/dbmakermanager:V0.3
       
       volumes:
          - ./dbmaker:/app
@@ -34,7 +34,7 @@ services:
 
    dbmanagerfotos:
    
-      image: ivanduque0/dbmakermanager:V0.2
+      image: ivanduque0/dbmakermanager:V0.3
       
       restart: always
       
@@ -51,7 +51,7 @@ services:
          
    dbmanagerusuarios:
    
-      image: ivanduque0/dbmakermanager:V0.2
+      image: ivanduque0/dbmakermanager:V0.3
       
       restart: always
       
@@ -68,7 +68,7 @@ services:
          
    dbmanagerhorarios:
    
-      image: ivanduque0/dbmakermanager:V0.2
+      image: ivanduque0/dbmakermanager:V0.3
       
       restart: always
       
@@ -85,7 +85,7 @@ services:
          
    dbmanagerinteracciones:
    
-      image: ivanduque0/dbmakermanager:V0.2
+      image: ivanduque0/dbmakermanager:V0.3
       
       restart: always
       

@@ -287,8 +287,8 @@ while True:
                                                 contrato=nombrecedula[0][2]
                                                 for entrada, salida, _, dia in horarios_permitidos:
                                                     if dia==diahoy:
-                                                        hora=str(caracas_now)[11:16]
-                                                        horahoy = datetime.strptime(hora, '%H:%M').time()
+                                                        hora=str(caracas_now)[11:19]
+                                                        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                                         fecha=str(caracas_now)[:10]
                                                         etapadia=1
                                                         if entrada<salida:
