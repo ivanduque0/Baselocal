@@ -105,6 +105,12 @@ while True:
             #camara = cv2.VideoCapture("http://192.168.20.102:8080/?action=stream")
             camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
             while True:
+
+                # Si se usa un sensor se deben descomentar estas lineas de abajo y se debe identar el resto del codigo
+                # cursor.execute('SELECT * FROM sensor')
+                # sensor_onoff = cursor.fetchall()
+                # if video is not None and sensor_onoff[0][0] == 1:
+
                 tz = pytz.timezone('America/Caracas')
                 caracas_now = datetime.now(tz)
                 #vista_previa = 0  
@@ -115,11 +121,6 @@ while True:
                     cv2.destroyAllWindows()
                 #video = cv2.flip(video, 0)
                 #print(video)
-
-                # Si se usa un sensor se deben descomentar estas lineas de abajo
-                # cursor.execute('SELECT * FROM sensor')
-                # sensor_onoff = cursor.fetchall()
-                # if video is not None and sensor_onoff[0][0] == 1:
 
                 if video is not None:
                     
@@ -367,15 +368,37 @@ while True:
                                 comprobar = nombres.index(nombrecarpeta)
                             except ValueError:
                                 ruta=os.path.join(directorio,img)
-                                subir_foto = face_recognition.load_image_file(ruta)
-                                decodificar = face_recognition.face_encodings(subir_foto)
-                                if decodificar != []:
-                                    decodificar = face_recognition.face_encodings(subir_foto)[0]
-                                    caras.append(decodificar)
-                                    nombre = os.path.splitext(img)[0]
-                                    nombres.append(nombre)
-                                    cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
-                                    conn.commit()
+                                subir_foto = cv2.imread(ruta)
+                                subir_foto = cv2.cvtColor(subir_foto, cv2.COLOR_BGR2RGB)
+                                altocut, anchocut, _ = subir_foto.shape
+                                resultscut = face_mesh.process(subir_foto)
+                                if resultscut.multi_face_landmarks is not None:
+                                    for face_landmarks in resultscut.multi_face_landmarks:
+                                        #mejilla derecha
+                                        y_447 = int(face_landmarks.landmark[447].y * altocut) 
+                                        x_447 = int(face_landmarks.landmark[447].x * anchocut) 
+                                        #mejilla izquierda
+                                        y_227 = int(face_landmarks.landmark[227].y * altocut)
+                                        x_227 = int(face_landmarks.landmark[227].x * anchocut)
+                                        #frente  
+                                        y_10 = int(face_landmarks.landmark[10].y * altocut)
+                                        x_10 = int(face_landmarks.landmark[10].x * anchocut)
+                                        #barbilla
+                                        y_175 = int(face_landmarks.landmark[175].y * altocut)
+                                        x_175 = int(face_landmarks.landmark[175].x * anchocut)
+                                    if y_10 >=10 and x_227 >= 10:
+                                        subir_fotocut = subir_foto[y_10-10 : y_175 +10, x_227 - 10: x_447 +10]
+                                    decodificar = face_recognition.face_encodings(subir_fotocut)
+                                    if decodificar != []:
+                                        decodificar = face_recognition.face_encodings(subir_foto)[0]
+                                        caras.append(decodificar)
+                                        nombre = os.path.splitext(img)[0]
+                                        nombres.append(nombre)
+                                        cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
+                                        conn.commit()
+                                    else:
+                                        cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
+                                        conn.commit()
                                 else:
                                     cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
                                     conn.commit()
