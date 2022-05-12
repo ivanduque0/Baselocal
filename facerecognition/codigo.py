@@ -380,28 +380,62 @@ while True:
                                         #mejilla izquierda
                                         y_227 = int(face_landmarks.landmark[227].y * altocut)
                                         x_227 = int(face_landmarks.landmark[227].x * anchocut)
-                                        #frente  
-                                        y_10 = int(face_landmarks.landmark[10].y * altocut)
-                                        x_10 = int(face_landmarks.landmark[10].x * anchocut)
-                                        #barbilla
-                                        y_175 = int(face_landmarks.landmark[175].y * altocut)
-                                        x_175 = int(face_landmarks.landmark[175].x * anchocut)
-                                    if y_10 >=10 and x_227 >= 10:
-                                        subir_fotocut = subir_foto[y_10-10 : y_175 +10, x_227 - 10: x_447 +10]
-                                    decodificar = face_recognition.face_encodings(subir_fotocut)
-                                    if decodificar != []:
-                                        decodificar = face_recognition.face_encodings(subir_foto)[0]
-                                        caras.append(decodificar)
-                                        nombre = os.path.splitext(img)[0]
-                                        nombres.append(nombre)
-                                        cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
-                                        conn.commit()
+
+                                    #creando coordenadas de cada punto
+                                    p1cut = np.array([x_447, y_447])
+                                    p2cut = np.array([x_227, y_227])
+                                    p3cut = np.array([x_227, y_447])
+
+                                    #obteniendo distancias entre los puntos
+                                    d1cut = np.linalg.norm(p1cut-p2cut)
+                                    d2cut = np.linalg.norm(p1cut-p3cut)
+
+                                    angulocut = degrees(acos(d2cut/d1cut))
+                                    
+                                    #haciendo que el angulo sea negativo cuando se rote la cabeza
+                                    #a la derecha
+                                    if y_227 < y_447:
+                                        angulocut= -angulocut
+
+                                    #registrando la rotacion
+                                    mcut = cv2.getRotationMatrix2D((anchocut // 2, altocut // 2), -angulocut, 1)
+                                    
+                                    #crearndo nueva ventana y dandole la rotacion a la imagen
+                                    alinearcut = cv2.warpAffine(subir_foto, mcut, (anchocut,altocut))
+                                    altocut2, anchocut2, _ = alinearcut.shape
+                                    resultscut2 = face_mesh.process(alinearcut)
+
+                                    if resultscut2.multi_face_landmarks is not None:
+                                        for face_landmarks in resultscut2.multi_face_landmarks:
+                                            #mejilla derecha
+                                            y_447 = int(face_landmarks.landmark[447].y * altocut) 
+                                            x_447 = int(face_landmarks.landmark[447].x * anchocut) 
+                                            #mejilla izquierda
+                                            y_227 = int(face_landmarks.landmark[227].y * altocut)
+                                            x_227 = int(face_landmarks.landmark[227].x * anchocut)
+                                            #frente  
+                                            y_10 = int(face_landmarks.landmark[10].y * altocut)
+                                            x_10 = int(face_landmarks.landmark[10].x * anchocut)
+                                            #barbilla
+                                            y_175 = int(face_landmarks.landmark[175].y * altocut)
+                                            x_175 = int(face_landmarks.landmark[175].x * anchocut)
+
+                                        if y_10 >=20 and x_227 >= 20:
+                                            subir_fotocut = alinearcut[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
+                                            decodificar = face_recognition.face_encodings(subir_fotocut)
+                                            if decodificar != []:
+                                                decodificar = face_recognition.face_encodings(subir_foto)[0]
+                                                caras.append(decodificar)
+                                                nombre = os.path.splitext(img)[0]
+                                                nombres.append(nombre)
+                                                cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
+                                                conn.commit()
+                                            else:
+                                                cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
+                                                conn.commit()
                                     else:
                                         cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
                                         conn.commit()
-                                else:
-                                    cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
-                                    conn.commit()
                                     
                         for img in imagenes:
                             nombre=os.path.splitext(img)[0]
