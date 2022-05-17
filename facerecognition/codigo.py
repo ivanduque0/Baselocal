@@ -316,6 +316,10 @@ while True:
                                                                 aperturadenegada(cursor, conn)
                                                                 #print('fuera de horario')
                                                     elif dia==diahoy and cantidaddias>1:
+                                                        hora=str(caracas_now)[11:19]
+                                                        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                                                        fecha=str(caracas_now)[:10]
+                                                        etapadia=1
                                                         if entrada<salida:
                                                             if horahoy >= entrada and horahoy <= salida:
                                                                 #print('entrada concedida')
