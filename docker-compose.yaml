@@ -12,7 +12,7 @@ services:
          - 44:5432
          
       volumes:
-         - ~/Desktop/Baselocal/postgresdata:/var/lib/postgresql/data
+         - ./postgresdata:/var/lib/postgresql/data
          
       env_file:
          - .env.postgres
@@ -41,7 +41,7 @@ services:
       command: python3 codigo.py
       
       volumes:
-         - ~/Desktop/Baselocal/dbmanagerfotos:/app
+         - ./dbmanagerfotos:/app
          
       env_file:
          - .env.manager
@@ -58,7 +58,7 @@ services:
       command: python3 codigo.py
       
       volumes:
-         - ~/Desktop/Baselocal/dbmanagerusuarios:/app
+         - ./dbmanagerusuarios:/app
          
       env_file:
          - .env.manager
@@ -75,7 +75,7 @@ services:
       command: python3 codigo.py
       
       volumes:
-         - ~/Desktop/Baselocal/dbmanagerhorarios:/app
+         - ./dbmanagerhorarios:/app
          
       env_file:
          - .env.manager
@@ -92,7 +92,7 @@ services:
       command: python3 codigo.py
       
       volumes:
-         - ~/Desktop/Baselocal/dbmanagerinteracciones:/app
+         - ./dbmanagerinteracciones:/app
          
       env_file:
          - .env.manager
@@ -113,8 +113,8 @@ services:
          - .env.recognition
       
       volumes:
-         - ~/Desktop/Baselocal/facerecognition:/app
-         - ~/Desktop/Baselocal/dbmanagerfotos/media/personas:/app/personas
+         - ./facerecognition:/app
+         - ./dbmanagerfotos/media/personas:/app/personas
          - /tmp/.X11-unix:/tmp/.X11-unix
          - /tmp/.docker.xauth:/tmp/.docker.xauth
          
