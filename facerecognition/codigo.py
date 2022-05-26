@@ -349,6 +349,7 @@ while True:
                                             if horarios_permitidos == []:
                                                 aperturadenegada(cursor, conn) 
                                                 #print('este usuario no tiene horarios establecidos')
+                                            diasusuario=[]    
                                         if nombrefoto == []:
                                             aperturadenegada(cursor, conn)
                                             
