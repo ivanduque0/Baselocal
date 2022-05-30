@@ -28,7 +28,7 @@ d2old=0
 video=None
 vista_previargb = 0
 vista_previa = 0
-razon="entrada"
+razon=os.environ.get("RAZON")
 t1=time.perf_counter()
 t2=0
 xref=0
@@ -124,8 +124,11 @@ while True:
                     cv2.destroyAllWindows()
                 #video = cv2.flip(video, 0)
                 #print(video)
-
-                if video is not None:
+                
+                cursor.execute('SELECT * FROM sensor')
+                sensor_onoff = cursor.fetchall()
+                if video is not None and sensor_onoff[0][0] == 1:
+                #if video is not None:
                     
                     alto, ancho, _ = video.shape
                     K = np.float32([[1,0,100],[0,1,100]])
@@ -133,7 +136,9 @@ while True:
                     alto2, ancho2, _ = video2.shape
                     K = cv2.getRotationMatrix2D((ancho2 // 2, alto2 // 2), 90, 1)
                     video2 = cv2.warpAffine(video2, K, (alto2,ancho2))
-                    K = np.float32([[1,0,-180],[0,1,-21]])
+                    K = np.float32([[1,0,-160],[0,1,-41]]) 
+                    # para resolucion de 640 x 480 = ([[1,0,-180],[0,1,-21]])
+                    # para resolucion de 360 x 240 = ([[1,0,-160],[0,1,-41]])
                     video = cv2.warpAffine(video2, K, (alto, ancho))
                     video = cv2.flip(video, 0)
                     alto, ancho, _ = video.shape
@@ -217,8 +222,8 @@ while True:
                             #if xmin < 0 or ymin < 0:
                             #    continue
                             if y_10 >=20 and x_227 >= 20:
-                                vista_previa = alinear[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
-                                vista_previargb = cv2.cvtColor(vista_previa, cv2.COLOR_BGR2RGB)
+                                vista_previargb = alinea_rgb[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
+                                #vista_previargb = cv2.cvtColor(vista_previa, cv2.COLOR_BGR2RGB)
                                 altog, anchog, _ = vista_previargb.shape
                                 vista_previargb = cv2.resize(vista_previargb, (anchog+100,altog+100))
                             
@@ -367,14 +372,14 @@ while True:
                                 xrefold=xref
                                 yrefold=yref
                                     
-                    tecla = cv2.waitKey(1)
+                    #tecla = cv2.waitKey(1)
 
                     #esto es solo para simular la entrada y salida para las consultas
-                    if tecla & 0xFF == 226:
-                        razon = "entrada"
+                    #if tecla & 0xFF == 226:
+                    #   razon = "entrada"
                     
-                    if tecla & 0xFF == 225:
-                        razon = "salida"
+                    #if tecla & 0xFF == 225:
+                    #   razon = "salida"
 
                     imagenes = os.listdir(directorio)
 
@@ -489,13 +494,13 @@ while True:
                         
                     #cv2.imshow('imagenp', vista_previa)
                     #cv2.imshow('imageng', vista_previargb)
-                    cv2.imshow('imagenn', video)
+                    #cv2.imshow('imagenn', video)
                     
 
-                    if tecla & 0xFF == 27:
-                        break
+                    #if tecla & 0xFF == 27:
+                    #   break
                     
-                    tecla = 0
+                    #tecla = 0
         camara.release()
         cv2.destroyAllWindows()
 
