@@ -122,6 +122,23 @@ services:
       
       depends_on:
          - postgres
+   
+   antispoofing:
+   
+      image: ivanduque0/antispoofing:V1
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ./antispoofing:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
 
 
    

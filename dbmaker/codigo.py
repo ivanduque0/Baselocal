@@ -32,16 +32,22 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_fotos (id integer, foto varchar(150), estado integer, cedula_id integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS led (onoff integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS sensor (onoff integer)')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS antisp (spoofing float, nospoofing float)')
         connlocal.commit()
         cursorlocal.execute('SELECT*FROM led')
         tablaled= cursorlocal.fetchall()
         cursorlocal.execute('SELECT*FROM sensor')
         tablasensor= cursorlocal.fetchall()
+        cursorlocal.execute('SELECT*FROM antisp')
+        tablaantisp= cursorlocal.fetchall()
         if len(tablaled) < 1:
             cursorlocal.execute('INSERT INTO led values(0)')
             connlocal.commit()
         if len(tablasensor) < 1:
             cursorlocal.execute('INSERT INTO sensor values(0)')
+            connlocal.commit()
+        if len(tablaantisp) < 1:
+            cursorlocal.execute('INSERT INTO antisp values(0,0)')
             connlocal.commit()
 
     except (Exception, psycopg2.Error) as error:

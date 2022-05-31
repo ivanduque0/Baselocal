@@ -43,6 +43,7 @@ total=0
 diasusuario = []
 cantidaddias = 0
 contadoraux = 0
+sensorflag = 0
 
 # for imagen in imagenes:
 #     ruta=os.path.join(directorio,imagen)
@@ -113,9 +114,6 @@ while True:
                 # cursor.execute('SELECT * FROM sensor')
                 # sensor_onoff = cursor.fetchall()
                 # if video is not None and sensor_onoff[0][0] == 1:
-
-                tz = pytz.timezone('America/Caracas')
-                caracas_now = datetime.now(tz)
                 #vista_previa = 0  
                 ret,video = camara.read()
                 if video is None:
@@ -129,7 +127,7 @@ while True:
                 sensor_onoff = cursor.fetchall()
                 if video is not None and sensor_onoff[0][0] == 1:
                 #if video is not None:
-                    
+                    sensorflag=0
                     alto, ancho, _ = video.shape
                     K = np.float32([[1,0,100],[0,1,100]])
                     video2 = cv2.warpAffine(video, K, (ancho+200,alto+200))
@@ -222,7 +220,7 @@ while True:
                             #if xmin < 0 or ymin < 0:
                             #    continue
                             if y_10 >=20 and x_227 >= 20:
-                                vista_previargb = alinea_rgb[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
+                                vista_previargb = alinear_rgb[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
                                 #vista_previargb = cv2.cvtColor(vista_previa, cv2.COLOR_BGR2RGB)
                                 altog, anchog, _ = vista_previargb.shape
                                 vista_previargb = cv2.resize(vista_previargb, (anchog+100,altog+100))
@@ -279,6 +277,8 @@ while True:
                                         etapadia=0
                                         etapadiaapertura=0
                                         if True in resultado:
+                                            tz = pytz.timezone('America/Caracas')
+                                            caracas_now = datetime.now(tz)
                                             rostro_encontrado = resultado.index(True)
                                             nombrefoto = nombres[rostro_encontrado]
                                             fotoconsulta = f'media/{directorio}/{nombrefoto}'
@@ -294,63 +294,65 @@ while True:
                                                 nombrecedula = cursor.fetchall()
                                                 nombre=nombrecedula[0][1]
                                                 contrato=nombrecedula[0][2]
-
-                                                for entrada, salida, _, dia in horarios_permitidos:
-                                                    diasusuario.append(dia)
-                                                cantidaddias = diasusuario.count(dia)
-                                                for entrada, salida, _, dia in horarios_permitidos:
-                                                    if dia==diahoy and cantidaddias==1:
-                                                        hora=str(caracas_now)[11:19]
-                                                        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
-                                                        fecha=str(caracas_now)[:10]
-                                                        etapadia=1
-                                                        if entrada<salida:
-                                                            if horahoy >= entrada and horahoy <= salida:
-                                                                #print('entrada concedida')
-                                                                aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
-                                                                etapadiaapertura=1
-                                                            else:
-                                                                aperturadenegada(cursor, conn)
-                                                                #print('fuera de horario')
-                                                        if entrada>salida:
-                                                            if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
-                                                                #print('entrada concedida')
-                                                                aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
-                                                                etapadiaapertura=1
-                                                            else:
-                                                                aperturadenegada(cursor, conn)
-                                                                #print('fuera de horario')
-                                                    elif dia==diahoy and cantidaddias>1:
-                                                        hora=str(caracas_now)[11:19]
-                                                        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
-                                                        fecha=str(caracas_now)[:10]
-                                                        etapadia=1
-                                                        if entrada<salida:
-                                                            if horahoy >= entrada and horahoy <= salida:
-                                                                #print('entrada concedida')
-                                                                aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
-                                                                etapadiaapertura=1
-                                                                contadoraux=0
-                                                            else:
-                                                                contadoraux = contadoraux+1
-                                                                if contadoraux == cantidaddias:
+                                                cursor.execute('SELECT * FROM antisp')
+                                                antispoofing = cursor.fetchall()
+                                                if antispoofing[0][0]<antispoofing[0][1]:
+                                                    for entrada, salida, _, dia in horarios_permitidos:
+                                                        diasusuario.append(dia)
+                                                    cantidaddias = diasusuario.count(dia)
+                                                    for entrada, salida, _, dia in horarios_permitidos:
+                                                        if dia==diahoy and cantidaddias==1:
+                                                            hora=str(caracas_now)[11:19]
+                                                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                                                            fecha=str(caracas_now)[:10]
+                                                            etapadia=1
+                                                            if entrada<salida:
+                                                                if horahoy >= entrada and horahoy <= salida:
+                                                                    #print('entrada concedida')
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    etapadiaapertura=1
+                                                                else:
                                                                     aperturadenegada(cursor, conn)
-                                                                    contadoraux=0
-                                                        if entrada>salida:
-                                                            if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
-                                                                #print('entrada concedida')
-                                                                aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
-                                                                etapadiaapertura=1
-                                                                contadoraux=0
-                                                            else:
-                                                                contadoraux = contadoraux+1
-                                                                if contadoraux == cantidaddias:
+                                                                    #print('fuera de horario')
+                                                            if entrada>salida:
+                                                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                                                    #print('entrada concedida')
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    etapadiaapertura=1
+                                                                else:
                                                                     aperturadenegada(cursor, conn)
+                                                                    #print('fuera de horario')
+                                                        elif dia==diahoy and cantidaddias>1:
+                                                            hora=str(caracas_now)[11:19]
+                                                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                                                            fecha=str(caracas_now)[:10]
+                                                            etapadia=1
+                                                            if entrada<salida:
+                                                                if horahoy >= entrada and horahoy <= salida:
+                                                                    #print('entrada concedida')
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    etapadiaapertura=1
                                                                     contadoraux=0
-                                                                #print('fuera de horario')
-                                                if etapadia==0 and etapadiaapertura==0:
-                                                    aperturadenegada(cursor, conn)
-                                                    #print('Dia no permitido')
+                                                                else:
+                                                                    contadoraux = contadoraux+1
+                                                                    if contadoraux == cantidaddias:
+                                                                        aperturadenegada(cursor, conn)
+                                                                        contadoraux=0
+                                                            if entrada>salida:
+                                                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                                                    #print('entrada concedida')
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    etapadiaapertura=1
+                                                                    contadoraux=0
+                                                                else:
+                                                                    contadoraux = contadoraux+1
+                                                                    if contadoraux == cantidaddias:
+                                                                        aperturadenegada(cursor, conn)
+                                                                        contadoraux=0
+                                                                    #print('fuera de horario')
+                                                    if etapadia==0 and etapadiaapertura==0:
+                                                        aperturadenegada(cursor, conn)
+                                                        #print('Dia no permitido')
                                             if horarios_permitidos == []:
                                                 aperturadenegada(cursor, conn) 
                                                 #print('este usuario no tiene horarios establecidos')
@@ -501,8 +503,12 @@ while True:
                     #   break
                     
                     #tecla = 0
-        camara.release()
-        cv2.destroyAllWindows()
+                else:
+                    if sensorflag==0:
+                        camara.release()
+                        sensorflag=1
+        #camara.release()
+        #cv2.destroyAllWindows()
 
     except (Exception, psycopg2.Error) as error:
         #print("fallo en hacer las consultas")
