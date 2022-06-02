@@ -15,6 +15,7 @@ ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 flaghorario = 0 #1 para dar acceso y 0 para denegarlo
 directorio=os.environ.get("DIRECTORIO")
+CONTRATO=os.environ.get("CONTRATO")
 imagenes = os.listdir(directorio)
 nombres = []
 caras = []
@@ -293,7 +294,6 @@ while True:
                                                 cursor.execute('SELECT * FROM web_usuarios where cedula=%s', (cedula_id,))
                                                 nombrecedula = cursor.fetchall()
                                                 nombre=nombrecedula[0][1]
-                                                contrato=nombrecedula[0][2]
                                                 cursor.execute('SELECT * FROM antisp')
                                                 antispoofing = cursor.fetchall()
                                                 if antispoofing[0][0]<antispoofing[0][1]:
@@ -309,7 +309,7 @@ while True:
                                                             if entrada<salida:
                                                                 if horahoy >= entrada and horahoy <= salida:
                                                                     #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
                                                                     etapadiaapertura=1
                                                                 else:
                                                                     aperturadenegada(cursor, conn)
@@ -317,7 +317,7 @@ while True:
                                                             if entrada>salida:
                                                                 if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                                                     #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
                                                                     etapadiaapertura=1
                                                                 else:
                                                                     aperturadenegada(cursor, conn)
@@ -330,7 +330,7 @@ while True:
                                                             if entrada<salida:
                                                                 if horahoy >= entrada and horahoy <= salida:
                                                                     #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
                                                                     etapadiaapertura=1
                                                                     contadoraux=0
                                                                 else:
@@ -341,7 +341,7 @@ while True:
                                                             if entrada>salida:
                                                                 if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                                                     #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, contrato, cedula_id, cursor,conn)
+                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
                                                                     etapadiaapertura=1
                                                                     contadoraux=0
                                                                 else:

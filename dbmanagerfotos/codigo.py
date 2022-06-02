@@ -131,10 +131,6 @@ while True:
                                     imagenarray = np.array(bytearray(imagenurl.read()),dtype=np.uint8)
                                     fotovisible = cv2.imdecode (imagenarray,-1)
                                     cv2.imwrite(f"{foto}.jpg",fotovisible)
-
-                    
-
-                        
                     total=0
                     listausuariosheroku=[]
                     listausuarioslocal=[]
