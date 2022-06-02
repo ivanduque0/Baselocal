@@ -117,6 +117,23 @@ services:
       depends_on:
          - postgres
          
+   telegrambot:
+   
+      image: ivanduque0/telegrambot:V1.0
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ./botelegram:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+
    facerecognition:
 
       image: ivanduque0/dockermpfrpsy:v1
