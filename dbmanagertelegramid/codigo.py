@@ -62,7 +62,7 @@ while True:
                             usuarios_local.index(usuario)
                         except ValueError:
                             cedula=usuario[0]
-                            telegram_id=[2]
+                            telegram_id=usuario[2]
                             cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s WHERE cedula=%s", (telegram_id,cedula))
                             connlocal.commit()
                 total=0
