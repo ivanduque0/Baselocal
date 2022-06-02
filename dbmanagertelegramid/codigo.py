@@ -63,10 +63,10 @@ while True:
                         except ValueError:
                             cedula=usuario[0]
                             telegram_id=[2]
-                            cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s WHERE cedula_id=%s", (telegram_id,cedula))
+                            cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s WHERE cedula=%s", (telegram_id,cedula))
                             connlocal.commit()
-            total=0
-            t1=time.perf_counter()
+                total=0
+                t1=time.perf_counter()
 
     except (Exception, psycopg2.Error) as error:
         print("fallo en hacer las consultas")
