@@ -40,28 +40,21 @@ while True:
         connuri = conn_info.stdout.decode('utf-8').strip()
         connheroku = psycopg2.connect(connuri)
         cursorheroku = connheroku.cursor()
-
-
-        cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s', (CONTRATO,))
-        interacciones_local= cursorlocal.fetchall()
-        nro_int_local_old=len(interacciones_local)
         
 
         t1=time.perf_counter()
         while True:
             t2 = time.perf_counter()
             total = t2-t1
-            
+            tz = pytz.timezone('America/Caracas')
+            caracas_now = datetime.now(tz)
+            fechahoy=str(caracas_now)[:10]
+            cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
+            interacciones_local= cursorlocal.fetchall()
+            cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula_id FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
+            interacciones_heroku= cursorheroku.fetchall()
 
             if nro_int_local > nro_int_heroku and total>1:
-
-                tz = pytz.timezone('America/Caracas')
-                caracas_now = datetime.now(tz)
-                fechahoy=str(caracas_now)[:10]
-                cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
-                interacciones_local= cursorlocal.fetchall()
-                cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula_id FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
-                interacciones_heroku= cursorheroku.fetchall()
 
                 nro_int_local = len(interacciones_local)
                 nro_int_heroku = len(interacciones_heroku)

@@ -39,7 +39,7 @@ while True:
         connheroku = psycopg2.connect(connuri)
         cursorheroku = connheroku.cursor()
         
-
+    
         t1=time.perf_counter()
         while True:
             t2=time.perf_counter()
