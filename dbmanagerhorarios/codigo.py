@@ -45,13 +45,14 @@ while True:
             t2=time.perf_counter()
             total=t2-t1
 
-            cursorlocal.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
-            usuarios_local= cursorlocal.fetchall()
-
-            cursorheroku.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
-            usuarios_heroku= cursorheroku.fetchall()
-
             if total > 3:
+
+                cursorlocal.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                usuarios_local= cursorlocal.fetchall()
+
+                cursorheroku.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                usuarios_heroku= cursorheroku.fetchall()
+
 
                 for usuario in usuarios_local:
                     cedula=usuario[0]

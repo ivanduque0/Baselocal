@@ -82,10 +82,10 @@ while True:
         #print("fallo en hacer las consultas")
         total=0
         spoofing = 0
-    nospoofing = 0
-    spoofingdb = 0
-    nospoofingdb = 0
-
+        nospoofing = 0
+        spoofingdb = 0
+        nospoofingdb = 0
+    
     finally:
         if conn:
             cursor.close()

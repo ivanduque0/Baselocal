@@ -45,16 +45,16 @@ while True:
             t2=time.perf_counter()
             total=t2-t1
 
-            cursorlocal.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
-            usuarios_local= cursorlocal.fetchall()
-
-            cursorheroku.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
-            usuarios_heroku= cursorheroku.fetchall()
-
-            nro_usu_local = len(usuarios_local)
-            nro_usu_heroku = len(usuarios_heroku)
-
             if total>3:
+
+                cursorlocal.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                usuarios_local= cursorlocal.fetchall()
+
+                cursorheroku.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                usuarios_heroku= cursorheroku.fetchall()
+
+                nro_usu_local = len(usuarios_local)
+                nro_usu_heroku = len(usuarios_heroku)
             
                 #cuando se va a eliminar un usuario
                 if nro_usu_local > nro_usu_heroku:

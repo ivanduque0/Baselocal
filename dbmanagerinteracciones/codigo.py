@@ -51,18 +51,20 @@ while True:
         while True:
             t2 = time.perf_counter()
             total = t2-t1
-            tz = pytz.timezone('America/Caracas')
-            caracas_now = datetime.now(tz)
-            fechahoy=str(caracas_now)[:10]
-            cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
-            interacciones_local= cursorlocal.fetchall()
-            cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula_id FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
-            interacciones_heroku= cursorheroku.fetchall()
-
-            nro_int_local = len(interacciones_local)
-            nro_int_heroku = len(interacciones_heroku)
+            
 
             if nro_int_local > nro_int_heroku and total>1:
+
+                tz = pytz.timezone('America/Caracas')
+                caracas_now = datetime.now(tz)
+                fechahoy=str(caracas_now)[:10]
+                cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
+                interacciones_local= cursorlocal.fetchall()
+                cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula_id FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
+                interacciones_heroku= cursorheroku.fetchall()
+
+                nro_int_local = len(interacciones_local)
+                nro_int_heroku = len(interacciones_heroku)
 
                 for interaccion in interacciones_local:
                     try:

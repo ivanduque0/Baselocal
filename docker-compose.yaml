@@ -99,6 +99,23 @@ services:
       
       depends_on:
          - postgres
+
+   dbmanagerid:
+   
+      image: ivanduque0/dbmakermanager:V0.3
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ./dbmanagertelegramid:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
          
    facerecognition:
 
