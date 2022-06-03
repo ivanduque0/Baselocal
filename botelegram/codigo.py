@@ -46,7 +46,7 @@ def aperturadenegada(cursorf, connf):
 @bot.message_handler(commands=['id'])
 def send_welcome(message):
     message.text
-    chatid = message.from_user.id
+    chatid = message.chat.id
     bot.reply_to(message, f"su ID es: {chatid}")
 
 @bot.message_handler(commands=['start'])
@@ -77,6 +77,8 @@ def manejador_seleccion(message):
         #print(message.text)
         if message.text == 'entrada principal':
             diasusuario = []
+            etapadia=0
+            etapadiaapertura=0
             cantidaddias = 0
             contadoraux = 0
             chat_id = message.chat.id
@@ -152,7 +154,8 @@ def manejador_seleccion(message):
                 if horarios_permitidos == []:
                     aperturadenegada(cursor, conn) 
                     #print('este usuario no tiene horarios establecidos')
-                diasusuario=[]    
+                diasusuario=[]
+                    
                 
             else:
                 aperturadenegada(cursor, conn) 
