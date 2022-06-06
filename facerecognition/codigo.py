@@ -306,7 +306,7 @@ while True:
                                                             horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                                             fecha=str(caracas_now)[:10]
                                                             etapadia=1
-                                                            aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                                                            aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
                                                             etapadiaapertura=1
                                                         elif dia==diahoy and cantidaddias==1:
                                                             hora=str(caracas_now)[11:19]
