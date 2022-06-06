@@ -14,23 +14,35 @@ bot = telebot.TeleBot(token, parse_mode=None)
 razon=os.environ.get("RAZON_BOT")
 total=0
 CONTRATO=os.environ.get("CONTRATO")
-pulseaqui = [
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
-    'pulse aqui',
+# pulseaqui = [
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
+#     'pulse aqui',
     
-]
+# ]
 
-keyboard = Keyboa(items=pulseaqui)
+# keyboard = Keyboa(items=pulseaqui)
 
+markup = telebot.types.ReplyKeyboardMarkup()
+markup.add("🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵\n🔵🔵🔵🔵ENTRADA PRINCIPAL🔵🔵🔵🔵\n🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵")
+markup.add("🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴\n🔴🔴🔴🔴PORTON VEHICULAR🔴🔴🔴🔴\n🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴")
+markup.add("🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶\n🔶🔶🔶🔶 PUERTA TRASERA 🔶🔶🔶🔶\n🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶")
+
+opciones = ['''🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵
+🔵🔵🔵🔵ENTRADA PRINCIPAL🔵🔵🔵🔵
+🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵''','''🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
+🔴🔴🔴🔴PORTON VEHICULAR🔴🔴🔴🔴
+🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴''','''🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶
+🔶🔶🔶🔶 PUERTA TRASERA 🔶🔶🔶🔶
+🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶''']
 
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf,connf):
     cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
@@ -53,35 +65,127 @@ def send_welcome(message):
 def send_welcome(message):
     message.text
     chatid = message.chat.id
-    bot.send_message(chat_id=chatid,text='Pulse cualquier boton', reply_markup=keyboard())
+    #bot.send_message(chat_id=chatid,text='Pulse cualquier boton', reply_markup=keyboard())
+    bot.send_game(chat_id=chatid, game_short_name='entrada_principal')
+    bot.send_game(chat_id=chatid, game_short_name='porton_vehicular')
+    bot.send_game(chat_id=chatid, game_short_name='puerta_trasera')
+    bot.send_message(chat_id=chatid,text='que acceso desea abrir?', reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def manejador_seleccion(call):
 
-    chatid = call.message.chat.id
-    if call.data == 'pulse aqui':
-        markup = telebot.types.ReplyKeyboardMarkup()
-        markup.add("entrada principal")
-        markup.add("porton vehicular","puerta trasera")
-        bot.send_message(chat_id=chatid,text='Pulse cualquier boton', reply_markup=keyboard())
-        bot.send_message(chat_id=chatid,text='que acceso desea abrir?', reply_markup=markup)
+    chat_id = call.message.chat.id
+    orden = call.game_short_name
+
     
+    # if call.data == 'pulse aqui':
+    #     markup = telebot.types.ReplyKeyboardMarkup()
+    #     markup.add("entrada principal")
+    #     markup.add("porton vehicular","puerta trasera")
+    #     bot.send_message(chat_id=chatid,text='Pulse cualquier boton', reply_markup=keyboard())
+    #     bot.send_message(chat_id=chatid,text='que acceso desea abrir?', reply_markup=markup)
+    if orden == 'entrada_principal':
+        diasusuario = []
+        etapadia=0
+        etapadiaapertura=0
+        cantidaddias = 0
+        contadoraux = 0
+        cursor.execute("SELECT * FROM web_usuarios where telegram_id='%s'", (chat_id,))
+        datosusuario = cursor.fetchall()
+        #print(datosusuario)
+        if len(datosusuario)!=0:
+            cedula=datosusuario[0][0]
+            nombre=datosusuario[0][1]
+            cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
+            horarios_permitidos = cursor.fetchall()
+            if horarios_permitidos != []:
+                tz = pytz.timezone('America/Caracas')
+                caracas_now = datetime.now(tz)
+                dia = caracas_now.weekday()
+                diahoy = dias_semana[dia]
+                for entrada, salida, _, dia in horarios_permitidos:
+                    diasusuario.append(dia)
+                cantidaddias = diasusuario.count(dia)
+                for entrada, salida, _, dia in horarios_permitidos:
+                    if 'Siempre' in diasusuario:
+                        hora=str(caracas_now)[11:19]
+                        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                        fecha=str(caracas_now)[:10]
+                        etapadia=1
+                        aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                        etapadiaapertura=1
+                    elif dia==diahoy and cantidaddias==1:
+                        hora=str(caracas_now)[11:19]
+                        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                        fecha=str(caracas_now)[:10]
+                        etapadia=1
+                        if entrada<salida:
+                            if horahoy >= entrada and horahoy <= salida:
+                                #print('entrada concedida')
+                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                                etapadiaapertura=1
+                            else:
+                                aperturadenegada(cursor, conn)
+                                #print('fuera de horario')
+                        if entrada>salida:
+                            if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                #print('entrada concedida')
+                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                                etapadiaapertura=1
+                            else:
+                                aperturadenegada(cursor, conn)
+                                #print('fuera de horario')
+                    elif dia==diahoy and cantidaddias>1:
+                        hora=str(caracas_now)[11:19]
+                        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                        fecha=str(caracas_now)[:10]
+                        etapadia=1
+                        if entrada<salida:
+                            if horahoy >= entrada and horahoy <= salida:
+                                #print('entrada concedida')
+                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                                etapadiaapertura=1
+                                contadoraux=0
+                            else:
+                                contadoraux = contadoraux+1
+                                if contadoraux == cantidaddias:
+                                    aperturadenegada(cursor, conn)
+                                    contadoraux=0
+                        if entrada>salida:
+                            if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                #print('entrada concedida')
+                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                                etapadiaapertura=1
+                                contadoraux=0
+                            else:
+                                contadoraux = contadoraux+1
+                                if contadoraux == cantidaddias:
+                                    aperturadenegada(cursor, conn)
+                                    contadoraux=0
+                                #print('fuera de horario')
+                if etapadia==0 and etapadiaapertura==0:
+                    aperturadenegada(cursor, conn)
+                    #print('Dia no permitido')
+            if horarios_permitidos == []:
+                aperturadenegada(cursor, conn) 
+                #print('este usuario no tiene horarios establecidos')
+            diasusuario=[]
+
 @bot.message_handler(func=lambda message: True)
 def manejador_seleccion(message):
 	
     chatid=message.chat.id
-    opciones = ["entrada principal","porton vehicular","puerta trasera"]
-
+    messageid=message.id
     try:
         opciones.index(message.text)
         #print(message.text)
-        if message.text == 'entrada principal':
+        if message.text == "🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵\n🔵🔵🔵🔵ENTRADA PRINCIPAL🔵🔵🔵🔵\n🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵":
             diasusuario = []
             etapadia=0
             etapadiaapertura=0
             cantidaddias = 0
             contadoraux = 0
-            chat_id = message.chat.id
+            chat_id = chatid
             cursor.execute("SELECT * FROM web_usuarios where telegram_id='%s'", (chat_id,))
             datosusuario = cursor.fetchall()
             #print(datosusuario)
@@ -99,7 +203,14 @@ def manejador_seleccion(message):
                         diasusuario.append(dia)
                     cantidaddias = diasusuario.count(dia)
                     for entrada, salida, _, dia in horarios_permitidos:
-                        if dia==diahoy and cantidaddias==1:
+                        if 'Siempre' in diasusuario:
+                            hora=str(caracas_now)[11:19]
+                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                            fecha=str(caracas_now)[:10]
+                            etapadia=1
+                            aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                            etapadiaapertura=1
+                        elif dia==diahoy and cantidaddias==1:
                             hora=str(caracas_now)[11:19]
                             horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                             fecha=str(caracas_now)[:10]
@@ -155,19 +266,13 @@ def manejador_seleccion(message):
                     aperturadenegada(cursor, conn) 
                     #print('este usuario no tiene horarios establecidos')
                 diasusuario=[]
-                    
-                
+               
             else:
                 aperturadenegada(cursor, conn) 
     except:
         pass
     finally:
-        
-        bot.send_message(chat_id=chatid,text='Pulse cualquier boton', reply_markup=keyboard())
-        markup = telebot.types.ReplyKeyboardMarkup()
-        markup.add("entrada principal")
-        markup.add("porton vehicular","puerta trasera")
-        bot.send_message(chat_id=chatid,text='que acceso desea abrir?', reply_markup=markup)
+        bot.delete_message(chat_id=chatid, message_id=messageid)
 
             
 
@@ -191,6 +296,8 @@ while True:
         cursor = conn.cursor()
 
         bot.infinity_polling()
+        bot.stop_polling()
+        
 
 
     except (Exception, psycopg2.Error) as error:

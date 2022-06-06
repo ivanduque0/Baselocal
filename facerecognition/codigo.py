@@ -301,7 +301,14 @@ while True:
                                                         diasusuario.append(dia)
                                                     cantidaddias = diasusuario.count(dia)
                                                     for entrada, salida, _, dia in horarios_permitidos:
-                                                        if dia==diahoy and cantidaddias==1:
+                                                        if 'Siempre' in diasusuario:
+                                                            hora=str(caracas_now)[11:19]
+                                                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                                                            fecha=str(caracas_now)[:10]
+                                                            etapadia=1
+                                                            aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula, cursor,conn)
+                                                            etapadiaapertura=1
+                                                        elif dia==diahoy and cantidaddias==1:
                                                             hora=str(caracas_now)[11:19]
                                                             horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                                             fecha=str(caracas_now)[:10]
