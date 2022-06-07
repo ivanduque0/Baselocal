@@ -43,10 +43,28 @@ while True:
         if len(tablaled) < 1:
             cursorlocal.execute('INSERT INTO led values(0)')
             connlocal.commit()
+            cursorlocal.execute('INSERT INTO led values(0)')
+            connlocal.commit()
+            cursorlocal.execute('INSERT INTO led values(0)')
+            connlocal.commit()
+            cursorlocal.execute('INSERT INTO led values(0)')
+            connlocal.commit()
         if len(tablasensor) < 1:
             cursorlocal.execute('INSERT INTO sensor values(0)')
             connlocal.commit()
+            cursorlocal.execute('INSERT INTO sensor values(0)')
+            connlocal.commit()
+            cursorlocal.execute('INSERT INTO sensor values(0)')
+            connlocal.commit()
+            cursorlocal.execute('INSERT INTO sensor values(0)')
+            connlocal.commit()
         if len(tablaantisp) < 1:
+            cursorlocal.execute('INSERT INTO antisp values(0,0)')
+            connlocal.commit()
+            cursorlocal.execute('INSERT INTO antisp values(0,0)')
+            connlocal.commit()
+            cursorlocal.execute('INSERT INTO antisp values(0,0)')
+            connlocal.commit()
             cursorlocal.execute('INSERT INTO antisp values(0,0)')
             connlocal.commit()
 
