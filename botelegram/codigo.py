@@ -44,6 +44,13 @@ opciones = ['''🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵
 🔶🔶🔶🔶 PUERTA TRASERA 🔶🔶🔶🔶
 🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶🔶''']
 
+markupentradaprincipal = telebot.types.InlineKeyboardMarkup()
+markupentradaprincipal.add(telebot.types.InlineKeyboardButton(text='ABRIR ENTRADA PRINCIPAL', callback_game=''))
+markupportonvehicular = telebot.types.InlineKeyboardMarkup()
+markupportonvehicular.add(telebot.types.InlineKeyboardButton(text='ABRIR PORTON VEHICULAR', callback_game=''))
+markuppuertatrasera = telebot.types.InlineKeyboardMarkup()
+markuppuertatrasera.add(telebot.types.InlineKeyboardButton(text='ABRIR PUERTA TRASERA', callback_game=''))
+
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf,connf):
     cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
     VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
@@ -66,9 +73,9 @@ def send_welcome(message):
     message.text
     chatid = message.chat.id
     #bot.send_message(chat_id=chatid,text='Pulse cualquier boton', reply_markup=keyboard())
-    bot.send_game(chat_id=chatid, game_short_name='entrada_principal')
-    bot.send_game(chat_id=chatid, game_short_name='porton_vehicular')
-    bot.send_game(chat_id=chatid, game_short_name='puerta_trasera')
+    bot.send_game(chat_id=chatid, game_short_name='entrada_principal', reply_markup=markupentradaprincipal)
+    bot.send_game(chat_id=chatid, game_short_name='porton_vehicular', reply_markup=markupportonvehicular)
+    bot.send_game(chat_id=chatid, game_short_name='puerta_trasera', reply_markup=markuppuertatrasera)
     bot.send_message(chat_id=chatid,text='que acceso desea abrir?', reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
