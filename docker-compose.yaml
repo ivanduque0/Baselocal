@@ -159,14 +159,14 @@ services:
    
    antispoofing:
    
-      image: ivanduque0/antispoofing:V1
+      image: ivanduque0/antispoofing:V1.1
       
       restart: always
       
       command: python3 codigo.py
       
-      volumes:
-         - ./antispoofing:/app
+      #volumes:
+         #- ./antispoofing:/app
          
       env_file:
          - .env.manager
