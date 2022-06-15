@@ -114,96 +114,41 @@ while True:
                 # Si se usa un sensor se deben descomentar estas lineas de abajo y se debe identar el resto del codigo
                 # cursor.execute('SELECT * FROM sensor')
                 # sensor_onoff = cursor.fetchall()
-                # if video is not None and sensor_onoff[0][0] == 1:
-                #vista_previa = 0  
-                ret,video = camara.read()
-                if video is None:
-                    camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
-                    ret,video = camara.read()
-                    cv2.destroyAllWindows()
-                #video = cv2.flip(video, 0)
-                #print(video)
-                
                 cursor.execute('SELECT * FROM sensor')
                 sensor_onoff = cursor.fetchall()
-                if video is not None and sensor_onoff[0][0] == 1:
-                #if video is not None:
-                    sensorflag=0
-                    alto, ancho, _ = video.shape
-                    K = np.float32([[1,0,100],[0,1,100]])
-                    video2 = cv2.warpAffine(video, K, (ancho+200,alto+200))
-                    alto2, ancho2, _ = video2.shape
-                    K = cv2.getRotationMatrix2D((ancho2 // 2, alto2 // 2), 90, 1)
-                    video2 = cv2.warpAffine(video2, K, (alto2,ancho2))
-                    K = np.float32([[1,0,-160],[0,1,-41]]) 
-                    # para resolucion de 640 x 480 = ([[1,0,-180],[0,1,-21]])
-                    # para resolucion de 360 x 240 = ([[1,0,-160],[0,1,-41]])
-                    video = cv2.warpAffine(video2, K, (alto, ancho))
-                    video = cv2.flip(video, 0)
-                    alto, ancho, _ = video.shape
-                    videorgb = cv2.cvtColor(video, cv2.COLOR_BGR2RGB)
-                    results = face_mesh.process(videorgb)
+                if sensor_onoff[0][0] == 1:
+                    #vista_previa = 0  
+                    ret,video = camara.read()
+                    if video is None:
+                        camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
+                        ret,video = camara.read()
+                        cv2.destroyAllWindows()
+                    #video = cv2.flip(video, 0)
+                    #print(video)
+                    
+                    
+                    if video is not None:
+                    #if video is not None:
+                        sensorflag=0
+                        alto, ancho, _ = video.shape
+                        K = np.float32([[1,0,100],[0,1,100]])
+                        video2 = cv2.warpAffine(video, K, (ancho+200,alto+200))
+                        alto2, ancho2, _ = video2.shape
+                        K = cv2.getRotationMatrix2D((ancho2 // 2, alto2 // 2), 90, 1)
+                        video2 = cv2.warpAffine(video2, K, (alto2,ancho2))
+                        K = np.float32([[1,0,-160],[0,1,-41]]) 
+                        # para resolucion de 640 x 480 = ([[1,0,-180],[0,1,-21]])
+                        # para resolucion de 360 x 240 = ([[1,0,-160],[0,1,-41]])
+                        video = cv2.warpAffine(video2, K, (alto, ancho))
+                        video = cv2.flip(video, 0)
+                        alto, ancho, _ = video.shape
+                        videorgb = cv2.cvtColor(video, cv2.COLOR_BGR2RGB)
+                        results = face_mesh.process(videorgb)
 
-                    if results.multi_face_landmarks is not None:
+                        if results.multi_face_landmarks is not None:
 
-                        for face_landmarks in results.multi_face_landmarks:
-                            
-                            #mejilla derecha
-                            y_447 = int(face_landmarks.landmark[447].y * alto) 
-                            x_447 = int(face_landmarks.landmark[447].x * ancho) 
-                            #mejilla izquierda
-                            y_227 = int(face_landmarks.landmark[227].y * alto)
-                            x_227 = int(face_landmarks.landmark[227].x * ancho)
-                            #frente  
-                            y_10 = int(face_landmarks.landmark[10].y * alto)
-                            x_10 = int(face_landmarks.landmark[10].x * ancho)
-                            #barbilla
-                            y_175 = int(face_landmarks.landmark[175].y * alto)
-                            x_175 = int(face_landmarks.landmark[175].x * ancho)
-
-                        #creando coordenadas de cada punto
-                        p1 = np.array([x_447, y_447])
-                        p2 = np.array([x_227, y_227])
-                        p3 = np.array([x_227, y_447])
-
-                        #obteniendo distancias entre los puntos
-                        d1 = np.linalg.norm(p1-p2)
-                        d2 = np.linalg.norm(p1-p3)
-
-                        angulo = degrees(acos(d2/d1))
-                        
-                        #haciendo que el angulo sea negativo cuando se rote la cabeza
-                        #a la derecha
-                        if y_227 < y_447:
-                            angulo= -angulo
-
-                        #registrando la rotacion
-                        m = cv2.getRotationMatrix2D((ancho // 2, alto // 2), -angulo, 1)
-                        
-                        #crearndo nueva ventana y dandole la rotacion a la imagen
-                        alinear = cv2.warpAffine(video, m, (ancho,alto))
-                        alinear_rgb = cv2.cvtColor(alinear, cv2.COLOR_BGR2RGB)
-                            #cv2.imshow("alinear", alinear)
-                            
-                        results2 = face_mesh.process(alinear_rgb)
-                        
-                        if results2.multi_face_landmarks is not None:
-
-                            for face_landmarks in results2.multi_face_landmarks:
-
-                                #puntos de los parpados 
-                                y_386 = int(face_landmarks.landmark[386].y * alto*10) 
-                                y_374 = int(face_landmarks.landmark[374].y * alto*10) 
-                                y_159 = int(face_landmarks.landmark[159].y * alto*10)
-                                y_145 = int(face_landmarks.landmark[145].y * alto*10)
-                                x_386 = int(face_landmarks.landmark[386].x * ancho*10) 
-                                x_374 = int(face_landmarks.landmark[374].x * ancho*10) 
-                                x_159 = int(face_landmarks.landmark[159].x * ancho*10)
-                                x_145 = int(face_landmarks.landmark[145].x * ancho*10)
-
-                                y_1 = int(face_landmarks.landmark[1].y * alto)
-                                x_1 = int(face_landmarks.landmark[1].x * ancho)
-
+                            for face_landmarks in results.multi_face_landmarks:
+                                
                                 #mejilla derecha
                                 y_447 = int(face_landmarks.landmark[447].y * alto) 
                                 x_447 = int(face_landmarks.landmark[447].x * ancho) 
@@ -216,300 +161,356 @@ while True:
                                 #barbilla
                                 y_175 = int(face_landmarks.landmark[175].y * alto)
                                 x_175 = int(face_landmarks.landmark[175].x * ancho)
+
+                            #creando coordenadas de cada punto
+                            p1 = np.array([x_447, y_447])
+                            p2 = np.array([x_227, y_227])
+                            p3 = np.array([x_227, y_447])
+
+                            #obteniendo distancias entre los puntos
+                            d1 = np.linalg.norm(p1-p2)
+                            d2 = np.linalg.norm(p1-p3)
+
+                            angulo = degrees(acos(d2/d1))
                             
+                            #haciendo que el angulo sea negativo cuando se rote la cabeza
+                            #a la derecha
+                            if y_227 < y_447:
+                                angulo= -angulo
 
-                            #if xmin < 0 or ymin < 0:
-                            #    continue
-                            if y_10 >=20 and x_227 >= 20:
-                                vista_previargb = alinear_rgb[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
-                                #vista_previargb = cv2.cvtColor(vista_previa, cv2.COLOR_BGR2RGB)
-                                altog, anchog, _ = vista_previargb.shape
-                                vista_previargb = cv2.resize(vista_previargb, (anchog+100,altog+100))
+                            #registrando la rotacion
+                            m = cv2.getRotationMatrix2D((ancho // 2, alto // 2), -angulo, 1)
                             
-
-                                p1 = np.array([x_386, y_386])
-                                p2 = np.array([x_386, y_374])
-                                p3 = np.array([x_386, y_159])
-                                p4 = np.array([x_386, y_145])
-
-                                d1 = np.linalg.norm(p1-p2)
-                                d2 = np.linalg.norm(p4-p3)
+                            #crearndo nueva ventana y dandole la rotacion a la imagen
+                            alinear = cv2.warpAffine(video, m, (ancho,alto))
+                            alinear_rgb = cv2.cvtColor(alinear, cv2.COLOR_BGR2RGB)
+                                #cv2.imshow("alinear", alinear)
                                 
-                                # dify1_1=
-                                # dify1_2=
+                            results2 = face_mesh.process(alinear_rgb)
+                            
+                            if results2.multi_face_landmarks is not None:
 
+                                for face_landmarks in results2.multi_face_landmarks:
+
+                                    #puntos de los parpados 
+                                    y_386 = int(face_landmarks.landmark[386].y * alto*10) 
+                                    y_374 = int(face_landmarks.landmark[374].y * alto*10) 
+                                    y_159 = int(face_landmarks.landmark[159].y * alto*10)
+                                    y_145 = int(face_landmarks.landmark[145].y * alto*10)
+                                    x_386 = int(face_landmarks.landmark[386].x * ancho*10) 
+                                    x_374 = int(face_landmarks.landmark[374].x * ancho*10) 
+                                    x_159 = int(face_landmarks.landmark[159].x * ancho*10)
+                                    x_145 = int(face_landmarks.landmark[145].x * ancho*10)
+
+                                    y_1 = int(face_landmarks.landmark[1].y * alto)
+                                    x_1 = int(face_landmarks.landmark[1].x * ancho)
+
+                                    #mejilla derecha
+                                    y_447 = int(face_landmarks.landmark[447].y * alto) 
+                                    x_447 = int(face_landmarks.landmark[447].x * ancho) 
+                                    #mejilla izquierda
+                                    y_227 = int(face_landmarks.landmark[227].y * alto)
+                                    x_227 = int(face_landmarks.landmark[227].x * ancho)
+                                    #frente  
+                                    y_10 = int(face_landmarks.landmark[10].y * alto)
+                                    x_10 = int(face_landmarks.landmark[10].x * ancho)
+                                    #barbilla
+                                    y_175 = int(face_landmarks.landmark[175].y * alto)
+                                    x_175 = int(face_landmarks.landmark[175].x * ancho)
                                 
 
-                                if t2-t1 >= 0.7 and (x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10):
-                                #if x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10:
-                                    yref = y_1
-                                    xref = x_1
+                                #if xmin < 0 or ymin < 0:
+                                #    continue
+                                if y_10 >=20 and x_227 >= 20:
+                                    vista_previargb = alinear_rgb[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
+                                    #vista_previargb = cv2.cvtColor(vista_previa, cv2.COLOR_BGR2RGB)
+                                    altog, anchog, _ = vista_previargb.shape
+                                    vista_previargb = cv2.resize(vista_previargb, (anchog+100,altog+100))
                                 
-                                if xrefold != 0 and (xrefold != xref or yrefold != yref):
-                                    xref=0
-                                    yref=0
-                                
-                            # if cv2.waitKey(1) & 0xFF == ord('e'):
-                            #     razon = "entrada"
-                
-                            # if cv2.waitKey(1) & 0xFF == ord('s'):
-                            #     razon = "salida"
 
-                                dif1 = (d1old*17)/100
-                                dif2 = (d2old*17)/100
+                                    p1 = np.array([x_386, y_386])
+                                    p2 = np.array([x_386, y_374])
+                                    p3 = np.array([x_386, y_159])
+                                    p4 = np.array([x_386, y_145])
 
-                                if d1>=d1old and d2>=d2old:
-                                    parpado=1
-                                t2=time.perf_counter()
-                                if t2-t1 < 0:
-                                    t2=0
-                                if d1<=d1old-dif1 and d2<=d2old-dif2 and parpado==1 and x_1 <= xrefold+5 and x_1>=xrefold-5 and y_1 <= yrefold+5 and y_1 >= yrefold-5 and xref == xrefold and yref == yrefold:
-                                    parpadeos=parpadeos+1         
-                                    #face_locations = face_recognition.face_locations(alinear_rgb)
-                                    encodingcamara = face_recognition.face_encodings(vista_previargb)          
-                                    if encodingcamara != []:
-
-                                        encodingcamaraa = face_recognition.face_encodings(vista_previargb)[0]
-
-                                        resultado = face_recognition.compare_faces(caras, encodingcamaraa, tolerance=0.5)
-
-                                        #nombre = "rostro no identificado. parpadee otra vez"
-                                        nombrefoto = []
-                                        etapadia=0
-                                        etapadiaapertura=0
-                                        if True in resultado:
-                                            tz = pytz.timezone('America/Caracas')
-                                            caracas_now = datetime.now(tz)
-                                            rostro_encontrado = resultado.index(True)
-                                            nombrefoto = nombres[rostro_encontrado]
-                                            fotoconsulta = f'media/{directorio}/{nombrefoto}'
-                                            cursor.execute('SELECT cedula_id FROM web_fotos where foto=%s', (fotoconsulta,))
-                                            cedula_id = cursor.fetchall()
-                                            cedula_id = cedula_id[0][0]
-                                            dia = caracas_now.weekday()
-                                            diahoy = dias_semana[dia]
-                                            cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula_id,))
-                                            horarios_permitidos = cursor.fetchall()
-                                            if horarios_permitidos != []:
-                                                cursor.execute('SELECT * FROM web_usuarios where cedula=%s', (cedula_id,))
-                                                nombrecedula = cursor.fetchall()
-                                                nombre=nombrecedula[0][1]
-                                                cursor.execute('SELECT * FROM antisp')
-                                                antispoofing = cursor.fetchall()
-                                                if antispoofing[0][0]<antispoofing[0][1]:
-                                                    for entrada, salida, _, dia in horarios_permitidos:
-                                                        diasusuario.append(dia)
-                                                    cantidaddias = diasusuario.count(dia)
-                                                    for entrada, salida, _, dia in horarios_permitidos:
-                                                        if 'Siempre' in diasusuario:
-                                                            hora=str(caracas_now)[11:19]
-                                                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
-                                                            fecha=str(caracas_now)[:10]
-                                                            etapadia=1
-                                                            aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
-                                                            etapadiaapertura=1
-                                                        elif dia==diahoy and cantidaddias==1:
-                                                            hora=str(caracas_now)[11:19]
-                                                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
-                                                            fecha=str(caracas_now)[:10]
-                                                            etapadia=1
-                                                            if entrada<salida:
-                                                                if horahoy >= entrada and horahoy <= salida:
-                                                                    #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
-                                                                    etapadiaapertura=1
-                                                                else:
-                                                                    aperturadenegada(cursor, conn)
-                                                                    #print('fuera de horario')
-                                                            if entrada>salida:
-                                                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
-                                                                    #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
-                                                                    etapadiaapertura=1
-                                                                else:
-                                                                    aperturadenegada(cursor, conn)
-                                                                    #print('fuera de horario')
-                                                        elif dia==diahoy and cantidaddias>1:
-                                                            hora=str(caracas_now)[11:19]
-                                                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
-                                                            fecha=str(caracas_now)[:10]
-                                                            etapadia=1
-                                                            if entrada<salida:
-                                                                if horahoy >= entrada and horahoy <= salida:
-                                                                    #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
-                                                                    etapadiaapertura=1
-                                                                    contadoraux=0
-                                                                else:
-                                                                    contadoraux = contadoraux+1
-                                                                    if contadoraux == cantidaddias:
-                                                                        aperturadenegada(cursor, conn)
-                                                                        contadoraux=0
-                                                            if entrada>salida:
-                                                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
-                                                                    #print('entrada concedida')
-                                                                    aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
-                                                                    etapadiaapertura=1
-                                                                    contadoraux=0
-                                                                else:
-                                                                    contadoraux = contadoraux+1
-                                                                    if contadoraux == cantidaddias:
-                                                                        aperturadenegada(cursor, conn)
-                                                                        contadoraux=0
-                                                                    #print('fuera de horario')
-                                                    if etapadia==0 and etapadiaapertura==0:
-                                                        aperturadenegada(cursor, conn)
-                                                        #print('Dia no permitido')
-                                            if horarios_permitidos == []:
-                                                aperturadenegada(cursor, conn) 
-                                                #print('este usuario no tiene horarios establecidos')
-                                            diasusuario=[]    
-                                        if nombrefoto == []:
-                                            aperturadenegada(cursor, conn)
-                                            
-                                        #print(nombre)
-                                    #print(f"numero de parpadeos en esta sesion= {parpadeos}")
-                                    parpado=0
-                                    d1old=0
-                                    d2old=0
+                                    d1 = np.linalg.norm(p1-p2)
+                                    d2 = np.linalg.norm(p4-p3)
                                     
-                                if t2-t1 >= 0.9:
-                                    d1old=d1
-                                    d2old=d2
-                                    t1=time.perf_counter()
-                                
-                                xrefold=xref
-                                yrefold=yref
-                                    
-                    #tecla = cv2.waitKey(1)
+                                    # dify1_1=
+                                    # dify1_2=
 
-                    #esto es solo para simular la entrada y salida para las consultas
-                    #if tecla & 0xFF == 226:
-                    #   razon = "entrada"
+                                    
+
+                                    if t2-t1 >= 0.7 and (x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10):
+                                    #if x_1 >= xref+10 or x_1 <= xref-10 or y_1 >= yref+10 or y_1 <= yref-10:
+                                        yref = y_1
+                                        xref = x_1
+                                    
+                                    if xrefold != 0 and (xrefold != xref or yrefold != yref):
+                                        xref=0
+                                        yref=0
+                                    
+                                # if cv2.waitKey(1) & 0xFF == ord('e'):
+                                #     razon = "entrada"
                     
-                    #if tecla & 0xFF == 225:
-                    #   razon = "salida"
+                                # if cv2.waitKey(1) & 0xFF == ord('s'):
+                                #     razon = "salida"
 
-                    imagenes = os.listdir(directorio)
+                                    dif1 = (d1old*17)/100
+                                    dif2 = (d2old*17)/100
 
-                    if len(nombres) > len(imagenes):
-                        for img in nombres:
-                            try:
-                                nombreencarpeta=f'{img}.jpg'  
-                                imagenes.index(nombreencarpeta)       
-                            except ValueError:
-                                indice = nombres.index(img)   
-                                nombres.pop(indice)
-                                caras.pop(indice)
-                                #print(nombres)
-                                #print(nombres)
-                                
-                        #imagenes = os.listdir(directorio)
+                                    if d1>=d1old and d2>=d2old:
+                                        parpado=1
+                                    t2=time.perf_counter()
+                                    if t2-t1 < 0:
+                                        t2=0
+                                    if d1<=d1old-dif1 and d2<=d2old-dif2 and parpado==1 and x_1 <= xrefold+5 and x_1>=xrefold-5 and y_1 <= yrefold+5 and y_1 >= yrefold-5 and xref == xrefold and yref == yrefold:
+                                        parpadeos=parpadeos+1         
+                                        #face_locations = face_recognition.face_locations(alinear_rgb)
+                                        encodingcamara = face_recognition.face_encodings(vista_previargb)          
+                                        if encodingcamara != []:
+
+                                            encodingcamaraa = face_recognition.face_encodings(vista_previargb)[0]
+
+                                            resultado = face_recognition.compare_faces(caras, encodingcamaraa, tolerance=0.5)
+
+                                            #nombre = "rostro no identificado. parpadee otra vez"
+                                            nombrefoto = []
+                                            etapadia=0
+                                            etapadiaapertura=0
+                                            if True in resultado:
+                                                tz = pytz.timezone('America/Caracas')
+                                                caracas_now = datetime.now(tz)
+                                                rostro_encontrado = resultado.index(True)
+                                                nombrefoto = nombres[rostro_encontrado]
+                                                fotoconsulta = f'media/{directorio}/{nombrefoto}'
+                                                cursor.execute('SELECT cedula_id FROM web_fotos where foto=%s', (fotoconsulta,))
+                                                cedula_id = cursor.fetchall()
+                                                cedula_id = cedula_id[0][0]
+                                                dia = caracas_now.weekday()
+                                                diahoy = dias_semana[dia]
+                                                cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula_id,))
+                                                horarios_permitidos = cursor.fetchall()
+                                                if horarios_permitidos != []:
+                                                    cursor.execute('SELECT * FROM web_usuarios where cedula=%s', (cedula_id,))
+                                                    nombrecedula = cursor.fetchall()
+                                                    nombre=nombrecedula[0][1]
+                                                    cursor.execute('SELECT * FROM antisp')
+                                                    antispoofing = cursor.fetchall()
+                                                    if antispoofing[0][0]<antispoofing[0][1]:
+                                                        for entrada, salida, _, dia in horarios_permitidos:
+                                                            diasusuario.append(dia)
+                                                        cantidaddias = diasusuario.count(dia)
+                                                        for entrada, salida, _, dia in horarios_permitidos:
+                                                            if 'Siempre' in diasusuario:
+                                                                hora=str(caracas_now)[11:19]
+                                                                horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                                                                fecha=str(caracas_now)[:10]
+                                                                etapadia=1
+                                                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                etapadiaapertura=1
+                                                            elif dia==diahoy and cantidaddias==1:
+                                                                hora=str(caracas_now)[11:19]
+                                                                horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                                                                fecha=str(caracas_now)[:10]
+                                                                etapadia=1
+                                                                if entrada<salida:
+                                                                    if horahoy >= entrada and horahoy <= salida:
+                                                                        #print('entrada concedida')
+                                                                        aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                        etapadiaapertura=1
+                                                                    else:
+                                                                        aperturadenegada(cursor, conn)
+                                                                        #print('fuera de horario')
+                                                                if entrada>salida:
+                                                                    if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                                                        #print('entrada concedida')
+                                                                        aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                        etapadiaapertura=1
+                                                                    else:
+                                                                        aperturadenegada(cursor, conn)
+                                                                        #print('fuera de horario')
+                                                            elif dia==diahoy and cantidaddias>1:
+                                                                hora=str(caracas_now)[11:19]
+                                                                horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                                                                fecha=str(caracas_now)[:10]
+                                                                etapadia=1
+                                                                if entrada<salida:
+                                                                    if horahoy >= entrada and horahoy <= salida:
+                                                                        #print('entrada concedida')
+                                                                        aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                        etapadiaapertura=1
+                                                                        contadoraux=0
+                                                                    else:
+                                                                        contadoraux = contadoraux+1
+                                                                        if contadoraux == cantidaddias:
+                                                                            aperturadenegada(cursor, conn)
+                                                                            contadoraux=0
+                                                                if entrada>salida:
+                                                                    if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                                                        #print('entrada concedida')
+                                                                        aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                        etapadiaapertura=1
+                                                                        contadoraux=0
+                                                                    else:
+                                                                        contadoraux = contadoraux+1
+                                                                        if contadoraux == cantidaddias:
+                                                                            aperturadenegada(cursor, conn)
+                                                                            contadoraux=0
+                                                                        #print('fuera de horario')
+                                                        if etapadia==0 and etapadiaapertura==0:
+                                                            aperturadenegada(cursor, conn)
+                                                            #print('Dia no permitido')
+                                                if horarios_permitidos == []:
+                                                    aperturadenegada(cursor, conn) 
+                                                    #print('este usuario no tiene horarios establecidos')
+                                                diasusuario=[]    
+                                            if nombrefoto == []:
+                                                aperturadenegada(cursor, conn)
+                                                
+                                            #print(nombre)
+                                        #print(f"numero de parpadeos en esta sesion= {parpadeos}")
+                                        parpado=0
+                                        d1old=0
+                                        d2old=0
+                                        
+                                    if t2-t1 >= 0.9:
+                                        d1old=d1
+                                        d2old=d2
+                                        t1=time.perf_counter()
+                                    
+                                    xrefold=xref
+                                    yrefold=yref
+                                        
+                        #tecla = cv2.waitKey(1)
+
+                        #esto es solo para simular la entrada y salida para las consultas
+                        #if tecla & 0xFF == 226:
+                        #   razon = "entrada"
                         
-                        # print(nombres)
-                        # caras2 = np.array(caras)
-                        # print(caras2.shape)
+                        #if tecla & 0xFF == 225:
+                        #   razon = "salida"
 
-                    if len(imagenes) > len(nombres):
-                        for img in imagenes:
-                            nombrecarpeta=os.path.splitext(img)[0]
-                            fotoconsulta = f'media/{directorio}/{nombrecarpeta}'
-                            try:      
-                                comprobar = nombres.index(nombrecarpeta)
-                            except ValueError:
-                                ruta=os.path.join(directorio,img)
-                                subir_foto = cv2.imread(ruta)
-                                subir_foto = cv2.cvtColor(subir_foto, cv2.COLOR_BGR2RGB)
-                                altocut, anchocut, _ = subir_foto.shape
-                                resultscut = face_mesh.process(subir_foto)
-                                if resultscut.multi_face_landmarks is not None:
-                                    for face_landmarks in resultscut.multi_face_landmarks:
-                                        #mejilla derecha
-                                        y_447 = int(face_landmarks.landmark[447].y * altocut) 
-                                        x_447 = int(face_landmarks.landmark[447].x * anchocut) 
-                                        #mejilla izquierda
-                                        y_227 = int(face_landmarks.landmark[227].y * altocut)
-                                        x_227 = int(face_landmarks.landmark[227].x * anchocut)
+                        imagenes = os.listdir(directorio)
 
-                                    #creando coordenadas de cada punto
-                                    p1cut = np.array([x_447, y_447])
-                                    p2cut = np.array([x_227, y_227])
-                                    p3cut = np.array([x_227, y_447])
-
-                                    #obteniendo distancias entre los puntos
-                                    d1cut = np.linalg.norm(p1cut-p2cut)
-                                    d2cut = np.linalg.norm(p1cut-p3cut)
-
-                                    angulocut = degrees(acos(d2cut/d1cut))
+                        if len(nombres) > len(imagenes):
+                            for img in nombres:
+                                try:
+                                    nombreencarpeta=f'{img}.jpg'  
+                                    imagenes.index(nombreencarpeta)       
+                                except ValueError:
+                                    indice = nombres.index(img)   
+                                    nombres.pop(indice)
+                                    caras.pop(indice)
+                                    #print(nombres)
+                                    #print(nombres)
                                     
-                                    #haciendo que el angulo sea negativo cuando se rote la cabeza
-                                    #a la derecha
-                                    if y_227 < y_447:
-                                        angulocut= -angulocut
+                            #imagenes = os.listdir(directorio)
+                            
+                            # print(nombres)
+                            # caras2 = np.array(caras)
+                            # print(caras2.shape)
 
-                                    #registrando la rotacion
-                                    mcut = cv2.getRotationMatrix2D((anchocut // 2, altocut // 2), -angulocut, 1)
-                                    
-                                    #crearndo nueva ventana y dandole la rotacion a la imagen
-                                    alinearcut = cv2.warpAffine(subir_foto, mcut, (anchocut,altocut))
-                                    altocut2, anchocut2, _ = alinearcut.shape
-                                    resultscut2 = face_mesh.process(alinearcut)
-
-                                    if resultscut2.multi_face_landmarks is not None:
-                                        for face_landmarks in resultscut2.multi_face_landmarks:
+                        if len(imagenes) > len(nombres):
+                            for img in imagenes:
+                                nombrecarpeta=os.path.splitext(img)[0]
+                                fotoconsulta = f'media/{directorio}/{nombrecarpeta}'
+                                try:      
+                                    comprobar = nombres.index(nombrecarpeta)
+                                except ValueError:
+                                    ruta=os.path.join(directorio,img)
+                                    subir_foto = cv2.imread(ruta)
+                                    subir_foto = cv2.cvtColor(subir_foto, cv2.COLOR_BGR2RGB)
+                                    altocut, anchocut, _ = subir_foto.shape
+                                    resultscut = face_mesh.process(subir_foto)
+                                    if resultscut.multi_face_landmarks is not None:
+                                        for face_landmarks in resultscut.multi_face_landmarks:
                                             #mejilla derecha
                                             y_447 = int(face_landmarks.landmark[447].y * altocut) 
                                             x_447 = int(face_landmarks.landmark[447].x * anchocut) 
                                             #mejilla izquierda
                                             y_227 = int(face_landmarks.landmark[227].y * altocut)
                                             x_227 = int(face_landmarks.landmark[227].x * anchocut)
-                                            #frente  
-                                            y_10 = int(face_landmarks.landmark[10].y * altocut)
-                                            x_10 = int(face_landmarks.landmark[10].x * anchocut)
-                                            #barbilla
-                                            y_175 = int(face_landmarks.landmark[175].y * altocut)
-                                            x_175 = int(face_landmarks.landmark[175].x * anchocut)
 
-                                        if y_10 >=20 and x_227 >= 20:
-                                            subir_fotocut = alinearcut[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
-                                            decodificar = face_recognition.face_encodings(subir_fotocut)
-                                            if decodificar != []:
-                                                decodificar = face_recognition.face_encodings(subir_foto)[0]
-                                                caras.append(decodificar)
-                                                nombre = os.path.splitext(img)[0]
-                                                nombres.append(nombre)
-                                                cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
-                                                conn.commit()
-                                            else:
-                                                cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
-                                                conn.commit()
-                                    else:
-                                        cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
-                                        conn.commit()
-                                    
-                        for img in imagenes:
-                            nombre=os.path.splitext(img)[0]
-                            try:
-                                comprobar = nombres.index(nombre)
-                            except ValueError:
-                                ruta=os.path.join(directorio,img)
-                                os.remove(ruta)
-                                #imagenes = os.listdir(directorio)
-                                #print(f"rostro {nombre} no registrado!")
-                        
-                        # print(nombres)
-                        # caras2 = np.array(caras)
-                        # print(caras2.shape)
-                        
-                    #cv2.imshow('imagenp', vista_previa)
-                    #cv2.imshow('imageng', vista_previargb)
-                    #cv2.imshow('imagenn', video)
-                    
+                                        #creando coordenadas de cada punto
+                                        p1cut = np.array([x_447, y_447])
+                                        p2cut = np.array([x_227, y_227])
+                                        p3cut = np.array([x_227, y_447])
 
-                    #if tecla & 0xFF == 27:
-                    #   break
-                    
-                    #tecla = 0
+                                        #obteniendo distancias entre los puntos
+                                        d1cut = np.linalg.norm(p1cut-p2cut)
+                                        d2cut = np.linalg.norm(p1cut-p3cut)
+
+                                        angulocut = degrees(acos(d2cut/d1cut))
+                                        
+                                        #haciendo que el angulo sea negativo cuando se rote la cabeza
+                                        #a la derecha
+                                        if y_227 < y_447:
+                                            angulocut= -angulocut
+
+                                        #registrando la rotacion
+                                        mcut = cv2.getRotationMatrix2D((anchocut // 2, altocut // 2), -angulocut, 1)
+                                        
+                                        #crearndo nueva ventana y dandole la rotacion a la imagen
+                                        alinearcut = cv2.warpAffine(subir_foto, mcut, (anchocut,altocut))
+                                        altocut2, anchocut2, _ = alinearcut.shape
+                                        resultscut2 = face_mesh.process(alinearcut)
+
+                                        if resultscut2.multi_face_landmarks is not None:
+                                            for face_landmarks in resultscut2.multi_face_landmarks:
+                                                #mejilla derecha
+                                                y_447 = int(face_landmarks.landmark[447].y * altocut) 
+                                                x_447 = int(face_landmarks.landmark[447].x * anchocut) 
+                                                #mejilla izquierda
+                                                y_227 = int(face_landmarks.landmark[227].y * altocut)
+                                                x_227 = int(face_landmarks.landmark[227].x * anchocut)
+                                                #frente  
+                                                y_10 = int(face_landmarks.landmark[10].y * altocut)
+                                                x_10 = int(face_landmarks.landmark[10].x * anchocut)
+                                                #barbilla
+                                                y_175 = int(face_landmarks.landmark[175].y * altocut)
+                                                x_175 = int(face_landmarks.landmark[175].x * anchocut)
+
+                                            if y_10 >=20 and x_227 >= 20:
+                                                subir_fotocut = alinearcut[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
+                                                decodificar = face_recognition.face_encodings(subir_fotocut)
+                                                if decodificar != []:
+                                                    decodificar = face_recognition.face_encodings(subir_foto)[0]
+                                                    caras.append(decodificar)
+                                                    nombre = os.path.splitext(img)[0]
+                                                    nombres.append(nombre)
+                                                    cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
+                                                    conn.commit()
+                                                else:
+                                                    cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
+                                                    conn.commit()
+                                        else:
+                                            cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
+                                            conn.commit()
+                                        
+                            for img in imagenes:
+                                nombre=os.path.splitext(img)[0]
+                                try:
+                                    comprobar = nombres.index(nombre)
+                                except ValueError:
+                                    ruta=os.path.join(directorio,img)
+                                    os.remove(ruta)
+                                    #imagenes = os.listdir(directorio)
+                                    #print(f"rostro {nombre} no registrado!")
+                            
+                            # print(nombres)
+                            # caras2 = np.array(caras)
+                            # print(caras2.shape)
+                            
+                        #cv2.imshow('imagenp', vista_previa)
+                        #cv2.imshow('imageng', vista_previargb)
+                        #cv2.imshow('imagenn', video)
+                        
+
+                        #if tecla & 0xFF == 27:
+                        #   break
+                        
+                        #tecla = 0
                 else:
                     if sensorflag==0:
                         camara.release()
