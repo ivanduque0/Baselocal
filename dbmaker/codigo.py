@@ -69,7 +69,7 @@ while True:
             connlocal.commit()
 
     except (Exception, psycopg2.Error) as error:
-        print("fallo en hacer las consultas")
+        #print("fallo en hacer las consultas")
         if connlocal:
             cursorlocal.close()
             connlocal.close()

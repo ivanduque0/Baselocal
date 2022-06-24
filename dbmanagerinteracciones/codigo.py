@@ -2,12 +2,8 @@ import psycopg2
 import os
 import subprocess
 import time
-import cloudinary
-import urllib.request
-import numpy as np
 import pytz
 from datetime import datetime
-import cv2
 
 CONTRATO=os.environ.get("CONTRATO")
 connlocal = None
@@ -83,7 +79,7 @@ while True:
                 t1=time.perf_counter()
 
     except (Exception, psycopg2.Error) as error:
-        print("fallo en hacer las consultas")
+        #print("fallo en hacer las consultas")
         if connlocal:
             cursorlocal.close()
             connlocal.close()
@@ -97,4 +93,4 @@ while True:
         if connheroku:
             cursorheroku.close()
             connheroku.close()
-            print("se ha cerrado la conexion a la base de datos")
+            #print("se ha cerrado la conexion a la base de datos")

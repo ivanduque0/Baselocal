@@ -308,14 +308,14 @@ while True:
 
 
     except (Exception, psycopg2.Error) as error:
-        print("fallo en hacer las consultas")
+        #print("fallo en hacer las consultas")
         total=0
 
     finally:
         if conn:
             cursor.close()
             conn.close()
-            print("se ha cerrado la conexion a la base de datos")
+            #print("se ha cerrado la conexion a la base de datos")
             total=0
 
 
