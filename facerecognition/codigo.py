@@ -62,7 +62,7 @@ sensorflag = 0
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf,connf):
     cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
     VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
-    cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+    cursorf.execute('''UPDATE led SET onoff=1 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
     connf.commit()
     
     #cursorf.execute('SELECT * FROM led')
@@ -72,7 +72,7 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     #    estado_led= cursor.fetchall()
 
 def aperturadenegada(cursorf, connf):
-    cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
+    cursorf.execute('''UPDATE led SET onoff=2 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
     connf.commit()
     
     #cursorf.execute('SELECT * FROM led')
@@ -114,7 +114,7 @@ while True:
                 # Si se usa un sensor se deben descomentar estas lineas de abajo y se debe identar el resto del codigo
                 # cursor.execute('SELECT * FROM sensor')
                 # sensor_onoff = cursor.fetchall()
-                cursor.execute('SELECT * FROM sensor')
+                cursor.execute('SELECT * FROM sensor WHERE acceso=%s', (os.environ.get("ACCESO"),))
                 sensor_onoff = cursor.fetchall()
                 if sensor_onoff[0][0] == 1:
                     #vista_previa = 0  

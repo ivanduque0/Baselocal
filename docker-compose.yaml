@@ -134,12 +134,14 @@ services:
       depends_on:
          - postgres
 
-   facerecognition:
+   facerecognition1:
 
       image: ivanduque0/dockermpfrpsy:v1
       
       environment:
          - DISPLAY=unix$DISPLAY
+         - HOST_STREAM=http://192.168.4.10:8080/?action=stream
+         - ACCESO=1
       
       restart: always
       
@@ -157,7 +159,77 @@ services:
       depends_on:
          - postgres
    
-   antispoofing:
+   facerecognition2:
+
+      image: ivanduque0/dockermpfrpsy:v1
+      
+      environment:
+         - DISPLAY=unix$DISPLAY
+         - HOST_STREAM=
+         - ACCESO=2
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./dbmanagerfotos/media/personas:/app/personas
+         - /tmp/.X11-unix:/tmp/.X11-unix
+         - /tmp/.docker.xauth:/tmp/.docker.xauth
+
+   facerecognition3:
+
+      image: ivanduque0/dockermpfrpsy:v1
+      
+      environment:
+         - DISPLAY=unix$DISPLAY
+         - HOST_STREAM=
+         - ACCESO=3
+      
+      restart: always
+
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./dbmanagerfotos/media/personas:/app/personas
+         - /tmp/.X11-unix:/tmp/.X11-unix
+         - /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+
+   facerecognition4:
+
+      image: ivanduque0/dockermpfrpsy:v1
+      
+      environment:
+         - DISPLAY=unix$DISPLAY
+         - HOST_STREAM=
+         - ACCESO=4
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./dbmanagerfotos/media/personas:/app/personas
+         - /tmp/.X11-unix:/tmp/.X11-unix
+         - /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing1:
    
       image: ivanduque0/antispoofing:V1.1
       
@@ -165,8 +237,9 @@ services:
       
       command: python3 codigo.py
       
-      #volumes:
-         #- ./antispoofing:/app
+      environment:
+         - HOSTSNAPSHOOT=http://192.168.20.148:8080/?action=snapshot
+         - ACCESO=1
          
       env_file:
          - .env.manager
@@ -174,6 +247,59 @@ services:
       depends_on:
          - postgres
 
+   antispoofing2:
+   
+      image: ivanduque0/antispoofing:V1.1
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      environment:
+         - HOSTSNAPSHOOT=
+         - ACCESO=2
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+
+   antispoofing3:
+   
+      image: ivanduque0/antispoofing:V1.1
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      environment:
+         - HOSTSNAPSHOOT=
+         - ACCESO=3
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+   
+   antispoofing4:
+   
+      image: ivanduque0/antispoofing:V1.1
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      environment:
+         - HOSTSNAPSHOOT=
+         - ACCESO=4
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
 
    
 
