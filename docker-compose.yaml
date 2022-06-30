@@ -141,6 +141,7 @@ services:
       environment:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=http://192.168.4.10:8080/?action=stream
+         - RAZON=
          - ACCESO=1
       
       restart: always
@@ -166,6 +167,7 @@ services:
       environment:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=
+         - RAZON=
          - ACCESO=2
       
       restart: always
@@ -186,6 +188,7 @@ services:
       environment:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=
+         - RAZON=
          - ACCESO=3
       
       restart: always
@@ -211,6 +214,7 @@ services:
       environment:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=
+         - RAZON=
          - ACCESO=4
       
       restart: always
