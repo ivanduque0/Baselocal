@@ -159,6 +159,24 @@ services:
       
       depends_on:
          - postgres
+
+   antispoofing1:
+   
+      image: ivanduque0/antispoofing:V1.1
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      environment:
+         - HOSTSNAPSHOOT=http://192.168.20.148:8080/?action=snapshot
+         - ACCESO=1
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
    
    facerecognition2:
 
@@ -180,6 +198,24 @@ services:
          - ./dbmanagerfotos/media/personas:/app/personas
          - /tmp/.X11-unix:/tmp/.X11-unix
          - /tmp/.docker.xauth:/tmp/.docker.xauth
+
+   antispoofing2:
+   
+      image: ivanduque0/antispoofing:V1.1
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      environment:
+         - HOSTSNAPSHOOT=
+         - ACCESO=2
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
 
    facerecognition3:
 
@@ -207,6 +243,24 @@ services:
       depends_on:
          - postgres
 
+   antispoofing3:
+   
+      image: ivanduque0/antispoofing:V1.1
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      environment:
+         - HOSTSNAPSHOOT=
+         - ACCESO=3
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+
    facerecognition4:
 
       image: ivanduque0/dockermpfrpsy:v1
@@ -229,60 +283,6 @@ services:
          - /tmp/.docker.xauth:/tmp/.docker.xauth
          
       privileged: true
-      
-      depends_on:
-         - postgres
-   
-   antispoofing1:
-   
-      image: ivanduque0/antispoofing:V1.1
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      environment:
-         - HOSTSNAPSHOOT=http://192.168.20.148:8080/?action=snapshot
-         - ACCESO=1
-         
-      env_file:
-         - .env.manager
-      
-      depends_on:
-         - postgres
-
-   antispoofing2:
-   
-      image: ivanduque0/antispoofing:V1.1
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      environment:
-         - HOSTSNAPSHOOT=
-         - ACCESO=2
-         
-      env_file:
-         - .env.manager
-      
-      depends_on:
-         - postgres
-
-   antispoofing3:
-   
-      image: ivanduque0/antispoofing:V1.1
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      environment:
-         - HOSTSNAPSHOOT=
-         - ACCESO=3
-         
-      env_file:
-         - .env.manager
       
       depends_on:
          - postgres
