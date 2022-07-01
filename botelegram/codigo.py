@@ -17,10 +17,10 @@ razon1=os.environ.get("RAZON_BOT1")
 razon2=os.environ.get("RAZON_BOT2")
 razon3=os.environ.get("RAZON_BOT3")
 razon4=os.environ.get("RAZON_BOT4")
-acceso1='ACCESO1'
-acceso2='ACCESO2'
-acceso3='ACCESO3'
-acceso4='ACCESO4'
+acceso1=os.environ.get('ACCESO1')
+acceso2=os.environ.get('ACCESO2')
+acceso3=os.environ.get('ACCESO3')
+acceso4=os.environ.get('ACCESO4')
 # pulseaqui = [
 #     'pulse aqui',
 #     'pulse aqui',
@@ -58,13 +58,13 @@ markupportonvehicular.add(telebot.types.InlineKeyboardButton(text='ABRIR PORTON 
 markuppuertatrasera = telebot.types.InlineKeyboardMarkup()
 markuppuertatrasera.add(telebot.types.InlineKeyboardButton(text='ABRIR PUERTA TRASERA', callback_game=''))
 
+
 def aperturaconcedida1(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf, connf, acceso):
     cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
     VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
     #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
     connf.commit()
     urllib.request.urlopen(os.environ.get(acceso))
-
 
 def aperturadenegada1(cursorf, connf, acceso):
     # cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
@@ -304,7 +304,7 @@ while True:
 
         conn = psycopg2.connect(
             database=os.environ.get("DATABASE"), 
-            user=os.environ.get("USER"), 
+            user=os.environ.get("USERDB"), 
             password=os.environ.get("PASSWORD"), 
             host=os.environ.get("HOST"), 
             port=os.environ.get("PORT")

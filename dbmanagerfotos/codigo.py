@@ -38,7 +38,7 @@ while True:
         #con esto se apunta a la base de datos local
         connlocal = psycopg2.connect(
             database=os.environ.get("DATABASE"), 
-            user=os.environ.get("USER"), 
+            user=os.environ.get("USERDB"), 
             password=os.environ.get("PASSWORD"), 
             host=os.environ.get("HOST"), 
             port=os.environ.get("PORT")
@@ -137,7 +137,7 @@ while True:
                     t1=time.perf_counter()
 
     except (Exception, psycopg2.Error) as error:
-        #print("fallo en hacer las consultas")
+        print("fallo en hacer las consultas")
         if connlocal:
             cursorlocal.close()
             connlocal.close()
@@ -145,10 +145,10 @@ while True:
             cursorheroku.close()
             connheroku.close()
     finally:
+        print("se ha cerrado la conexion a la base de datos")
         if connlocal:
             cursorlocal.close()
             connlocal.close()
         if connheroku:
             cursorheroku.close()
             connheroku.close()
-            #print("se ha cerrado la conexion a la base de datos")

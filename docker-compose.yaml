@@ -140,7 +140,7 @@ services:
       
       environment:
          - DISPLAY=unix$DISPLAY
-         - HOST_STREAM=http://192.168.4.10:8080/?action=stream
+         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
          - RAZON=
          - ACCESO=1
       
@@ -166,14 +166,17 @@ services:
       
       restart: always
       
-      command: python3 codigo.py
+      command: python3 codigo/codigo.py
       
       environment:
-         - HOSTSNAPSHOOT=http://192.168.20.148:8080/?action=snapshot
+         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
          - ACCESO=1
          
       env_file:
          - .env.manager
+
+      volumes:
+         - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres
@@ -205,7 +208,7 @@ services:
       
       restart: always
       
-      command: python3 codigo.py
+      command: python3 codigo/codigo.py
       
       environment:
          - HOSTSNAPSHOOT=
@@ -213,6 +216,9 @@ services:
          
       env_file:
          - .env.manager
+
+      volumes:
+         - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres
@@ -249,7 +255,7 @@ services:
       
       restart: always
       
-      command: python3 codigo.py
+      command: python3 codigo/codigo.py
       
       environment:
          - HOSTSNAPSHOOT=
@@ -257,6 +263,9 @@ services:
          
       env_file:
          - .env.manager
+
+      volumes:
+         - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres
@@ -293,7 +302,7 @@ services:
       
       restart: always
       
-      command: python3 codigo.py
+      command: python3 codigo/codigo.py
       
       environment:
          - HOSTSNAPSHOOT=
@@ -301,6 +310,9 @@ services:
          
       env_file:
          - .env.manager
+
+      volumes:
+         - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres

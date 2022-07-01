@@ -26,7 +26,7 @@ while True:
     try:
         conn = psycopg2.connect(
             database=os.environ.get("DATABASE"), 
-            user=os.environ.get("USER"), 
+            user=os.environ.get("USERDB"), 
             password=os.environ.get("PASSWORD"), 
             host=os.environ.get("HOST"), 
             port=os.environ.get("PORT")
@@ -79,7 +79,7 @@ while True:
                     nospoofingdb = consulta[0][1]        
             
     except (Exception, psycopg2.Error) as error:
-        #print("fallo en hacer las consultas")
+        print("fallo en hacer las consultas")
         total=0
         spoofing = 0
         nospoofing = 0
@@ -90,7 +90,7 @@ while True:
         if conn:
             cursor.close()
             conn.close()
-            #print("se ha cerrado la conexion a la base de datos")
+            print("se ha cerrado la conexion a la base de datos")
             total=0
             spoofing = 0
             nospoofing = 0
