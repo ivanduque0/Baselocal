@@ -142,6 +142,7 @@ services:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=http://192.168.21.117:8080/?action=stream
          - RAZON=
+         - URL_ACCESO=
          - ACCESO=1
       
       restart: always
@@ -189,6 +190,7 @@ services:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=
          - RAZON=
+         - URL_ACCESO=
          - ACCESO=2
       
       restart: always
@@ -231,6 +233,7 @@ services:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=
          - RAZON=
+         - URL_ACCESO=
          - ACCESO=3
       
       restart: always
@@ -278,6 +281,7 @@ services:
          - DISPLAY=unix$DISPLAY
          - HOST_STREAM=
          - RAZON=
+         - URL_ACCESO=
          - ACCESO=4
       
       restart: always

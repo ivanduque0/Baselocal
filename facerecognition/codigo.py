@@ -8,6 +8,7 @@ import os
 import time
 from math import  acos,degrees
 import mediapipe as mp
+import urllib.request
 
 conn = None
 dias_semana = ("Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo")
@@ -62,18 +63,21 @@ sensorflag = 0
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf,connf):
     cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
     VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
-    cursorf.execute('''UPDATE led SET onoff=1 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
+    #cursorf.execute('''UPDATE led SET onoff=1 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
     connf.commit()
-    
+    urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/on')
     #cursorf.execute('SELECT * FROM led')
     #estado_led= cursorf.fetchall()
     #while estado_led[0][0]==1:
     #    cursorf.execute('SELECT * FROM led')
     #    estado_led= cursor.fetchall()
 
-def aperturadenegada(cursorf, connf):
-    cursorf.execute('''UPDATE led SET onoff=2 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
-    connf.commit()
+def aperturadenegada():
+    urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/off')
+
+# def aperturadenegada(cursorf, connf):
+#     cursorf.execute('''UPDATE led SET onoff=2 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
+#     connf.commit()
     
     #cursorf.execute('SELECT * FROM led')
     #estado_led= cursorf.fetchall()
@@ -122,7 +126,7 @@ while True:
                     if video is None:
                         camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
                         ret,video = camara.read()
-                        cv2.destroyAllWindows()
+                        #cv2.destroyAllWindows()
                     #video = cv2.flip(video, 0)
                     #print(video)
                     
@@ -295,7 +299,7 @@ while True:
                                                     cursor.execute('SELECT * FROM web_usuarios where cedula=%s', (cedula_id,))
                                                     nombrecedula = cursor.fetchall()
                                                     nombre=nombrecedula[0][1]
-                                                    cursor.execute('SELECT * FROM antisp')
+                                                    cursor.execute('SELECT * FROM antisp WHERE acceso=%s', (os.environ.get("ACCESO"),))
                                                     antispoofing = cursor.fetchall()
                                                     if antispoofing[0][0]<antispoofing[0][1]:
                                                         for entrada, salida, _, dia in horarios_permitidos:
@@ -320,7 +324,7 @@ while True:
                                                                         aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
                                                                         etapadiaapertura=1
                                                                     else:
-                                                                        aperturadenegada(cursor, conn)
+                                                                        aperturadenegada()
                                                                         #print('fuera de horario')
                                                                 if entrada>salida:
                                                                     if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
@@ -328,7 +332,7 @@ while True:
                                                                         aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
                                                                         etapadiaapertura=1
                                                                     else:
-                                                                        aperturadenegada(cursor, conn)
+                                                                        aperturadenegada()
                                                                         #print('fuera de horario')
                                                             elif dia==diahoy and cantidaddias>1:
                                                                 hora=str(caracas_now)[11:19]
@@ -344,7 +348,7 @@ while True:
                                                                     else:
                                                                         contadoraux = contadoraux+1
                                                                         if contadoraux == cantidaddias:
-                                                                            aperturadenegada(cursor, conn)
+                                                                            aperturadenegada()
                                                                             contadoraux=0
                                                                 if entrada>salida:
                                                                     if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
@@ -355,18 +359,18 @@ while True:
                                                                     else:
                                                                         contadoraux = contadoraux+1
                                                                         if contadoraux == cantidaddias:
-                                                                            aperturadenegada(cursor, conn)
+                                                                            aperturadenegada()
                                                                             contadoraux=0
                                                                         #print('fuera de horario')
                                                         if etapadia==0 and etapadiaapertura==0:
-                                                            aperturadenegada(cursor, conn)
+                                                            aperturadenegada()
                                                             #print('Dia no permitido')
                                                 if horarios_permitidos == []:
-                                                    aperturadenegada(cursor, conn) 
+                                                    aperturadenegada() 
                                                     #print('este usuario no tiene horarios establecidos')
                                                 diasusuario=[]    
                                             if nombrefoto == []:
-                                                aperturadenegada(cursor, conn)
+                                                aperturadenegada()
                                                 
                                             #print(nombre)
                                         #print(f"numero de parpadeos en esta sesion= {parpadeos}")
@@ -391,6 +395,136 @@ while True:
                         #if tecla & 0xFF == 225:
                         #   razon = "salida"
 
+                        #---------------------------------------------se hizo que se cargaran nuevas fotos
+                        #de usuarios solo cuando no se detecte nadie usando el sistema
+                        #si se quiere que se registren solo cuando alguien lo use, descomentar lo de abajo
+                        #hasta el indicador "#------------------------------------------------"
+
+                        # imagenes = os.listdir(directorio)
+
+                        # if len(nombres) > len(imagenes):
+                        #     for img in nombres:
+                        #         try:
+                        #             nombreencarpeta=f'{img}.jpg'  
+                        #             imagenes.index(nombreencarpeta)       
+                        #         except ValueError:
+                        #             indice = nombres.index(img)   
+                        #             nombres.pop(indice)
+                        #             caras.pop(indice)
+                        #             #print(nombres)
+                        #             #print(nombres)
+                                    
+                        #     #imagenes = os.listdir(directorio)
+                            
+                        #     # print(nombres)
+                        #     # caras2 = np.array(caras)
+                        #     # print(caras2.shape)
+
+                        # if len(imagenes) > len(nombres):
+                        #     for img in imagenes:
+                        #         nombrecarpeta=os.path.splitext(img)[0]
+                        #         fotoconsulta = f'media/{directorio}/{nombrecarpeta}'
+                        #         try:      
+                        #             comprobar = nombres.index(nombrecarpeta)
+                        #         except ValueError:
+                        #             ruta=os.path.join(directorio,img)
+                        #             subir_foto = cv2.imread(ruta)
+                        #             subir_foto = cv2.cvtColor(subir_foto, cv2.COLOR_BGR2RGB)
+                        #             altocut, anchocut, _ = subir_foto.shape
+                        #             resultscut = face_mesh.process(subir_foto)
+                        #             if resultscut.multi_face_landmarks is not None:
+                        #                 for face_landmarks in resultscut.multi_face_landmarks:
+                        #                     #mejilla derecha
+                        #                     y_447 = int(face_landmarks.landmark[447].y * altocut) 
+                        #                     x_447 = int(face_landmarks.landmark[447].x * anchocut) 
+                        #                     #mejilla izquierda
+                        #                     y_227 = int(face_landmarks.landmark[227].y * altocut)
+                        #                     x_227 = int(face_landmarks.landmark[227].x * anchocut)
+
+                        #                 #creando coordenadas de cada punto
+                        #                 p1cut = np.array([x_447, y_447])
+                        #                 p2cut = np.array([x_227, y_227])
+                        #                 p3cut = np.array([x_227, y_447])
+
+                        #                 #obteniendo distancias entre los puntos
+                        #                 d1cut = np.linalg.norm(p1cut-p2cut)
+                        #                 d2cut = np.linalg.norm(p1cut-p3cut)
+
+                        #                 angulocut = degrees(acos(d2cut/d1cut))
+                                        
+                        #                 #haciendo que el angulo sea negativo cuando se rote la cabeza
+                        #                 #a la derecha
+                        #                 if y_227 < y_447:
+                        #                     angulocut= -angulocut
+
+                        #                 #registrando la rotacion
+                        #                 mcut = cv2.getRotationMatrix2D((anchocut // 2, altocut // 2), -angulocut, 1)
+                                        
+                        #                 #crearndo nueva ventana y dandole la rotacion a la imagen
+                        #                 alinearcut = cv2.warpAffine(subir_foto, mcut, (anchocut,altocut))
+                        #                 altocut2, anchocut2, _ = alinearcut.shape
+                        #                 resultscut2 = face_mesh.process(alinearcut)
+
+                        #                 if resultscut2.multi_face_landmarks is not None:
+                        #                     for face_landmarks in resultscut2.multi_face_landmarks:
+                        #                         #mejilla derecha
+                        #                         y_447 = int(face_landmarks.landmark[447].y * altocut) 
+                        #                         x_447 = int(face_landmarks.landmark[447].x * anchocut) 
+                        #                         #mejilla izquierda
+                        #                         y_227 = int(face_landmarks.landmark[227].y * altocut)
+                        #                         x_227 = int(face_landmarks.landmark[227].x * anchocut)
+                        #                         #frente  
+                        #                         y_10 = int(face_landmarks.landmark[10].y * altocut)
+                        #                         x_10 = int(face_landmarks.landmark[10].x * anchocut)
+                        #                         #barbilla
+                        #                         y_175 = int(face_landmarks.landmark[175].y * altocut)
+                        #                         x_175 = int(face_landmarks.landmark[175].x * anchocut)
+
+                        #                     if y_10 >=20 and x_227 >= 20:
+                        #                         subir_fotocut = alinearcut[y_10-20 : y_175 +20, x_227 - 20: x_447 +20]
+                        #                         decodificar = face_recognition.face_encodings(subir_fotocut)
+                        #                         if decodificar != []:
+                        #                             decodificar = face_recognition.face_encodings(subir_foto)[0]
+                        #                             caras.append(decodificar)
+                        #                             nombre = os.path.splitext(img)[0]
+                        #                             nombres.append(nombre)
+                        #                             cursor.execute('UPDATE web_fotos SET estado=1 WHERE foto=%s;', (fotoconsulta,))
+                        #                             conn.commit()
+                        #                         else:
+                        #                             cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
+                        #                             conn.commit()
+                        #                 else:
+                        #                     cursor.execute('UPDATE web_fotos SET estado=2 WHERE foto=%s;', (fotoconsulta,))
+                        #                     conn.commit()
+                                        
+                        #     for img in imagenes:
+                        #         nombre=os.path.splitext(img)[0]
+                        #         try:
+                        #             comprobar = nombres.index(nombre)
+                        #         except ValueError:
+                        #             ruta=os.path.join(directorio,img)
+                        #             os.remove(ruta)
+                        #             #imagenes = os.listdir(directorio)
+                        #             #print(f"rostro {nombre} no registrado!")
+                            
+                        #     # print(nombres)
+                        #     # caras2 = np.array(caras)
+                        #     # print(caras2.shape)
+
+                        #-------------------------------------------------
+
+                        #cv2.imshow('imagenp', vista_previa)
+                        #cv2.imshow('imageng', vista_previargb)
+                        #cv2.imshow('imagenn', video)
+                        
+
+                        #if tecla & 0xFF == 27:
+                        #   break
+                        
+                        #tecla = 0
+                else:
+                    if sensorflag==0:
+                        #camara.release()
                         imagenes = os.listdir(directorio)
 
                         if len(nombres) > len(imagenes):
@@ -495,40 +629,22 @@ while True:
                                 except ValueError:
                                     ruta=os.path.join(directorio,img)
                                     os.remove(ruta)
-                                    #imagenes = os.listdir(directorio)
-                                    #print(f"rostro {nombre} no registrado!")
-                            
-                            # print(nombres)
-                            # caras2 = np.array(caras)
-                            # print(caras2.shape)
-                            
-                        #cv2.imshow('imagenp', vista_previa)
-                        #cv2.imshow('imageng', vista_previargb)
-                        #cv2.imshow('imagenn', video)
-                        
 
-                        #if tecla & 0xFF == 27:
-                        #   break
-                        
-                        #tecla = 0
-                else:
-                    if sensorflag==0:
-                        camara.release()
                         sensorflag=1
         #camara.release()
         #cv2.destroyAllWindows()
 
     except (Exception, psycopg2.Error) as error:
-        #print("fallo en hacer las consultas")
+        print("fallo en hacer las consultas")
         camara.release()
-        cv2.destroyAllWindows()
+        #cv2.destroyAllWindows()
         total=0
 
     finally:
+        print("se ha cerrado la conexion a la base de datos")
         if conn:
             cursor.close()
             conn.close()
-            #print("se ha cerrado la conexion a la base de datos")
-            camara.release()
-            cv2.destroyAllWindows()
+            #camara.release()
+            #cv2.destroyAllWindows()
             total=0
