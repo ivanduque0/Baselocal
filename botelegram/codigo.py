@@ -12,6 +12,7 @@ ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 total=0
 token=os.environ.get("TOKEN_BOT")
+bot = telebot.TeleBot(token, parse_mode=None)
 CONTRATO=os.environ.get("CONTRATO")
 razon1=os.environ.get("RAZON_BOT1")
 razon2=os.environ.get("RAZON_BOT2")
@@ -310,21 +311,21 @@ while True:
             port=os.environ.get("PORT")
         )
         cursor = conn.cursor()
-        bot = telebot.TeleBot(token, parse_mode=None)
         bot.infinity_polling()
         bot.stop_polling()
+        bot = telebot.TeleBot(token, parse_mode=None)
         
 
 
     except (Exception, psycopg2.Error) as error:
-        #print("fallo en hacer las consultas")
+        print("fallo en hacer las consultas")
         total=0
 
     finally:
+        print("se ha cerrado la conexion a la base de datos")
         if conn:
             cursor.close()
             conn.close()
-            #print("se ha cerrado la conexion a la base de datos")
             total=0
 
 
