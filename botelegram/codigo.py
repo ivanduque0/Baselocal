@@ -6,7 +6,7 @@ import pytz
 from datetime import datetime
 from keyboa import Keyboa
 import urllib.request
-
+# import requests # PARA USAR CUANDO SE USE UN SERVIDOR LOCAL
 dias_semana = ("Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo")
 ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
@@ -22,6 +22,10 @@ acceso1=os.environ.get('URL_ACCESO1')
 acceso2=os.environ.get('URL_ACCESO2')
 acceso3=os.environ.get('URL_ACCESO3')
 acceso4=os.environ.get('URL_ACCESO4')
+
+# PARA USAR CUANDO SE USE UN SERVIDOR LOCAL
+# accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
+
 # pulseaqui = [
 #     'pulse aqui',
 #     'pulse aqui',
@@ -66,6 +70,25 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
     connf.commit()
     urllib.request.urlopen(f'{acceso}/on')
+	
+    # EN CASO DE USAR UN SERVIDOR LOCAL COMUN Y QUERER ACTIVAR CON SOLO UN ESP8266 EN CAMPO Y VARIOS ESP32, SE DEBE USAR ESTO
+    # url = "http://tesis-reconocimiento-facial.herokuapp.com/apertura/"
+    # dataa = {'contrato': CONTRATO, 'acceso': acceso}
+    # requests.post(url, data=dataa)
+    # r = requests.get('http://tesis-reconocimiento-facial.herokuapp.com/apertura$
+    # jsonget = r.json()[0]
+    # contrato = jsonget['contrato']
+    # acceso = jsonget['acceso']
+    # while contrato != CONTRATO or acceso == 'no':
+    #     requests.post(url, data=dataa)
+    #     r = requests.get('http://tesis-reconocimiento-facial.herokuapp.com/aper$
+    #     jsonget = r.json()[0]
+    #     contrato = jsonget['contrato']
+    #     acceso = jsonget['acceso']
+    # urllib.request.urlopen(f'{accesodict[acceso]}/on')
+    # dataa = {'contrato': 'no', 'acceso': 'no'}
+    # requests.post(url, data=dataa)
+		     
 
 def aperturadenegada(cursorf, connf, acceso):
     # cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
