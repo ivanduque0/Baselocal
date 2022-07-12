@@ -71,7 +71,7 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     connf.commit()
     urllib.request.urlopen(f'{acceso}/on')
 	
-    # EN CASO DE USAR UN SERVIDOR LOCAL COMUN Y QUERER ACTIVAR CON SOLO UN ESP8266 EN CAMPO Y VARIOS ESP32, SE DEBE USAR ESTO
+    # EN CASO DE USAR UN SERVIDOR LOCAL COMUN Y QUERER ACTIVAR CON SOLO UN ESP8266 EN CAMPO Y VARIOS ESP01, SE DEBE USAR ESTO
     # url = "http://tesis-reconocimiento-facial.herokuapp.com/apertura/"
     # dataa = {'contrato': CONTRATO, 'acceso': acceso}
     # requests.post(url, data=dataa)
