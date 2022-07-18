@@ -208,8 +208,7 @@ def manejador_seleccion(call):
                 aperturadenegada(cursor, conn, '1') 
                 #print('este usuario no tiene horarios establecidos')
             diasusuario=[]
-	
-	else:
+        else:
             aperturadenegada(cursor, conn, '1')
 
 @bot.message_handler(func=lambda message: True)
