@@ -91,7 +91,7 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
 def aperturadenegada(cursorf, connf, acceso):
     # cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
     # connf.commit()
-    urllib.request.urlopen(f'{acceso}/off')
+    urllib.request.urlopen(f'{accesodict[acceso]}/off')
 
 @bot.message_handler(commands=['id'])
 def send_welcome(message):
