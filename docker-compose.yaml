@@ -32,6 +32,23 @@ services:
       depends_on:
          - postgres
 
+   dbmanagerall:
+   
+      image: ivanduque0/dbmakermanager:V0.3
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ./allmanager:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+
    dbmanagerfotos:
    
       image: ivanduque0/dbmakermanager:V0.3
