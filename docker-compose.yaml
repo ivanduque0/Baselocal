@@ -6,6 +6,8 @@ services:
    
       image: postgres:14-alpine
       
+      container_name: postgres
+
       restart: always
 
       ports:
@@ -35,6 +37,8 @@ services:
    dbmanagerall:
    
       image: ivanduque0/dbmakermanager:V0.3
+
+      container_name: dbmanagerall
       
       restart: always
       
@@ -48,95 +52,12 @@ services:
       
       depends_on:
          - postgres
-
-   dbmanagerfotos:
-   
-      image: ivanduque0/dbmakermanager:V0.3
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      volumes:
-         - ./dbmanagerfotos:/app
-         
-      env_file:
-         - .env.manager
-         
-      depends_on:
-         - postgres
-         
-   dbmanagerusuarios:
-   
-      image: ivanduque0/dbmakermanager:V0.3
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      volumes:
-         - ./dbmanagerusuarios:/app
-         
-      env_file:
-         - .env.manager
-      
-      depends_on:
-         - postgres
-         
-   dbmanagerhorarios:
-   
-      image: ivanduque0/dbmakermanager:V0.3
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      volumes:
-         - ./dbmanagerhorarios:/app
-         
-      env_file:
-         - .env.manager
-      
-      depends_on:
-         - postgres
-         
-   dbmanagerinteracciones:
-   
-      image: ivanduque0/dbmakermanager:V0.3
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      volumes:
-         - ./dbmanagerinteracciones:/app
-         
-      env_file:
-         - .env.manager
-      
-      depends_on:
-         - postgres
-
-   dbmanagerid:
-   
-      image: ivanduque0/dbmakermanager:V0.3
-      
-      restart: always
-      
-      command: python3 codigo.py
-      
-      volumes:
-         - ./dbmanagertelegramid:/app
-         
-      env_file:
-         - .env.manager
-      
-      depends_on:
-         - postgres
          
    telegrambot:
    
       image: ivanduque0/telegrambot:V1.0
+
+      container_name: telegrambot
       
       restart: always
       
@@ -154,6 +75,8 @@ services:
    facerecognition1:
 
       image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition1
       
       environment:
          - DISPLAY=unix$DISPLAY
@@ -169,7 +92,8 @@ services:
       
       volumes:
          - ./facerecognition:/app
-         - ./dbmanagerfotos/media/personas:/app/personas
+         #- ./dbmanagerfotos/media/personas:/app/personas
+         - ./dbmanagerall/media/personas:/app/personas
          - /tmp/.X11-unix:/tmp/.X11-unix
          - /tmp/.docker.xauth:/tmp/.docker.xauth
          
@@ -181,6 +105,8 @@ services:
    antispoofing1:
    
       image: ivanduque0/antispoofing:V1.1
+
+      container_name: antispoofing1
       
       restart: always
       
@@ -202,6 +128,8 @@ services:
    facerecognition2:
 
       image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition2
       
       environment:
          - DISPLAY=unix$DISPLAY
@@ -217,13 +145,15 @@ services:
       
       volumes:
          - ./facerecognition:/app
-         - ./dbmanagerfotos/media/personas:/app/personas
+         - ./dbmanagerall/media/personas:/app/personas
          - /tmp/.X11-unix:/tmp/.X11-unix
          - /tmp/.docker.xauth:/tmp/.docker.xauth
 
    antispoofing2:
    
       image: ivanduque0/antispoofing:V1.1
+
+      container_name: antispoofing2
       
       restart: always
       
@@ -245,6 +175,8 @@ services:
    facerecognition3:
 
       image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition3
       
       environment:
          - DISPLAY=unix$DISPLAY
@@ -260,7 +192,7 @@ services:
       
       volumes:
          - ./facerecognition:/app
-         - ./dbmanagerfotos/media/personas:/app/personas
+         - ./dbmanagerall/media/personas:/app/personas
          - /tmp/.X11-unix:/tmp/.X11-unix
          - /tmp/.docker.xauth:/tmp/.docker.xauth
          
@@ -272,6 +204,8 @@ services:
    antispoofing3:
    
       image: ivanduque0/antispoofing:V1.1
+
+      container_name: antispoofing3
       
       restart: always
       
@@ -293,6 +227,8 @@ services:
    facerecognition4:
 
       image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition4
       
       environment:
          - DISPLAY=unix$DISPLAY
@@ -308,7 +244,7 @@ services:
       
       volumes:
          - ./facerecognition:/app
-         - ./dbmanagerfotos/media/personas:/app/personas
+         - ./dbmanagerall/media/personas:/app/personas
          - /tmp/.X11-unix:/tmp/.X11-unix
          - /tmp/.docker.xauth:/tmp/.docker.xauth
          
@@ -320,6 +256,8 @@ services:
    antispoofing4:
    
       image: ivanduque0/antispoofing:V1.1
+
+      container_name: antispoofing4
       
       restart: always
       
@@ -338,8 +276,88 @@ services:
       depends_on:
          - postgres
 
-   
 
+   # dbmanagerfotos:
    
+   #    image: ivanduque0/dbmakermanager:V0.3
       
+   #    restart: always
+      
+   #    command: python3 codigo.py
+      
+   #    volumes:
+   #       - ./dbmanagerfotos:/app
+         
+   #    env_file:
+   #       - .env.manager
+         
+   #    depends_on:
+   #       - postgres
+         
+   # dbmanagerusuarios:
    
+   #    image: ivanduque0/dbmakermanager:V0.3
+      
+   #    restart: always
+      
+   #    command: python3 codigo.py
+      
+   #    volumes:
+   #       - ./dbmanagerusuarios:/app
+         
+   #    env_file:
+   #       - .env.manager
+      
+   #    depends_on:
+   #       - postgres
+         
+   # dbmanagerhorarios:
+   
+   #    image: ivanduque0/dbmakermanager:V0.3
+      
+   #    restart: always
+      
+   #    command: python3 codigo.py
+      
+   #    volumes:
+   #       - ./dbmanagerhorarios:/app
+         
+   #    env_file:
+   #       - .env.manager
+      
+   #    depends_on:
+   #       - postgres
+         
+   # dbmanagerinteracciones:
+   
+   #    image: ivanduque0/dbmakermanager:V0.3
+      
+   #    restart: always
+      
+   #    command: python3 codigo.py
+      
+   #    volumes:
+   #       - ./dbmanagerinteracciones:/app
+         
+   #    env_file:
+   #       - .env.manager
+      
+   #    depends_on:
+   #       - postgres
+
+   # dbmanagerid:
+   
+   #    image: ivanduque0/dbmakermanager:V0.3
+      
+   #    restart: always
+      
+   #    command: python3 codigo.py
+      
+   #    volumes:
+   #       - ./dbmanagertelegramid:/app
+         
+   #    env_file:
+   #       - .env.manager
+      
+   #    depends_on:
+   #       - postgres

@@ -34,7 +34,7 @@ cloudinary.config(
 )
 
 while True:
-    
+    total=0
     t1=time.perf_counter()
     while total<=5:
         t2=time.perf_counter()
@@ -92,7 +92,7 @@ while True:
                     hora=None
                     razon=None
                     cedula=None
-                    etapa=1
+                etapa=1
 
             if etapa==1:
 
@@ -172,7 +172,7 @@ while True:
                                     cv2.imwrite(f"{foto}.jpg",fotovisible)
                     listausuariosheroku=[]
                     listausuarioslocal=[]
-                    etapa=2
+                etapa=2
 
             if etapa==2:
 
