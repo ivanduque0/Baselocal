@@ -10,6 +10,7 @@ import pytz
 from datetime import datetime
 
 CONTRATO=os.environ.get("CONTRATO")
+maximo_dias_acumular=int(os.environ.get("DIAS_ACUMULAR"))
 connlocal = None
 connheroku = None
 cursorheroku=None
@@ -20,6 +21,8 @@ diaslocal=[]
 diasheroku=[]
 total=0
 fechahoy=None
+fechaayer=None
+diasacumulados=[]
 etapa=0
 DIRECTORIO=os.environ.get("DIRECTORIO", "media/personas")
 
@@ -64,6 +67,24 @@ while True:
                 tz = pytz.timezone('America/Caracas')
                 caracas_now = datetime.now(tz)
                 fechahoy=str(caracas_now)[:10]
+
+                if fechahoy != fechaayer:
+                    fechaayer=fechahoy
+                    tupla_fecha_hoy=(fechahoy,)
+                    cursorlocal.execute('SELECT fecha FROM dias_acumulados')
+                    dias_acumulados= cursorlocal.fetchall()
+                    nro_dias_acumulados=len(dias_acumulados)
+
+                    if nro_dias_acumulados >= maximo_dias_acumular:
+                        cursorlocal.execute('DELETE FROM web_interacciones *')
+                        cursorlocal.execute('DELETE FROM dias_acumulados *')
+                        connlocal.commit()
+                        
+                    if not tupla_fecha_hoy in dias_acumulados:
+                        cursorlocal.execute('''INSERT INTO dias_acumulados (fecha)
+                        VALUES (%s);''', (fechahoy,))
+                        connlocal.commit()
+                
                 cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
                 interacciones_local= cursorlocal.fetchall()
                 cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula_id FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
@@ -72,7 +93,7 @@ while True:
                 nro_int_local = len(interacciones_local)
                 nro_int_heroku = len(interacciones_heroku)
 
-                if nro_int_local > nro_int_heroku:
+                if nro_int_local != nro_int_heroku:
 
                     for interaccion in interacciones_local:
                         try:

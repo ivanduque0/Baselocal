@@ -31,6 +31,7 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_horariospermitidos (entrada time without time zone, salida time without time zone, cedula_id integer, dia varchar(180))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_fotos (id integer, foto varchar(150), estado integer, cedula_id integer)')
         # cursorlocal.execute('CREATE TABLE IF NOT EXISTS led (onoff integer, acceso integer)')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS dias_acumulados (fecha varchar(150))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS sensor (onoff integer, acceso integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS antisp (spoofing float, nospoofing float, acceso integer)')
         connlocal.commit()
