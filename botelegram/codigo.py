@@ -68,7 +68,12 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
     #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
     connf.commit()
-    urllib.request.urlopen(f'{accesodict[acceso]}/on')
+    try:
+        urllib.request.urlopen(f'{accesodict[acceso]}/on')
+    except:
+        print("fallo en peticion http")
+    finally:
+        pass
 	
     # EN CASO DE USAR UN SERVIDOR LOCAL COMUN Y QUERER ACTIVAR CON SOLO UN ESP8266 EN CAMPO Y VARIOS ESP01, SE DEBE USAR ESTO
     # url = "http://tesis-reconocimiento-facial.herokuapp.com/apertura/"
@@ -91,8 +96,13 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
 def aperturadenegada(cursorf, connf, acceso):
     # cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
     # connf.commit()
-    urllib.request.urlopen(f'{accesodict[acceso]}/off')
-
+    try:
+        urllib.request.urlopen(f'{accesodict[acceso]}/off')
+    except:
+        print("fallo en peticion http")
+    finally:
+        pass
+    
 @bot.message_handler(commands=['id'])
 def send_welcome(message):
     message.text

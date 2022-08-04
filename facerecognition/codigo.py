@@ -65,7 +65,12 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
     #cursorf.execute('''UPDATE led SET onoff=1 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
     connf.commit()
-    urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/on')
+    try:
+        urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/on')
+    except:
+        print("fallo en peticion http")
+    finally:
+        pass
     #cursorf.execute('SELECT * FROM led')
     #estado_led= cursorf.fetchall()
     #while estado_led[0][0]==1:
@@ -73,7 +78,12 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     #    estado_led= cursor.fetchall()
 
 def aperturadenegada():
-    urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/off')
+    try:
+        urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/off')
+    except:
+        print("fallo en peticion http")
+    finally:
+        pass
 
 # def aperturadenegada(cursorf, connf):
 #     cursorf.execute('''UPDATE led SET onoff=2 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
