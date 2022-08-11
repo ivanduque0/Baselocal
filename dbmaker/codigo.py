@@ -33,7 +33,7 @@ while True:
         # cursorlocal.execute('CREATE TABLE IF NOT EXISTS led (onoff integer, acceso integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS dias_acumulados (fecha varchar(150))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS sensor (onoff integer, acceso integer)')
-        cursorlocal.execute('CREATE TABLE IF NOT EXISTS antisp (spoofing float, nospoofing float, acceso integer)')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS antisp (spoofing integer, acceso integer)')
         connlocal.commit()
         # cursorlocal.execute('SELECT*FROM led')
         # tablaled= cursorlocal.fetchall()
@@ -60,13 +60,13 @@ while True:
             cursorlocal.execute('INSERT INTO sensor values(0,4)')
             connlocal.commit()
         if len(tablaantisp) < 1:
-            cursorlocal.execute('INSERT INTO antisp values(0,0,1)')
+            cursorlocal.execute('INSERT INTO antisp values(0,1)')
             connlocal.commit()
-            cursorlocal.execute('INSERT INTO antisp values(0,0,2)')
+            cursorlocal.execute('INSERT INTO antisp values(0,2)')
             connlocal.commit()
-            cursorlocal.execute('INSERT INTO antisp values(0,0,3)')
+            cursorlocal.execute('INSERT INTO antisp values(0,3)')
             connlocal.commit()
-            cursorlocal.execute('INSERT INTO antisp values(0,0,4)')
+            cursorlocal.execute('INSERT INTO antisp values(0,4)')
             connlocal.commit()
 
     except (Exception, psycopg2.Error) as error:

@@ -311,7 +311,7 @@ while True:
                                                     nombre=nombrecedula[0][1]
                                                     cursor.execute('SELECT * FROM antisp WHERE acceso=%s', (os.environ.get("ACCESO"),))
                                                     antispoofing = cursor.fetchall()
-                                                    if antispoofing[0][0]<antispoofing[0][1]:
+                                                    if antispoofing[0][0]:
                                                         for entrada, salida, _, dia in horarios_permitidos:
                                                             diasusuario.append(dia)
                                                         cantidaddias = diasusuario.count(dia)
