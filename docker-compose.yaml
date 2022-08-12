@@ -79,7 +79,7 @@ services:
       container_name: facerecognition1
       
       environment:
-         - DISPLAY=unix$DISPLAY
+         #- DISPLAY=unix$DISPLAY
          - HOST_STREAM=http://192.168.21.117:8080/?action=stream
          - RAZON=
          - URL_ACCESO=
@@ -94,8 +94,8 @@ services:
          - ./facerecognition:/app
          #- ./dbmanagerfotos/media/personas:/app/personas
          - ./allmanager/media/personas:/app/personas
-         - /tmp/.X11-unix:/tmp/.X11-unix
-         - /tmp/.docker.xauth:/tmp/.docker.xauth
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
          
       privileged: true
       
@@ -104,13 +104,13 @@ services:
 
    antispoofing1:
    
-      image: ivanduque0/antispoofing:V1.1
+      image: ivanduque0/antispoofingyolo:V0.1
 
       container_name: antispoofing1
       
       restart: always
       
-      command: python3 codigo/codigo.py
+      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
@@ -119,8 +119,8 @@ services:
       env_file:
          - .env.manager
 
-      volumes:
-         - ./antispoofing:/app/codigo
+      # volumes:
+      #    - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres
@@ -132,7 +132,7 @@ services:
       container_name: facerecognition2
       
       environment:
-         - DISPLAY=unix$DISPLAY
+         #- DISPLAY=unix$DISPLAY
          - HOST_STREAM=
          - RAZON=
          - URL_ACCESO=
@@ -146,18 +146,18 @@ services:
       volumes:
          - ./facerecognition:/app
          - ./allmanager/media/personas:/app/personas
-         - /tmp/.X11-unix:/tmp/.X11-unix
-         - /tmp/.docker.xauth:/tmp/.docker.xauth
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
 
    antispoofing2:
    
-      image: ivanduque0/antispoofing:V1.1
+      image: ivanduque0/antispoofingyolo:V0.1
 
       container_name: antispoofing2
       
       restart: always
       
-      command: python3 codigo/codigo.py
+      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=
@@ -166,8 +166,8 @@ services:
       env_file:
          - .env.manager
 
-      volumes:
-         - ./antispoofing:/app/codigo
+      # volumes:
+      #    - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres
@@ -179,7 +179,7 @@ services:
       container_name: facerecognition3
       
       environment:
-         - DISPLAY=unix$DISPLAY
+         #- DISPLAY=unix$DISPLAY
          - HOST_STREAM=
          - RAZON=
          - URL_ACCESO=
@@ -193,8 +193,8 @@ services:
       volumes:
          - ./facerecognition:/app
          - ./allmanager/media/personas:/app/personas
-         - /tmp/.X11-unix:/tmp/.X11-unix
-         - /tmp/.docker.xauth:/tmp/.docker.xauth
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
          
       privileged: true
       
@@ -203,13 +203,13 @@ services:
 
    antispoofing3:
    
-      image: ivanduque0/antispoofing:V1.1
+      image: ivanduque0/antispoofingyolo:V0.1
 
       container_name: antispoofing3
       
       restart: always
       
-      command: python3 codigo/codigo.py
+      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=
@@ -218,8 +218,8 @@ services:
       env_file:
          - .env.manager
 
-      volumes:
-         - ./antispoofing:/app/codigo
+      # volumes:
+      #    - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres
@@ -231,7 +231,7 @@ services:
       container_name: facerecognition4
       
       environment:
-         - DISPLAY=unix$DISPLAY
+         #- DISPLAY=unix$DISPLAY
          - HOST_STREAM=
          - RAZON=
          - URL_ACCESO=
@@ -245,8 +245,8 @@ services:
       volumes:
          - ./facerecognition:/app
          - ./allmanager/media/personas:/app/personas
-         - /tmp/.X11-unix:/tmp/.X11-unix
-         - /tmp/.docker.xauth:/tmp/.docker.xauth
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
          
       privileged: true
       
@@ -255,13 +255,13 @@ services:
    
    antispoofing4:
    
-      image: ivanduque0/antispoofing:V1.1
+      image: ivanduque0/antispoofingyolo:V0.1
 
       container_name: antispoofing4
       
       restart: always
       
-      command: python3 codigo/codigo.py
+      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=
@@ -270,8 +270,8 @@ services:
       env_file:
          - .env.manager
 
-      volumes:
-         - ./antispoofing:/app/codigo
+      # volumes:
+      #    - ./antispoofing:/app/codigo
       
       depends_on:
          - postgres
