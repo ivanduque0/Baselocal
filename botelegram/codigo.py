@@ -14,6 +14,7 @@ total=0
 token=os.environ.get("TOKEN_BOT")
 bot = telebot.TeleBot(token, parse_mode=None)
 CONTRATO=os.environ.get("CONTRATO")
+TIMEOUT=int(os.environ.get("TIMEOUT"))
 razon1=os.environ.get("RAZON_BOT1")
 razon2=os.environ.get("RAZON_BOT2")
 razon3=os.environ.get("RAZON_BOT3")
@@ -344,7 +345,7 @@ while True:
             port=os.environ.get("PORT")
         )
         cursor = conn.cursor()
-        bot.polling(skip_pending=True)
+        bot.polling(skip_pending=True, timeout=TIMEOUT)
         bot.stop_polling()
         
 
