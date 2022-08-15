@@ -110,7 +110,7 @@ services:
       
       restart: always
       
-      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
@@ -119,8 +119,8 @@ services:
       env_file:
          - .env.manager
 
-      # volumes:
-      #    - ./antispoofing:/app/codigo
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
       
       depends_on:
          - postgres
@@ -157,7 +157,7 @@ services:
       
       restart: always
       
-      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=
@@ -166,8 +166,8 @@ services:
       env_file:
          - .env.manager
 
-      # volumes:
-      #    - ./antispoofing:/app/codigo
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
       
       depends_on:
          - postgres
@@ -209,7 +209,7 @@ services:
       
       restart: always
       
-      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=
@@ -218,8 +218,8 @@ services:
       env_file:
          - .env.manager
 
-      # volumes:
-      #    - ./antispoofing:/app/codigo
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
       
       depends_on:
          - postgres
@@ -261,7 +261,7 @@ services:
       
       restart: always
       
-      command: python3 detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
          - HOSTSNAPSHOOT=
@@ -270,8 +270,8 @@ services:
       env_file:
          - .env.manager
 
-      # volumes:
-      #    - ./antispoofing:/app/codigo
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
       
       depends_on:
          - postgres
