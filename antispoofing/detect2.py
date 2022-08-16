@@ -229,7 +229,8 @@ if __name__ == "__main__":
             )
             conn.autocommit = False
             cursor = conn.cursor()
-        
+            cursor.execute('UPDATE antisp SET spoofing=0 WHERE acceso=%s', (acceso, ))
+            conn.commit()
             opt = parse_opt()
             main(opt)
 
