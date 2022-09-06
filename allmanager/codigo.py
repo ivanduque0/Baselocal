@@ -212,7 +212,7 @@ while True:
                         listausuarioslocal.append(cedula)
                 
                 for usuario in listausuarioslocal:
-                    cursorheroku.execute('SELECT entrada, salida, cedula, dia FROM web_horariospermitidos WHERE cedula_id=%s and contrato_id=%s',(usuario,CONTRATO))
+                    cursorheroku.execute('SELECT entrada, salida, cedula, dia FROM web_horariospermitidos WHERE cedula=%s and contrato_id=%s',(usuario,CONTRATO))
                     diasheroku= cursorheroku.fetchall()
                     
                     cursorlocal.execute('SELECT * FROM web_horariospermitidos WHERE cedula_id=%s',(usuario,))
