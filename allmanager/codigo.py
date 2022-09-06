@@ -330,7 +330,7 @@ while True:
                         try:
                             listausuarioslocal.index(usuario)
                         except ValueError:
-                            cursorheroku.execute('SELECT cedula, nombre, telegram_id, contrato_id FROM web_usuarios where cedula=%s', (usuario,))
+                            cursorheroku.execute('SELECT cedula, nombre, telegram_id, contrato_id FROM web_usuarios where cedula=%s and contrato_id=%s', (usuario,CONTRATO))
                             usuario_heroku= cursorheroku.fetchall()
                             cedula=usuario_heroku[0][0]
                             nombre=usuario_heroku[0][1]
