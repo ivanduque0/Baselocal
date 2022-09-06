@@ -87,7 +87,7 @@ while True:
                 
                 cursorlocal.execute('SELECT * FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
                 interacciones_local= cursorlocal.fetchall()
-                cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula_id FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
+                cursorheroku.execute('SELECT nombre, fecha, hora, razon, contrato, cedula FROM web_interacciones where contrato=%s and fecha=%s', (CONTRATO,fechahoy))
                 interacciones_heroku= cursorheroku.fetchall()
 
                 nro_int_local = len(interacciones_local)
@@ -104,7 +104,7 @@ while True:
                             hora=interaccion[2]
                             razon=interaccion[3]
                             cedula=interaccion[5]
-                            cursorheroku.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+                            cursorheroku.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula)
                             VALUES (%s, %s, %s, %s, %s, %s);''', (nombre, fecha, hora, razon, CONTRATO, cedula))
                             connheroku.commit()
                     
@@ -120,7 +120,7 @@ while True:
                 cursorlocal.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula, nombre, telegram_id, contrato_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
                 usuarios_heroku= cursorheroku.fetchall()
                 
                 for usuario in usuarios_local:
@@ -143,7 +143,7 @@ while True:
                     for usuario in listausuarioslocal:
                         cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (usuario,))
                         fotos_local= cursorlocal.fetchall()
-                        cursorheroku.execute('SELECT * FROM web_fotos where cedula_id=%s', (usuario,))
+                        cursorheroku.execute('SELECT id, foto, estado, cedula FROM web_fotos where cedula=%s', (usuario,))
                         fotos_heroku= cursorheroku.fetchall()
 
                         #eliminar fotos no validadas de forma local
@@ -200,7 +200,7 @@ while True:
                 cursorlocal.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula, nombre, telegram_id, contrato_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
                 usuarios_heroku= cursorheroku.fetchall()
 
 
@@ -275,7 +275,7 @@ while True:
                 cursorlocal.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT * FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula, nombre, telegram_id, contrato_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
                 usuarios_heroku= cursorheroku.fetchall()
 
                 nro_usu_local = len(usuarios_local)
@@ -330,7 +330,7 @@ while True:
                         try:
                             listausuarioslocal.index(usuario)
                         except ValueError:
-                            cursorheroku.execute('SELECT * FROM web_usuarios where cedula=%s', (usuario,))
+                            cursorheroku.execute('SELECT cedula, nombre, telegram_id, contrato_id FROM web_usuarios where cedula=%s', (usuario,))
                             usuario_heroku= cursorheroku.fetchall()
                             cedula=usuario_heroku[0][0]
                             nombre=usuario_heroku[0][1]
