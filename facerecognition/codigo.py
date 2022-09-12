@@ -17,6 +17,7 @@ primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 flaghorario = 0 #1 para dar acceso y 0 para denegarlo
 directorio=os.environ.get("DIRECTORIO")
 CONTRATO=os.environ.get("CONTRATO")
+DELAY_DETECCION=int(os.environ.get("DELAY_DETECCION"))
 imagenes = os.listdir(directorio)
 nombres = []
 caras = []
@@ -77,6 +78,7 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
     #while estado_led[0][0]==1:
     #    cursorf.execute('SELECT * FROM led')
     #    estado_led= cursor.fetchall()
+    time.sleep(DELAY_DETECCION)
 
 def aperturadenegada():
     try:
