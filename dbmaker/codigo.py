@@ -34,6 +34,7 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS dias_acumulados (fecha varchar(150))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS sensor (onoff integer, acceso integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS antisp (spoofing integer, acceso integer)')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS cargar_fotos (cargar integer)')
         connlocal.commit()
         # cursorlocal.execute('SELECT*FROM led')
         # tablaled= cursorlocal.fetchall()
@@ -41,6 +42,8 @@ while True:
         tablasensor= cursorlocal.fetchall()
         cursorlocal.execute('SELECT*FROM antisp')
         tablaantisp= cursorlocal.fetchall()
+        cursorlocal.execute('SELECT*FROM cargar_fotos')
+        tablacargar= cursorlocal.fetchall()
         # if len(tablaled) < 1:
         #     cursorlocal.execute('INSERT INTO led values(0,1)')
         #     connlocal.commit()
@@ -50,6 +53,10 @@ while True:
         #     connlocal.commit()
         #     cursorlocal.execute('INSERT INTO led values(0,4)')
         #     connlocal.commit()
+        if len(tablacargar) < 1:
+            cursorlocal.execute('INSERT INTO cargar_fotos values(0)')
+            connlocal.commit()
+
         if len(tablasensor) < 1:
             cursorlocal.execute('INSERT INTO sensor values(0,1)')
             connlocal.commit()

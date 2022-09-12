@@ -20,7 +20,7 @@ CONTRATO=os.environ.get("CONTRATO")
 imagenes = os.listdir(directorio)
 nombres = []
 caras = []
-mp_face_detection = mp.solutions.face_detection
+#mp_face_detection = mp.solutions.face_detection
 mp_face_mesh = mp.solutions.face_mesh
 mp_drawing = mp.solutions.drawing_utils
 parpado=0
@@ -46,6 +46,7 @@ diasusuario = []
 cantidaddias = 0
 contadoraux = 0
 sensorflag = 0
+camara=None
 
 # for imagen in imagenes:
 #     ruta=os.path.join(directorio,imagen)
@@ -130,6 +131,8 @@ while True:
                 # sensor_onoff = cursor.fetchall()
                 cursor.execute('SELECT * FROM sensor WHERE acceso=%s', (os.environ.get("ACCESO"),))
                 sensor_onoff = cursor.fetchall()
+                cursor.execute('SELECT * FROM cargar_fotos')
+                cargar_fotos = cursor.fetchall()
                 if sensor_onoff[0][0] == 1:
                     #vista_previa = 0  
                     ret,video = camara.read()
@@ -142,7 +145,6 @@ while True:
                     
                     
                     if video is not None:
-                    #if video is not None:
                         sensorflag=0
                         alto, ancho, _ = video.shape
                         K = np.float32([[1,0,100],[0,1,100]])
@@ -532,8 +534,11 @@ while True:
                         #   break
                         
                         #tecla = 0
-                else:
-                    if sensorflag==0:
+                if sensor_onoff[0][0] == 0 or cargar_fotos[0][0] == 1:
+                    if sensorflag==0 or cargar_fotos[0][0] == 1:
+                        if cargar_fotos[0][0] == 1:
+                            cursor.execute('UPDATE cargar_fotos SET cargar=0 WHERE cargar=1;')
+                            conn.commit()
                         #camara.release()
                         imagenes = os.listdir(directorio)
 

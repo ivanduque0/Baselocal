@@ -110,6 +110,13 @@ def send_welcome(message):
     chatid = message.chat.id
     bot.reply_to(message, f"su ID es: {chatid}")
 
+@bot.message_handler(commands=['cargarimagenes'])
+def send_welcome(message):
+    message.text
+    cursor.execute('UPDATE cargar_fotos SET cargar=1 WHERE cargar=0;')
+    conn.commit()
+    bot.reply_to(message, f"Orden para cargar imagenes ejecutada")
+
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     message.text
