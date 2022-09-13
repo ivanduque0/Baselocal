@@ -60,7 +60,6 @@ while True:
         connheroku = psycopg2.connect(connuri)
         cursorheroku = connheroku.cursor()
         
-        t1=time.perf_counter()
         while True:
 
             if etapa==0:
