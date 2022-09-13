@@ -7,10 +7,10 @@ from ping3 import ping
 
 CONTRATO=os.environ.get("CONTRATO")
 connlocal = None
-connheroku = None
+cursorlocal=None
 total=0
-etapa=0
 total_ping = 0
+intentos=0
 
 ######################################
 #############ACCESOS###################
@@ -64,15 +64,20 @@ while True:
             t2_ping=time.perf_counter()
             total_ping=t2_ping-t1_ping
 
-            if total_ping > 300:
+            # ESTE ES EL TIEMPO EN EL QUE SE HACE PING A LOS DISPOSITIVOS, 
+            # LO NORMAL PARA PRODUCCION SON 2 MINUTOS
+            if total_ping > 120:
                 for dispositivo in dispositivos:
-                    ping_dispositivo = ping(dispositivo)
-                    if ping_dispositivo:
-                        cursorlocal.execute('UPDATE web_dispositivos SET estado=1 WHERE dispositivo=%s', (dispositivo,))
-                        connlocal.commit()
-                    else:
-                        cursorlocal.execute('UPDATE web_dispositivos SET estado=0 WHERE dispositivo=%s', (dispositivo,))
-                        connlocal.commit()
+                    if dispositivo:
+                        ping_dispositivo = ping(dispositivo)
+                        if ping_dispositivo:
+                            cursorlocal.execute('UPDATE web_dispositivos SET estado=1 WHERE dispositivo=%s', (dispositivo,))
+                            connlocal.commit()
+                        else:
+                            intentos=intentos+1
+                            if intentos>=3:
+                                cursorlocal.execute('UPDATE web_dispositivos SET estado=0 WHERE dispositivo=%s', (dispositivo,))
+                                connlocal.commit()
                 t1_ping=time.perf_counter()
 
 

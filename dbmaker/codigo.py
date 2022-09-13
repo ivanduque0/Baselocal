@@ -88,7 +88,7 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS sensor (onoff integer, acceso integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS antisp (spoofing integer, acceso integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS cargar_fotos (cargar integer)')
-        #cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_dispositivos (dispositivo varchar(150), descripcion varchar(150), estado varchar(150))')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_dispositivos (dispositivo varchar(150), descripcion varchar(150), estado varchar(150))')
         connlocal.commit()
         # cursorlocal.execute('SELECT*FROM led')
         # tablaled= cursorlocal.fetchall()
@@ -98,8 +98,8 @@ while True:
         tablaantisp= cursorlocal.fetchall()
         cursorlocal.execute('SELECT*FROM cargar_fotos')
         tablacargar= cursorlocal.fetchall()
-        # cursorlocal.execute('SELECT*FROM web_dispositivos')
-        # tabladispositivos= cursorlocal.fetchall()
+        cursorlocal.execute('SELECT*FROM web_dispositivos')
+        tabladispositivos= cursorlocal.fetchall()
 
         # if len(tablaled) < 1:
         #     cursorlocal.execute('INSERT INTO led values(0,1)')
@@ -111,13 +111,13 @@ while True:
         #     cursorlocal.execute('INSERT INTO led values(0,4)')
         #     connlocal.commit()
 
-        # if len(tabladispositivos) < 1:
-        #     for dispositivo in dispositivos:
-        #         if dispositivo:
-        #             descripcion = dispositivos_dict[dispositivo]
-        #             estado = '0'
-        #             cursorlocal.execute('INSERT INTO cargar_fotos values(%s, %s, %s)',(dispositivo, descripcion, estado))
-        #             connlocal.commit()
+        if len(tabladispositivos) < 1:
+            for dispositivo in dispositivos:
+                if dispositivo:
+                    descripcion = dispositivos_dict[dispositivo]
+                    estado = '0'
+                    cursorlocal.execute('INSERT INTO web_dispositivos values(%s, %s, %s)',(dispositivo, descripcion, estado))
+                    connlocal.commit()
 
         if len(tablacargar) < 1:
             cursorlocal.execute('INSERT INTO cargar_fotos values(0)')
