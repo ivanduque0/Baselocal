@@ -65,14 +65,18 @@ markuppuertatrasera.add(telebot.types.InlineKeyboardButton(text='ABRIR PUERTA TR
 
 
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf, connf, acceso):
-    cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
-    VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
-    #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
-    connf.commit()
+    
     try:
         urllib.request.urlopen(f'{accesodict[acceso]}/on')
+        cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
+        #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+        connf.commit()
     except:
-        print("fallo en peticion http")
+        cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo en {razonf}', contratof, cedulaf))
+        #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+        connf.commit()
     finally:
         pass
 	

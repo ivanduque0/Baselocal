@@ -10,7 +10,7 @@ connlocal = None
 cursorlocal=None
 total=0
 total_ping = 0
-intentos=0
+TIEMPO_PING=int(os.environ.get('TIEMPO_PING'))
 
 ######################################
 #############ACCESOS###################
@@ -66,19 +66,16 @@ while True:
 
             # ESTE ES EL TIEMPO EN EL QUE SE HACE PING A LOS DISPOSITIVOS, 
             # LO NORMAL PARA PRODUCCION SON 2 MINUTOS
-            if total_ping > 120:
+            if total_ping > TIEMPO_PING:
                 for dispositivo in dispositivos:
                     if dispositivo:
-                        ping_dispositivo = ping(dispositivo)
+                        ping_dispositivo = ping(dispositivo[7:20])
                         if ping_dispositivo:
                             cursorlocal.execute('UPDATE web_dispositivos SET estado=1 WHERE dispositivo=%s', (dispositivo,))
                             connlocal.commit()
-                            intentos=0
                         else:
-                            intentos=intentos+1
-                            if intentos>=3:
-                                cursorlocal.execute('UPDATE web_dispositivos SET estado=0 WHERE dispositivo=%s', (dispositivo,))
-                                connlocal.commit()
+                            cursorlocal.execute('UPDATE web_dispositivos SET estado=0 WHERE dispositivo=%s', (dispositivo,))
+                            connlocal.commit()
                 t1_ping=time.perf_counter()
 
 
