@@ -73,6 +73,7 @@ while True:
                         if ping_dispositivo:
                             cursorlocal.execute('UPDATE web_dispositivos SET estado=1 WHERE dispositivo=%s', (dispositivo,))
                             connlocal.commit()
+                            intentos=0
                         else:
                             intentos=intentos+1
                             if intentos>=3:
