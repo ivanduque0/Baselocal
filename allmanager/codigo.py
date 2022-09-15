@@ -357,7 +357,7 @@ while True:
                             estado=dispositivolocal[2]
                             cursorheroku.execute('''INSERT INTO web_dispositivos (dispositivo, descripcion, estado, contrato_id)
                             VALUES (%s, %s, %s, %s);''', (dispositivo, descripcion, estado, CONTRATO))
-                            connlocal.commit()
+                            connheroku.commit()
                 else:
                     tz = pytz.timezone('America/Caracas')
                     caracas_now = datetime.now(tz)
@@ -373,7 +373,7 @@ while True:
                             estado=dispositivolocal[2]
                             cursorheroku.execute('UPDATE web_dispositivos SET estado=%s, fecha=%s, hora=%s WHERE dispositivo=%s AND descripcion=%s AND contrato_id=%s;', 
                             (estado,fechaahora,horaahora, dispositivo, descripcion, CONTRATO))
-                            connlocal.commit()
+                            connheroku.commit()
                 etapa=0
 
     except (Exception, psycopg2.Error) as error:
