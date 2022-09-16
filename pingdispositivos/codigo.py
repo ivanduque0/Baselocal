@@ -33,11 +33,15 @@ camara4=os.environ.get('URL_CAMARA4')
 # camara7=os.environ.get('URL_CAMARA7')
 # camara8=os.environ.get('URL_CAMARA8')
 
+SERVIDOR_LOCAL=os.environ.get('URL_SERVIDOR')
+
 dispositivos=[acceso1, acceso2, acceso3, acceso4, 
-              camara1, camara2, camara3, camara4,
+              camara1, camara2, camara3, camara4, SERVIDOR_LOCAL
             #   camara5, camara6, camara7, camara7
               ]
 
+#EN caso que hayan mas dispositivos, se les agregan mas ceros a la lista intentos
+intentos=[0,0,0,0,0,0,0,0,0]
 
 while True:
     total=0
@@ -68,14 +72,18 @@ while True:
             # LO NORMAL PARA PRODUCCION SON 2 MINUTOS
             if total_ping > TIEMPO_PING:
                 for dispositivo in dispositivos:
+                    intentos_tabla=dispositivos.index(dispositivo)
                     if dispositivo:
                         ping_dispositivo = ping(dispositivo[7:20])
                         if ping_dispositivo:
                             cursorlocal.execute('UPDATE web_dispositivos SET estado=1 WHERE dispositivo=%s', (dispositivo,))
                             connlocal.commit()
+                            intentos[intentos_tabla]=0
                         else:
-                            cursorlocal.execute('UPDATE web_dispositivos SET estado=0 WHERE dispositivo=%s', (dispositivo,))
-                            connlocal.commit()
+                            intentos[intentos_tabla]=intentos[intentos_tabla]+1
+                            if intentos[intentos_tabla] >= 4:
+                                cursorlocal.execute('UPDATE web_dispositivos SET estado=0 WHERE dispositivo=%s', (dispositivo,))
+                                connlocal.commit()
                 t1_ping=time.perf_counter()
 
 

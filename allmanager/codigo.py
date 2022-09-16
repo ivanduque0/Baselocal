@@ -348,6 +348,8 @@ while True:
                 dispositivos_heroku= cursorheroku.fetchall()
 
                 if len(dispositivos_heroku) != len(dispositivos_local):
+                    cursorheroku.execute('''DELETE FROM web_dispositivos * WHERE contrato_id=%s''', (CONTRATO,))
+                    connheroku.commit()
                     for dispositivolocal in dispositivos_local:
                         try:
                             dispositivos_heroku.index(dispositivolocal)

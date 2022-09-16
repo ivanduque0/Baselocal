@@ -5,6 +5,8 @@ connlocal = None
 cursorlocal=None
 total=0
 
+SERVIDOR_LOCAL=os.environ.get('URL_SERVIDOR')
+
 ######################################
 #############ACCESOS###################
 #######################################
@@ -41,7 +43,7 @@ descripcion_camara4=os.environ.get('RAZON_CAM4')
 # descripcion_camara8=os.environ.get('RAZON_CAM8')
 
 dispositivos=[acceso1, acceso2, acceso3, acceso4, 
-              camara1, camara2, camara3, camara4,
+              camara1, camara2, camara3, camara4, SERVIDOR_LOCAL,
             #   camara5, camara6, camara7, camara7
               ]
 
@@ -53,6 +55,7 @@ dispositivos_dict ={acceso1:descripcion_acceso1,
                     camara2:descripcion_camara2, 
                     camara3:descripcion_camara3, 
                     camara4:descripcion_camara4, 
+                    SERVIDOR_LOCAL:'SERVIDOR LOCAL',
                     # camara5:descripcion_camara5, 
                     # camara6:descripcion_camara6, 
                     # camara7:descripcion_camara7, 
