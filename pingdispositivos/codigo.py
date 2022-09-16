@@ -74,7 +74,8 @@ while True:
                 for dispositivo in dispositivos:
                     intentos_tabla=dispositivos.index(dispositivo)
                     if dispositivo:
-                        ping_dispositivo = ping(dispositivo[7:20])
+                        longitud_url=len(dispositivo)
+                        ping_dispositivo = ping(dispositivo[7:longitud_url])
                         if ping_dispositivo:
                             cursorlocal.execute('UPDATE web_dispositivos SET estado=1 WHERE dispositivo=%s', (dispositivo,))
                             connlocal.commit()

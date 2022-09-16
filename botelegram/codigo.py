@@ -129,7 +129,7 @@ def send_welcome(message):
     bot.send_game(chat_id=chatid, game_short_name='entrada_principal', reply_markup=markupentradaprincipal)
     bot.send_game(chat_id=chatid, game_short_name='porton_vehicular', reply_markup=markupportonvehicular)
     bot.send_game(chat_id=chatid, game_short_name='puerta_trasera', reply_markup=markuppuertatrasera)
-    bot.send_message(chat_id=chatid,text='que acceso desea abrir?', reply_markup=markup)
+    bot.send_message(chat_id=chatid,text=f"su ID es: {chatid}")#, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def manejador_seleccion(call):

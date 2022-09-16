@@ -350,26 +350,33 @@ while True:
                 if len(dispositivos_heroku) != len(dispositivos_local):
                     cursorheroku.execute('''DELETE FROM web_dispositivos * WHERE contrato_id=%s''', (CONTRATO,))
                     connheroku.commit()
+                    cursorheroku.execute('SELECT dispositivo, descripcion, estado FROM web_dispositivos where contrato_id=%s', (CONTRATO,))
+                    dispositivos_heroku= cursorheroku.fetchall()
                     for dispositivolocal in dispositivos_local:
                         try:
                             dispositivos_heroku.index(dispositivolocal)
                         except ValueError:
+                            tz = pytz.timezone('America/Caracas')
+                            caracas_now = datetime.now(tz)
+                            fechaahora=str(caracas_now)[:10]
+                            hora=str(caracas_now)[11:19]
+                            horaahora = datetime.strptime(hora, '%H:%M:%S').time()
                             dispositivo=dispositivolocal[0]
                             descripcion=dispositivolocal[1]
                             estado=dispositivolocal[2]
-                            cursorheroku.execute('''INSERT INTO web_dispositivos (dispositivo, descripcion, estado, contrato_id)
-                            VALUES (%s, %s, %s, %s);''', (dispositivo, descripcion, estado, CONTRATO))
+                            cursorheroku.execute('''INSERT INTO web_dispositivos (dispositivo, descripcion, estado, contrato_id, fecha, hora)
+                            VALUES (%s, %s, %s, %s, %s, %s);''', (dispositivo, descripcion, estado, CONTRATO, fechaahora, horaahora))
                             connheroku.commit()
                 else:
-                    tz = pytz.timezone('America/Caracas')
-                    caracas_now = datetime.now(tz)
-                    fechaahora=str(caracas_now)[:10]
-                    hora=str(caracas_now)[11:19]
-                    horaahora = datetime.strptime(hora, '%H:%M:%S').time()
                     for dispositivolocal in dispositivos_local:
                         try:
                             dispositivos_heroku.index(dispositivolocal)
                         except ValueError:
+                            tz = pytz.timezone('America/Caracas')
+                            caracas_now = datetime.now(tz)
+                            fechaahora=str(caracas_now)[:10]
+                            hora=str(caracas_now)[11:19]
+                            horaahora = datetime.strptime(hora, '%H:%M:%S').time()
                             dispositivo=dispositivolocal[0]
                             descripcion=dispositivolocal[1]
                             estado=dispositivolocal[2]
