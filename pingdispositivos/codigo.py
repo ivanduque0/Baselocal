@@ -1,8 +1,6 @@
 import psycopg2
 import os
 import time
-import numpy as np
-from datetime import datetime
 from ping3 import ping
 
 CONTRATO=os.environ.get("CONTRATO")
