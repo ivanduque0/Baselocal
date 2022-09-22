@@ -110,21 +110,33 @@ while True:
             resp = requests.get(url=URL)
             aperturas_solicitadas = resp.json()
             if len(aperturas_solicitadas):
+                tz = pytz.timezone('America/Caracas')
+                caracas_now = datetime.now(tz)
+                hora=str(caracas_now)[11:19]
+                fecha=str(caracas_now)[:10]
+                #A PARTIR DE AQUI DEBO HACER QE SE COMPARE LA HORA Y FECHA ACTUAL
+                #CON LA HORA Y FECHA QUE FUE ENVIADA LA SOLICITUD, NO DEBE SER DE UN DIA DISTINTO
+                #, DEBE SER A LA MISMA HORA Y NO DEBE TENER MUCHOS MINUTOS DE DIFERENCIA
                 for apertura in aperturas_solicitadas:
                     #print(dt['contrato'])
                     if apertura['contrato'] == CONTRATO:
                         solicitud_id=apertura['id']
-                        id_usuario = apertura['id_usuario']
-                        solicitud_acceso=apertura['acceso']
-                        cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado)
-                            VALUES (%s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 0))
-                        conn.commit()
+                        cursor.execute('SELECT * FROM solicitud_aperturas WHERE id=%s',(solicitud_id,))
+                        aperturas_local_existente= cursor.fetchall()
+                        if not aperturas_local_existente:
+                            id_usuario = apertura['id_usuario']
+                            solicitud_acceso=apertura['acceso']
+                            cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado)
+                                VALUES (%s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 0))
+                            conn.commit()
 
             cursor.execute('SELECT id, id_usuario, acceso, estado FROM solicitud_aperturas')
             aperturas_local= cursor.fetchall()
 
             for aperturalocal in aperturas_local:
                 estado_solicitud=aperturalocal[3]
+                #si es igual a 0 es porque aun no ha sido procesada la solicitud
+                #de apertura
                 if estado_solicitud == 0:
                     diasusuario = []
                     etapadia=0
