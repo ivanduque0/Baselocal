@@ -92,6 +92,7 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS antisp (spoofing integer, acceso integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS cargar_fotos (cargar integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_dispositivos (dispositivo varchar(150), descripcion varchar(150), estado varchar(150))')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS solicitud_aperturas (id integer, id_usuario varchar(150), acceso varchar(150), estado integer)')
         connlocal.commit()
         # cursorlocal.execute('SELECT*FROM led')
         # tablaled= cursorlocal.fetchall()
