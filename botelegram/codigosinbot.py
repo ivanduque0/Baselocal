@@ -133,6 +133,13 @@ while True:
                             cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado)
                                 VALUES (%s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 0))
                             conn.commit()
+                    else:
+                        id_usuario = apertura['id_usuario']
+                        solicitud_acceso=apertura['acceso']
+                        cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado)
+                            VALUES (%s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 1))
+                        conn.commit()
+
 
             cursor.execute('SELECT id, id_usuario, acceso, estado FROM solicitud_aperturas')
             aperturas_local= cursor.fetchall()
