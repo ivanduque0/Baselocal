@@ -339,8 +339,19 @@ while True:
                     listausuariosheroku=[]
                     listausuarioslocal=[]
                 etapa=5
-            
+
             if etapa==5:
+                cursorlocal.execute('SELECT id, estado FROM solicitud_aperturas')
+                aperturas_local= cursorlocal.fetchall()
+                if aperturas_local:
+                    for aperturalocal in aperturas_local:
+                        if aperturalocal[1] == 1:
+                            idapertura=aperturalocal[0]
+                            cursorlocal.execute('DELETE FROM solicitud_aperturas WHERE id=%s', (idapertura,))
+                            connlocal.commit()
+                etapa==6
+   
+            if etapa==6:
                 cursorlocal.execute('SELECT * FROM web_dispositivos')
                 dispositivos_local= cursorlocal.fetchall()
 

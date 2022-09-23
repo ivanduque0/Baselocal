@@ -113,13 +113,17 @@ while True:
                 tz = pytz.timezone('America/Caracas')
                 caracas_now = datetime.now(tz)
                 hora=str(caracas_now)[11:19]
+                hora_hora=int(hora[:2])
+                hora_minuto=int(hora[3:5])
                 fecha=str(caracas_now)[:10]
-                #A PARTIR DE AQUI DEBO HACER QE SE COMPARE LA HORA Y FECHA ACTUAL
-                #CON LA HORA Y FECHA QUE FUE ENVIADA LA SOLICITUD, NO DEBE SER DE UN DIA DISTINTO
-                #, DEBE SER A LA MISMA HORA Y NO DEBE TENER MUCHOS MINUTOS DE DIFERENCIA
                 for apertura in aperturas_solicitadas:
                     #print(dt['contrato'])
-                    if apertura['contrato'] == CONTRATO:
+                    solicitud_hora_completa = apertura['hora']
+                    solicitud_hora=int(solicitud_hora_completa[:2])
+                    solicitud_minuto=int(solicitud_hora_completa[3:5])
+                    diferencia_horas=hora_hora-solicitud_hora
+                    diferencia_minutos=hora_minuto-solicitud_minuto
+                    if apertura['contrato'] == CONTRATO and apertura['fecha'] == fecha and diferencia_horas==0 and (diferencia_minutos >= -1 or diferencia_minutos <= 2):
                         solicitud_id=apertura['id']
                         cursor.execute('SELECT * FROM solicitud_aperturas WHERE id=%s',(solicitud_id,))
                         aperturas_local_existente= cursor.fetchall()
