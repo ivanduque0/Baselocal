@@ -351,7 +351,7 @@ while True:
                             connheroku.commit()
                             cursorlocal.execute('DELETE FROM solicitud_aperturas WHERE id=%s', (idapertura,))
                             connlocal.commit()
-                etapa==6
+                etapa=6
    
             if etapa==6:
                 cursorlocal.execute('SELECT * FROM web_dispositivos')

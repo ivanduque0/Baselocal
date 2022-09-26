@@ -45,11 +45,12 @@ accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf, connf, acceso):
     
     try:
-        urllib.request.urlopen(f'{accesodict[acceso]}/on')
-        cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
-        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
-        #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
-        connf.commit()
+        if accesodict[acceso]:
+            urllib.request.urlopen(f'{accesodict[acceso]}/on')
+            cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+            VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
+            #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+            connf.commit()
     except:
         cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
         VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razonf}', contratof, cedulaf))
@@ -123,19 +124,18 @@ while True:
                     solicitud_minuto=int(solicitud_hora_completa[3:5])
                     diferencia_horas=hora_hora-solicitud_hora
                     diferencia_minutos=hora_minuto-solicitud_minuto
+                    solicitud_id=apertura['id']
+                    id_usuario = apertura['id_usuario']
+                    solicitud_acceso=apertura['acceso']
                     if apertura['contrato'] == CONTRATO and apertura['fecha'] == fecha and diferencia_horas==0 and (diferencia_minutos >= -1 or diferencia_minutos <= 2):
-                        solicitud_id=apertura['id']
                         cursor.execute('SELECT * FROM solicitud_aperturas WHERE id=%s',(solicitud_id,))
                         aperturas_local_existente= cursor.fetchall()
                         if not aperturas_local_existente:
-                            id_usuario = apertura['id_usuario']
-                            solicitud_acceso=apertura['acceso']
                             cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado)
                                 VALUES (%s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 0))
                             conn.commit()
                     else:
-                        id_usuario = apertura['id_usuario']
-                        solicitud_acceso=apertura['acceso']
+                        
                         cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado)
                             VALUES (%s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 1))
                         conn.commit()
@@ -157,7 +157,7 @@ while True:
                     id_usuario = aperturalocal[1]
                     acceso_solicitud=aperturalocal[2]
                     id_solicitud=aperturalocal[0]
-                    cursor.execute("SELECT * FROM web_usuarios where telegram_id='%s'", (id_usuario,))
+                    cursor.execute("SELECT * FROM web_usuarios where telegram_id=%s", (id_usuario,))
                     datosusuario = cursor.fetchall()
                     #print(datosusuario)
                     if len(datosusuario)!=0:

@@ -148,7 +148,7 @@ services:
       
       restart: always
       
-      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.5
       
       environment:
          - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
@@ -171,7 +171,7 @@ services:
       
       environment:
          #- DISPLAY=unix$DISPLAY
-         - HOST_STREAM=
+         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
          - RAZON=
          - URL_ACCESO=
          - ACCESO=2
@@ -198,7 +198,7 @@ services:
       command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
-         - HOSTSNAPSHOOT=
+         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
          - ACCESO=2
          
       env_file:
@@ -218,7 +218,7 @@ services:
       
       environment:
          #- DISPLAY=unix$DISPLAY
-         - HOST_STREAM=
+         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
          - RAZON=
          - URL_ACCESO=
          - ACCESO=3
@@ -250,7 +250,7 @@ services:
       command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
-         - HOSTSNAPSHOOT=
+         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
          - ACCESO=3
          
       env_file:
@@ -270,7 +270,7 @@ services:
       
       environment:
          #- DISPLAY=unix$DISPLAY
-         - HOST_STREAM=
+         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
          - RAZON=
          - URL_ACCESO=
          - ACCESO=4
@@ -302,7 +302,7 @@ services:
       command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
-         - HOSTSNAPSHOOT=
+         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
          - ACCESO=4
          
       env_file:
