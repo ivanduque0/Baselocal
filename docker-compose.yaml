@@ -71,6 +71,25 @@ services:
       
       depends_on:
          - postgres
+   
+   aperturas:
+   
+      image: ivanduque0/telegrambot:V1.0
+
+      container_name: aperturas
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ./aperturas:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
 
    ping:
    

@@ -119,7 +119,10 @@ while True:
             for dispositivo in dispositivos:
                 if dispositivo:
                     descripcion = dispositivos_dict[dispositivo]
-                    estado = '0'
+                    if dispositivo == SERVIDOR_LOCAL:
+                        estado = '1'
+                    else:
+                        estado = '0'
                     cursorlocal.execute('INSERT INTO web_dispositivos values(%s, %s, %s)',(dispositivo, descripcion, estado))
                     connlocal.commit()
 

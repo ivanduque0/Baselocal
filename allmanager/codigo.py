@@ -347,6 +347,8 @@ while True:
                     for aperturalocal in aperturas_local:
                         if aperturalocal[1] == 1:
                             idapertura=aperturalocal[0]
+                            cursorheroku.execute('DELETE FROM web_apertura WHERE id=%s', (idapertura,))
+                            connheroku.commit()
                             cursorlocal.execute('DELETE FROM solicitud_aperturas WHERE id=%s', (idapertura,))
                             connlocal.commit()
                 etapa==6

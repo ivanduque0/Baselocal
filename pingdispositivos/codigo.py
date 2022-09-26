@@ -31,15 +31,13 @@ camara4=os.environ.get('URL_CAMARA4')
 # camara7=os.environ.get('URL_CAMARA7')
 # camara8=os.environ.get('URL_CAMARA8')
 
-SERVIDOR_LOCAL=os.environ.get('URL_SERVIDOR')
-
 dispositivos=[acceso1, acceso2, acceso3, acceso4, 
-              camara1, camara2, camara3, camara4, SERVIDOR_LOCAL
+              camara1, camara2, camara3, camara4
             #   camara5, camara6, camara7, camara7
               ]
 
 #EN caso que hayan mas dispositivos, se les agregan mas ceros a la lista intentos
-intentos=[0,0,0,0,0,0,0,0,0]
+intentos=[0,0,0,0,0,0,0,0]
 
 while True:
     total=0
