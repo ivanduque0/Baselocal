@@ -91,6 +91,25 @@ services:
       depends_on:
          - postgres
 
+   wifilocal:
+   
+      image: ivanduque0/telegrambot:V1.0
+
+      container_name: wifi
+      
+      restart: always
+      
+      command: python3 codigo.py
+      
+      volumes:
+         - ./servidorlocalwifi:/app
+         
+      env_file:
+         - .env.manager
+      
+      depends_on:
+         - postgres
+
    ping:
    
       image: ivanduque0/dbmakermanager:V0.3

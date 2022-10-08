@@ -24,7 +24,7 @@ acceso3=os.environ.get('URL_ACCESO3')
 acceso4=os.environ.get('URL_ACCESO4')
 
 accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
-
+razondict = {'1':razon1, '2':razon2, '3':razon3, '4':razon4}
 # pulseaqui = [
 #     'pulse aqui',
 #     'pulse aqui',
@@ -42,18 +42,18 @@ accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
 
 # keyboard = Keyboa(items=pulseaqui)
 
-def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf, connf, acceso):
+def aperturaconcedida(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
     
     try:
         if accesodict[acceso]:
             urllib.request.urlopen(f'{accesodict[acceso]}/on')
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
-            VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
+            VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondict[acceso], contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
             connf.commit()
     except:
         cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
-        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razonf}', contratof, cedulaf))
+        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondict[acceso]}', contratof, cedulaf))
         #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
         connf.commit()
     finally:
@@ -179,7 +179,7 @@ while True:
                                     horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                     fecha=str(caracas_now)[:10]
                                     etapadia=1
-                                    aperturaconcedida(nombre, fecha, horahoy, razon1, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                     etapadiaapertura=1
                                 elif dia==diahoy and cantidaddias==1:
                                     hora=str(caracas_now)[11:19]
@@ -189,7 +189,7 @@ while True:
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, razon1, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                         else:
                                             aperturadenegada(cursor, conn, acceso_solicitud)
@@ -197,7 +197,7 @@ while True:
                                     if entrada>salida:
                                         if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, razon1, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                         else:
                                             aperturadenegada(cursor, conn, acceso_solicitud)
@@ -210,7 +210,7 @@ while True:
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, razon1, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                             contadoraux=0
                                         else:
@@ -221,7 +221,7 @@ while True:
                                     if entrada>salida:
                                         if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, razon1, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                             contadoraux=0
                                         else:
