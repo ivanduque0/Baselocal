@@ -10,7 +10,7 @@ SERVIDOR_LOCAL=os.environ.get('URL_SERVIDOR')
 longitud_servidor_local=len(SERVIDOR_LOCAL)
 SERVIDOR_LOCAL = SERVIDOR_LOCAL[7:longitud_servidor_local]
 hostName = SERVIDOR_LOCAL
-serverPort = 1010
+serverPort = 43157
 
 dias_semana = ("Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo")
 ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
@@ -31,7 +31,7 @@ accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
 razondict = {'1':razon1, '2':razon2, '3':razon3, '4':razon4}
 
 def aperturaconcedida(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
-    
+
     try:
         if accesodict[acceso]:
             urllib.request.urlopen(f'{accesodict[acceso]}/on')
@@ -55,21 +55,37 @@ def aperturadenegada(cursorf, connf, acceso):
     except:
         print("fallo en peticion http")
     finally:
-        pass  
+        pass
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200)
-        peticion=self.path[1::].split("/")
-        # print(f"peticion = {peticion}")
-        self.send_header("Content-type", "utf-8")
-        self.end_headers()
-        self.wfile.write(bytes(f"{self.path[1::]}", "utf-8"))
+        if self.path == "/seguricel_wifi_activo":
+            self.send_response(200)
+            self.send_header("Content-type", "utf-8")
+            self.end_headers()
+        # else:
+        #     print("cerrado")
+        #     webServer.shutdown()
         
-        if len(peticion) == 2:
-            id_usuario, acceso_solicitud = peticion
-            print(type(id_usuario))
-            print(type(acceso_solicitud))
+        # peticion=self.path[1::].split("/")
+        # print(f"peticion = {peticion}")
+        # self.send_header("Content-type", "utf-8")
+        # self.end_headers()
+        #self.wfile.write(bytes(f"{self.path[1::]}", "utf-8"))
+
+        
+
+    def do_POST(self):
+        peticion=self.path[1::].split("/")
+        if len(peticion) == 3 and peticion[2] == "seguricel_wifi_activo":
+            self.send_response(200)
+            self.send_header("Content-type", "utf-8")
+            self.end_headers()
+            # self.wfile.write(bytes(f"{self.path[1::]}", "utf-8"))
+
+            id_usuario, acceso_solicitud, _ = peticion
+            print(id_usuario)
+            print(acceso_solicitud)
 
             diasusuario = []
             etapadia=0
@@ -153,19 +169,18 @@ class MyServer(BaseHTTPRequestHandler):
                         aperturadenegada(cursor, conn, acceso_solicitud)
                         #print('Dia no permitido')
                 if horarios_permitidos == []:
-                    aperturadenegada(cursor, conn, acceso_solicitud) 
+                    aperturadenegada(cursor, conn, acceso_solicitud)
                     #print('este usuario no tiene horarios establecidos')
                 diasusuario=[]
             else:
-                aperturadenegada(cursor, conn, acceso_solicitud) 
+                aperturadenegada(cursor, conn, acceso_solicitud)
 
-
-if __name__ == "__main__":        
+if __name__ == "__main__":
     webServer = HTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
 
     while True:
-    
+
         t11=time.perf_counter()
         while total<=5:
             t22=time.perf_counter()
@@ -173,14 +188,15 @@ if __name__ == "__main__":
         total=0
         try:
             conn = psycopg2.connect(
-                database=os.environ.get("DATABASE"), 
-                user=os.environ.get("USERDB"), 
-                password=os.environ.get("PASSWORD"), 
-                host=os.environ.get("HOST"), 
+                database=os.environ.get("DATABASE"),
+                user=os.environ.get("USERDB"),
+                password=os.environ.get("PASSWORD"),
+                host=os.environ.get("HOST"),
                 port=os.environ.get("PORT")
             )
             cursor = conn.cursor()
             webServer.serve_forever()
+            print("fallo")
         except (Exception, psycopg2.Error, KeyboardInterrupt) as error:
             print("fallo en hacer las consultas")
             total=0
@@ -192,4 +208,3 @@ if __name__ == "__main__":
                 conn.close()
                 total=0
             webServer.server_close()
-            
