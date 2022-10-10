@@ -95,7 +95,7 @@ services:
    
       image: ivanduque0/telegrambot:V1.0
 
-      container_name: wifi
+      container_name: wifilocal
       
       restart: always
       
