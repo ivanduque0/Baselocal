@@ -48,6 +48,9 @@ cantidaddias = 0
 contadoraux = 0
 sensorflag = 0
 camara=None
+totalrefrescar= 0
+t1refrescar = 0
+t2refrescar = 0
 
 # for imagen in imagenes:
 #     ruta=os.path.join(directorio,imagen)
@@ -76,7 +79,8 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
         #cursorf.execute('''UPDATE led SET onoff=1 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
         connf.commit()
     finally:
-        pass
+        camara.release()
+        #pass
     #cursorf.execute('SELECT * FROM led')
     #estado_led= cursorf.fetchall()
     #while estado_led[0][0]==1:
@@ -90,7 +94,8 @@ def aperturadenegada():
     except:
         print("fallo en peticion http")
     finally:
-        pass
+        camara.release()
+        #pass
 
 # def aperturadenegada(cursorf, connf):
 #     cursorf.execute('''UPDATE led SET onoff=2 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
@@ -132,7 +137,13 @@ while True:
                 #camara = cv2.VideoCapture("http://192.168.21.102:81/stream")
                 #camara = cv2.VideoCapture("http://192.168.20.102:8080/?action=stream")
                 camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
+                t1refrescar=time.perf_counter()
                 while True:
+                    t2refrescar=time.perf_counter()
+                    totalrefrescar=t2refrescar-t1refrescar
+                    if totalrefrescar>=60:
+                        camara.release()
+                        t1refrescar=time.perf_counter()
 
                     # Si se usa un sensor se deben descomentar estas lineas de abajo y se debe identar el resto del codigo
                     # cursor.execute('SELECT * FROM sensor')
