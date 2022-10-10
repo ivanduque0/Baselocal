@@ -6,10 +6,7 @@ import pytz
 from datetime import datetime
 import urllib.request
 
-SERVIDOR_LOCAL=os.environ.get('URL_SERVIDOR')
-longitud_servidor_local=len(SERVIDOR_LOCAL)
-SERVIDOR_LOCAL = SERVIDOR_LOCAL[7:longitud_servidor_local]
-hostName = SERVIDOR_LOCAL
+hostName = '0.0.0.0'
 serverPort = 43157
 
 dias_semana = ("Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo")

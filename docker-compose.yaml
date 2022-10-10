@@ -103,6 +103,9 @@ services:
       
       volumes:
          - ./servidorlocalwifi:/app
+
+      ports:
+         - 43157:43157
          
       env_file:
          - .env.manager
