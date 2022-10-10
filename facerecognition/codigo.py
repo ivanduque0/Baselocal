@@ -51,6 +51,7 @@ camara=None
 totalrefrescar= 0
 t1refrescar = 0
 t2refrescar = 0
+REFRESCAR_CAMARA=int(os.environ.get('REFRESCAR_CAMARA'))
 
 # for imagen in imagenes:
 #     ruta=os.path.join(directorio,imagen)
@@ -141,7 +142,7 @@ while True:
                 while True:
                     t2refrescar=time.perf_counter()
                     totalrefrescar=t2refrescar-t1refrescar
-                    if totalrefrescar>=60:
+                    if totalrefrescar >= REFRESCAR_CAMARA:
                         camara.release()
                         t1refrescar=time.perf_counter()
 
