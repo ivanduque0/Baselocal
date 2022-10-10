@@ -65,7 +65,7 @@ camara=None
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf,connf):
     
     try:
-        urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/on')
+        urllib.request.urlopen(url=f'{os.environ.get("URL_ACCESO")}/on', timeout=3)
         cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
         VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
         #cursorf.execute('''UPDATE led SET onoff=1 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
@@ -86,7 +86,7 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
 
 def aperturadenegada():
     try:
-        urllib.request.urlopen(f'{os.environ.get("URL_ACCESO")}/off')
+        urllib.request.urlopen(url=f'{os.environ.get("URL_ACCESO")}/off', timeout=3)
     except:
         print("fallo en peticion http")
     finally:

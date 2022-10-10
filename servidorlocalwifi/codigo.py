@@ -31,7 +31,7 @@ def aperturaconcedida(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf
 
     try:
         if accesodict[acceso]:
-            urllib.request.urlopen(f'{accesodict[acceso]}/on')
+            urllib.request.urlopen(url=f'{accesodict[acceso]}/on', timeout=3)
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
             VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondict[acceso], contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
@@ -48,7 +48,7 @@ def aperturadenegada(cursorf, connf, acceso):
     # cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
     # connf.commit()
     try:
-        urllib.request.urlopen(f'{accesodict[acceso]}/off')
+        urllib.request.urlopen(url=f'{accesodict[acceso]}/off', timeout=3)
     except:
         print("fallo en peticion http")
     finally:
