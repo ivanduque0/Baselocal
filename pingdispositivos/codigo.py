@@ -31,13 +31,28 @@ camara4=os.environ.get('URL_CAMARA4')
 # camara7=os.environ.get('URL_CAMARA7')
 # camara8=os.environ.get('URL_CAMARA8')
 
+######################################
+#############CAPTAHUELLAS#############
+#######################################
+
+captahuella1=os.environ.get('URL_CAPTAHUELLA1')
+captahuella2=os.environ.get('URL_CAPTAHUELLA2')
+captahuella3=os.environ.get('URL_CAPTAHUELLA3')
+captahuella4=os.environ.get('URL_CAPTAHUELLA4')
+# captahuella5=os.environ.get('URL_CAPTAHUELLA5')
+# captahuella6=os.environ.get('URL_CAPTAHUELLA6')
+# captahuella7=os.environ.get('URL_CAPTAHUELLA7')
+# captahuella8=os.environ.get('URL_CAPTAHUELLA8')
+
 dispositivos=[acceso1, acceso2, acceso3, acceso4, 
-              camara1, camara2, camara3, camara4
-            #   camara5, camara6, camara7, camara7
+              camara1, camara2, camara3, camara4,
+              #   camara5, camara6, camara7, camara7
+              captahuella1, captahuella2, captahuella3, captahuella4,
+            #   captahuella5, captahuella6, captahuella7, captahuella8
               ]
 
 #EN caso que hayan mas dispositivos, se les agregan mas ceros a la lista intentos
-intentos=[0,0,0,0,0,0,0,0]
+intentos=[0,0,0,0,0,0,0,0,0,0,0,0]
 
 while True:
     total=0

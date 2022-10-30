@@ -42,8 +42,25 @@ descripcion_camara4=os.environ.get('RAZON_CAM4')
 # descripcion_camara7=os.environ.get('RAZON_CAM7')
 # descripcion_camara8=os.environ.get('RAZON_CAM8')
 
+
+######################################
+#############CAPTAHUELLAS#############
+#######################################
+
+captahuella1=os.environ.get('URL_CAPTAHUELLA1')
+captahuella2=os.environ.get('URL_CAPTAHUELLA2')
+captahuella3=os.environ.get('URL_CAPTAHUELLA3')
+captahuella4=os.environ.get('URL_CAPTAHUELLA4')
+
+descripcion_captahuella1=os.environ.get('RAZON_CAPTAHUELLA1')
+descripcion_captahuella2=os.environ.get('RAZON_CAPTAHUELLA2')
+descripcion_captahuella3=os.environ.get('RAZON_CAPTAHUELLA3')
+descripcion_captahuella4=os.environ.get('RAZON_CAPTAHUELLA4')
+
+
 dispositivos=[acceso1, acceso2, acceso3, acceso4, 
-              camara1, camara2, camara3, camara4, SERVIDOR_LOCAL,
+              camara1, camara2, camara3, camara4, 
+              captahuella1, captahuella2, captahuella3, captahuella4SERVIDOR_LOCAL,
             #   camara5, camara6, camara7, camara7
               ]
 
@@ -55,6 +72,10 @@ dispositivos_dict ={acceso1:descripcion_acceso1,
                     camara2:descripcion_camara2, 
                     camara3:descripcion_camara3, 
                     camara4:descripcion_camara4, 
+                    captahuella1:descripcion_captahuella1, 
+                    captahuella2:descripcion_captahuella2, 
+                    captahuella3:descripcion_captahuella3, 
+                    captahuella4:descripcion_captahuella4, 
                     SERVIDOR_LOCAL:'SERVIDOR LOCAL',
                     # camara5:descripcion_camara5, 
                     # camara6:descripcion_camara6, 
@@ -93,6 +114,7 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS cargar_fotos (cargar integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_dispositivos (dispositivo varchar(150), descripcion varchar(150), estado varchar(150))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS solicitud_aperturas (id integer, id_usuario varchar(150), acceso varchar(150), estado integer)')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_huellas (id_suprema integer, cedula varchar(150), template text)')
         connlocal.commit()
         # cursorlocal.execute('SELECT*FROM led')
         # tablaled= cursorlocal.fetchall()
