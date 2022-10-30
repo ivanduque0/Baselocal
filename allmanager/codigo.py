@@ -468,7 +468,7 @@ while True:
                     listahuellaslocal=[]
                 etapa=7
    
-            if etapa==8:
+            if etapa==7:
                 cursorlocal.execute('SELECT * FROM web_dispositivos')
                 dispositivos_local= cursorlocal.fetchall()
 

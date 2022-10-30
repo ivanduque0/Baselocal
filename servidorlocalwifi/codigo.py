@@ -23,6 +23,10 @@ razonhuella1=os.environ.get("RAZON_CAPTAHUELLA1")
 razonhuella2=os.environ.get("RAZON_CAPTAHUELLA2")
 razonhuella3=os.environ.get("RAZON_CAPTAHUELLA3")
 razonhuella4=os.environ.get("RAZON_CAPTAHUELLA4")
+# razonhuella5=os.environ.get("RAZON_CAPTAHUELLA5")
+# razonhuella6=os.environ.get("RAZON_CAPTAHUELLA6")
+# razonhuella7=os.environ.get("RAZON_CAPTAHUELLA7")
+# razonhuella8=os.environ.get("RAZON_CAPTAHUELLA8")
 acceso1=os.environ.get('URL_ACCESO1')
 acceso2=os.environ.get('URL_ACCESO2')
 acceso3=os.environ.get('URL_ACCESO3')
@@ -31,6 +35,7 @@ acceso4=os.environ.get('URL_ACCESO4')
 accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
 razondict = {'1':razon1, '2':razon2, '3':razon3, '4':razon4}
 razondicthuellas = {'1':razonhuella1, '2':razonhuella2, '3':razonhuella3, '4':razonhuella4}
+
 def aperturaconcedida(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
 
     try:
