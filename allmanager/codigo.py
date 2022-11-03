@@ -467,8 +467,40 @@ while True:
                     listahuellasheroku=[]
                     listahuellaslocal=[]
                 etapa=7
-   
+
             if etapa==7:
+                cursorlocal.execute('SELECT epc, cedula FROM web_tagsrfid')
+                tags_local= cursorlocal.fetchall()
+
+                cursorheroku.execute('SELECT epc, cedula FROM web_tagsrfid where contrato_id=%s', (CONTRATO,))
+                tags_heroku= cursorheroku.fetchall()
+
+                nro_tags_local = len(tags_local)
+                nro_tags_heroku = len(tags_heroku)
+
+                if nro_tags_heroku > nro_tags_local:
+                    for tagherokuiterar in tags_heroku:
+                        try:
+                            tags_local.index(tagherokuiterar)
+                        except ValueError:
+                            epc=tagherokuiterar[0]
+                            cedula=tagherokuiterar[1]
+                            cursorlocal.execute('''INSERT INTO web_tagsrfid (epc, cedula)
+                            VALUES (%s, %s);''', (epc, cedula))
+                            connlocal.commit()
+
+                if nro_tags_local > nro_tags_heroku:
+                    for taglocaliterar in tags_local:
+                        try:
+                            tags_heroku.index(taglocaliterar)
+                        except ValueError:
+                            epc=taglocaliterar[0]
+                            cedula=taglocaliterar[1]
+                            cursorlocal.execute('DELETE FROM web_tagsrfid WHERE epc=%s AND cedula=%s',(epc, cedula))
+                            connlocal.commit()
+                etapa=8
+   
+            if etapa==8:
                 cursorlocal.execute('SELECT * FROM web_dispositivos')
                 dispositivos_local= cursorlocal.fetchall()
 

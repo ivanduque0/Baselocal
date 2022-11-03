@@ -15,10 +15,10 @@ primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 total=0
 CONTRATO=os.environ.get("CONTRATO")
 
-razon1=os.environ.get("RAZON_BOT1")
-razon2=os.environ.get("RAZON_BOT2")
-razon3=os.environ.get("RAZON_BOT3")
-razon4=os.environ.get("RAZON_BOT4")
+razon1=os.environ.get("RAZON_TELEFONO1")
+razon2=os.environ.get("RAZON_TELEFONO2")
+razon3=os.environ.get("RAZON_TELEFONO3")
+razon4=os.environ.get("RAZON_TELEFONO4")
 razonhuella1=os.environ.get("RAZON_CAPTAHUELLA1")
 razonhuella2=os.environ.get("RAZON_CAPTAHUELLA2")
 razonhuella3=os.environ.get("RAZON_CAPTAHUELLA3")
@@ -27,6 +27,14 @@ razonhuella4=os.environ.get("RAZON_CAPTAHUELLA4")
 # razonhuella6=os.environ.get("RAZON_CAPTAHUELLA6")
 # razonhuella7=os.environ.get("RAZON_CAPTAHUELLA7")
 # razonhuella8=os.environ.get("RAZON_CAPTAHUELLA8")
+razonrfid1=os.environ.get("RAZON_RFID1")
+razonrfid2=os.environ.get("RAZON_RFID2")
+razonrfid3=os.environ.get("RAZON_RFID3")
+razonrfid4=os.environ.get("RAZON_RFID4")
+# razonrfid1=os.environ.get("RAZON_RFID5")
+# razonrfid2=os.environ.get("RAZON_RFID6")
+# razonrfid3=os.environ.get("RAZON_RFID7")
+# razonrfid4=os.environ.get("RAZON_RFID8")
 acceso1=os.environ.get('URL_ACCESO1')
 acceso2=os.environ.get('URL_ACCESO2')
 acceso3=os.environ.get('URL_ACCESO3')
@@ -35,6 +43,7 @@ acceso4=os.environ.get('URL_ACCESO4')
 accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
 razondict = {'1':razon1, '2':razon2, '3':razon3, '4':razon4}
 razondicthuellas = {'1':razonhuella1, '2':razonhuella2, '3':razonhuella3, '4':razonhuella4}
+razondictrfids = {'1':razonrfid1, '2':razonrfid2, '3':razonrfid3, '4':razonrfid4}
 
 def aperturaconcedida(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
 
@@ -65,6 +74,23 @@ def aperturaconcedidahuella(nombref, fechaf, horaf, contratof, cedulaf, cursorf,
     except:
         cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
         VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondicthuellas[acceso]}', contratof, cedulaf))
+        #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+        connf.commit()
+    finally:
+        pass
+
+def aperturaconcedidarfid(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
+
+    try:
+        if accesodict[acceso]:
+            urllib.request.urlopen(url=f'{accesodict[acceso]}/on', timeout=3)
+            cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+            VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondictrfids[acceso], contratof, cedulaf))
+            #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+            connf.commit()
+    except:
+        cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondictrfids[acceso]}', contratof, cedulaf))
         #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
         connf.commit()
     finally:
@@ -302,6 +328,103 @@ class MyServer(BaseHTTPRequestHandler):
                 diasusuario=[]
             else:
                 aperturadenegada(cursor, conn, acceso_solicitud)
+
+        if len(peticion) == 3 and peticion[2] == "seguricel_rfid_activo":
+            self.send_response(200)
+            self.send_header("Content-type", "utf-8")
+            self.end_headers()
+            # self.wfile.write(bytes(f"{self.path[1::]}", "utf-8"))
+            epc, acceso_solicitud, _ = peticion
+            diasusuario = []
+            etapadia=0
+            etapadiaapertura=0
+            cantidaddias = 0
+            contadoraux = 0
+            cursor.execute("SELECT cedula FROM web_tagsrfid where epc=%s", (epc,))
+            datosusuario_rfid = cursor.fetchall()
+            #print(datosusuario)
+            if len(datosusuario_rfid)!=0:
+                cursor.execute("SELECT * FROM web_usuarios where cedula=%s", (datosusuario_rfid[0][0],))
+                datosusuario = cursor.fetchall()
+                cedula=datosusuario[0][0]
+                nombre=datosusuario[0][1]
+                cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
+                horarios_permitidos = cursor.fetchall()
+                if horarios_permitidos != []:
+                    tz = pytz.timezone('America/Caracas')
+                    caracas_now = datetime.now(tz)
+                    dia = caracas_now.weekday()
+                    diahoy = dias_semana[dia]
+                    for entrada, salida, _, dia in horarios_permitidos:
+                        diasusuario.append(dia)
+                    cantidaddias = diasusuario.count(dia)
+                    for entrada, salida, _, dia in horarios_permitidos:
+                        if 'Siempre' in diasusuario:
+                            hora=str(caracas_now)[11:19]
+                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                            fecha=str(caracas_now)[:10]
+                            etapadia=1
+                            aperturaconcedidarfid(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                            etapadiaapertura=1
+                        elif dia==diahoy and cantidaddias==1:
+                            hora=str(caracas_now)[11:19]
+                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                            fecha=str(caracas_now)[:10]
+                            etapadia=1
+                            if entrada<salida:
+                                if horahoy >= entrada and horahoy <= salida:
+                                    #print('entrada concedida')
+                                    aperturaconcedidarfid(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                else:
+                                    aperturadenegada(cursor, conn, acceso_solicitud)
+                                    #print('fuera de horario')
+                            if entrada>salida:
+                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                    #print('entrada concedida')
+                                    aperturaconcedidarfid(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                else:
+                                    aperturadenegada(cursor, conn, acceso_solicitud)
+                                    #print('fuera de horario')
+                        elif dia==diahoy and cantidaddias>1:
+                            hora=str(caracas_now)[11:19]
+                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                            fecha=str(caracas_now)[:10]
+                            etapadia=1
+                            if entrada<salida:
+                                if horahoy >= entrada and horahoy <= salida:
+                                    #print('entrada concedida')
+                                    aperturaconcedidarfid(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                    contadoraux=0
+                                else:
+                                    contadoraux = contadoraux+1
+                                    if contadoraux == cantidaddias:
+                                        aperturadenegada(cursor, conn, acceso_solicitud)
+                                        contadoraux=0
+                            if entrada>salida:
+                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                    #print('entrada concedida')
+                                    aperturaconcedidarfid(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                    contadoraux=0
+                                else:
+                                    contadoraux = contadoraux+1
+                                    if contadoraux == cantidaddias:
+                                        aperturadenegada(cursor, conn, acceso_solicitud)
+                                        contadoraux=0
+                                    #print('fuera de horario')
+                    if etapadia==0 and etapadiaapertura==0:
+                        aperturadenegada(cursor, conn, acceso_solicitud)
+                        #print('Dia no permitido')
+                if horarios_permitidos == []:
+                    aperturadenegada(cursor, conn, acceso_solicitud)
+                    #print('este usuario no tiene horarios establecidos')
+                diasusuario=[]
+            else:
+                aperturadenegada(cursor, conn, acceso_solicitud)
+
 
 if __name__ == "__main__":
     webServer = HTTPServer((hostName, serverPort), MyServer)

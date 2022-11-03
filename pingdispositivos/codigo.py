@@ -44,15 +44,30 @@ captahuella4=os.environ.get('URL_CAPTAHUELLA4')
 # captahuella7=os.environ.get('URL_CAPTAHUELLA7')
 # captahuella8=os.environ.get('URL_CAPTAHUELLA8')
 
+######################################
+################RFID###################
+#######################################
+
+rfid1=os.environ.get('URL_RFID1')
+rfid2=os.environ.get('URL_RFID2')
+rfid3=os.environ.get('URL_RFID3')
+rfid4=os.environ.get('URL_RFID4')
+# rfid5=os.environ.get('URL_RFID5')
+# rfid6=os.environ.get('URL_RFID6')
+# rfid7=os.environ.get('URL_RFID7')
+# rfid8=os.environ.get('URL_RFID8')
+
 dispositivos=[acceso1, acceso2, acceso3, acceso4, 
               camara1, camara2, camara3, camara4,
               #   camara5, camara6, camara7, camara7
               captahuella1, captahuella2, captahuella3, captahuella4,
-            #   captahuella5, captahuella6, captahuella7, captahuella8
+              # captahuella5, captahuella6, captahuella7, captahuella8,
+              rfid1, rfid2, rfid3, rfid4,
+              # rfid5, rfid6, rfid7, rfid8
               ]
 
 #EN caso que hayan mas dispositivos, se les agregan mas ceros a la lista intentos
-intentos=[0,0,0,0,0,0,0,0,0,0,0,0]
+intentos=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 while True:
     total=0

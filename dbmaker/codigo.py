@@ -15,10 +15,10 @@ acceso2=os.environ.get('URL_ACCESO2')
 acceso3=os.environ.get('URL_ACCESO3')
 acceso4=os.environ.get('URL_ACCESO4')
 
-descripcion_acceso1=os.environ.get('RAZON_BOT1')
-descripcion_acceso2=os.environ.get('RAZON_BOT2')
-descripcion_acceso3=os.environ.get('RAZON_BOT3')
-descripcion_acceso4=os.environ.get('RAZON_BOT4')
+descripcion_acceso1=os.environ.get('RAZON_TELEFONO1')
+descripcion_acceso2=os.environ.get('RAZON_TELEFONO2')
+descripcion_acceso3=os.environ.get('RAZON_TELEFONO3')
+descripcion_acceso4=os.environ.get('RAZON_TELEFONO4')
 
 ######################################
 #############CAMARAS###################
@@ -51,16 +51,48 @@ captahuella1=os.environ.get('URL_CAPTAHUELLA1')
 captahuella2=os.environ.get('URL_CAPTAHUELLA2')
 captahuella3=os.environ.get('URL_CAPTAHUELLA3')
 captahuella4=os.environ.get('URL_CAPTAHUELLA4')
+# captahuella5=os.environ.get('URL_CAPTAHUELLA5')
+# captahuella6=os.environ.get('URL_CAPTAHUELLA6')
+# captahuella7=os.environ.get('URL_CAPTAHUELLA7')
+# captahuella8=os.environ.get('URL_CAPTAHUELLA8')
 
 descripcion_captahuella1=os.environ.get('RAZON_CAPTAHUELLA1')
 descripcion_captahuella2=os.environ.get('RAZON_CAPTAHUELLA2')
 descripcion_captahuella3=os.environ.get('RAZON_CAPTAHUELLA3')
 descripcion_captahuella4=os.environ.get('RAZON_CAPTAHUELLA4')
+# descripcion_captahuella5=os.environ.get('RAZON_CAPTAHUELLA5')
+# descripcion_captahuella6=os.environ.get('RAZON_CAPTAHUELLA6')
+# descripcion_captahuella7=os.environ.get('RAZON_CAPTAHUELLA7')
+# descripcion_captahuella8=os.environ.get('RAZON_CAPTAHUELLA8')
 
+
+######################################
+################RFID###################
+#######################################
+
+rfid1=os.environ.get('URL_RFID1')
+rfid2=os.environ.get('URL_RFID2')
+rfid3=os.environ.get('URL_RFID3')
+rfid4=os.environ.get('URL_RFID4')
+# rfid5=os.environ.get('URL_RFID5')
+# rfid6=os.environ.get('URL_RFID6')
+# rfid7=os.environ.get('URL_RFID7')
+# rfid8=os.environ.get('URL_RFID8')
+
+descripcion_rfid1=os.environ.get('RAZON_RFID1')
+descripcion_rfid2=os.environ.get('RAZON_RFID2')
+descripcion_rfid3=os.environ.get('RAZON_RFID3')
+descripcion_rfid4=os.environ.get('RAZON_RFID4')
+# descripcion_rfid5=os.environ.get('RAZON_RFID5')
+# descripcion_rfid6=os.environ.get('RAZON_RFID6')
+# descripcion_rfid7=os.environ.get('RAZON_RFID7')
+# descripcion_rfid8=os.environ.get('RAZON_RFID8')
 
 dispositivos=[acceso1, acceso2, acceso3, acceso4, 
               camara1, camara2, camara3, camara4, 
-              captahuella1, captahuella2, captahuella3, captahuella4SERVIDOR_LOCAL,
+              captahuella1, captahuella2, captahuella3, captahuella4, 
+              rfid1, rfid2, rfid3, rfid4,
+              SERVIDOR_LOCAL,
             #   camara5, camara6, camara7, camara7
               ]
 
@@ -75,7 +107,11 @@ dispositivos_dict ={acceso1:descripcion_acceso1,
                     captahuella1:descripcion_captahuella1, 
                     captahuella2:descripcion_captahuella2, 
                     captahuella3:descripcion_captahuella3, 
-                    captahuella4:descripcion_captahuella4, 
+                    captahuella4:descripcion_captahuella4,
+                    rfid1:descripcion_rfid1,
+                    rfid2:descripcion_rfid2,
+                    rfid3:descripcion_rfid3,
+                    rfid4:descripcion_rfid4,
                     SERVIDOR_LOCAL:'SERVIDOR LOCAL',
                     # camara5:descripcion_camara5, 
                     # camara6:descripcion_camara6, 
@@ -115,6 +151,7 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_dispositivos (dispositivo varchar(150), descripcion varchar(150), estado varchar(150))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS solicitud_aperturas (id integer, id_usuario varchar(150), acceso varchar(150), estado integer)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_huellas (id_suprema integer, cedula varchar(150), template text)')
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS web_tagsrfid (epc text, cedula varchar(150))')
         connlocal.commit()
         # cursorlocal.execute('SELECT*FROM led')
         # tablaled= cursorlocal.fetchall()
