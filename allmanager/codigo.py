@@ -391,10 +391,10 @@ while True:
                 if len(usuarios_local) == len(usuarios_heroku):
 
                     for usuario_local in listausuarioslocal:
-                        cursorlocal.execute('SELECT template, id_suprema FROM web_huellas')
+                        cursorlocal.execute('SELECT template, id_suprema FROM web_huellas where cedula=%s', (usuario_local,))
                         huellas_local= cursorlocal.fetchall()
 
-                        cursorheroku.execute('SELECT template, id_suprema FROM web_huellas where cedula=%s', (usuario_local))
+                        cursorheroku.execute('SELECT template, id_suprema FROM web_huellas where cedula=%s', (usuario_local,))
                         huellas_heroku= cursorheroku.fetchall()
 
                         nro_huellas_local = len(huellas_local)
