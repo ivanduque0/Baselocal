@@ -15,10 +15,10 @@ acceso2=os.environ.get('URL_ACCESO2')
 acceso3=os.environ.get('URL_ACCESO3')
 acceso4=os.environ.get('URL_ACCESO4')
 
-descripcion_acceso1=os.environ.get('RAZON_TELEFONO1')
-descripcion_acceso2=os.environ.get('RAZON_TELEFONO2')
-descripcion_acceso3=os.environ.get('RAZON_TELEFONO3')
-descripcion_acceso4=os.environ.get('RAZON_TELEFONO4')
+descripcion_acceso1=os.environ.get('RAZON_ACCESO1')
+descripcion_acceso2=os.environ.get('RAZON_ACCESO2')
+descripcion_acceso3=os.environ.get('RAZON_ACCESO3')
+descripcion_acceso4=os.environ.get('RAZON_ACCESO4')
 
 ######################################
 #############CAMARAS###################

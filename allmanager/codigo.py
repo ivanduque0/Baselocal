@@ -26,6 +26,9 @@ fechahoy=None
 fechaayer=None
 diasacumulados=[]
 etapa=0
+nroCaptahuellasConHuella=0
+nroCaptahuellasSinHuella=0
+captahuella_actual=0
 DIRECTORIO=os.environ.get("DIRECTORIO", "media/personas")
 
 captahuella1=os.environ.get('URL_CAPTAHUELLA1')
@@ -372,7 +375,6 @@ while True:
 
                 nro_huellas_local = len(huellas_local)
                 nro_huellas_heroku = len(huellas_heroku)
-            
                 #cuando se van a eliminar huellas
                 if nro_huellas_local > nro_huellas_heroku:
 
@@ -394,22 +396,25 @@ while True:
                         try:
                             listahuellasheroku.index(templateEnLista)
                         except ValueError:
+                            nroCaptahuellasSinHuella=0
+                            captahuella_actual=0
+                            cursorlocal.execute('SELECT id_suprema FROM web_huellas where template=%s', (templateEnLista,))
+                            huella_local= cursorlocal.fetchall()
+                            id_suprema = huella_local[0][0]
+                            id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
+                            id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
                             for captahuella in captahuellas:
                                 if captahuella:
-                                    cursorlocal.execute('SELECT id_suprema FROM web_huellas where template=%s', (templateEnLista,))
-                                    huella_local= cursorlocal.fetchall()
-                                    id_suprema = huella_local[0][0]
-                                    id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
-                                    id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
+                                    captahuella_actual=captahuella_actual+1
                                     try:
                                         peticion = urllib.request.urlopen(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
                                         if peticion.getcode() == 200:
-                                            cursorlocal.execute('DELETE FROM web_huellas WHERE template=%s', (templateEnLista,))
-                                            connlocal.commit()
+                                            nroCaptahuellasSinHuella=nroCaptahuellasSinHuella+1
                                     except:
-                                        print("fallo al conectar con la esp8266")
-                                    finally:
-                                        pass
+                                        print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
+                            if nroCaptahuellasSinHuella == captahuella_actual:
+                                cursorlocal.execute('DELETE FROM web_huellas WHERE template=%s', (templateEnLista,))
+                                connlocal.commit()
                     listahuellasheroku=[]
                     listahuellaslocal=[]
 
@@ -439,6 +444,8 @@ while True:
                             id_suprema=huella_heroku[0][0]
                             cedula=huella_heroku[0][1]
                             template=huella_heroku[0][2]
+                            nroCaptahuellasConHuella=0
+                            captahuella_actual=0
                             if not id_suprema:
                                 cursorlocal.execute('SELECT id_suprema FROM web_huellas ORDER BY id_suprema DESC LIMIT 1')
                                 largest_id_suprema= cursorlocal.fetchall()
@@ -450,20 +457,32 @@ while True:
                                     id_suprema=largest_id_suprema[0][0]+1
                                     cursorheroku.execute('UPDATE web_huellas SET id_suprema=%s WHERE template=%s', (id_suprema, template))
                                     connheroku.commit()
+                            id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
+                            id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
                             for captahuella in captahuellas:
                                 if captahuella:
-                                    id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
-                                    id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
+                                    captahuella_actual=captahuella_actual+1
                                     try:
                                         peticion = urllib.request.urlopen(url=f'{captahuella}/anadir/{id_suprema_hex}/{template}', timeout=3)
                                         if peticion.getcode() == 200:
+                                            nroCaptahuellasConHuella=nroCaptahuellasConHuella+1
                                             cursorlocal.execute('''INSERT INTO web_huellas (id_suprema, cedula, template)
                                             VALUES (%s, %s, %s)''', (id_suprema, cedula, template))
                                             connlocal.commit()       
                                     except:
-                                        print("fallo al conectar con la esp8266")
-                                    finally:
-                                        pass
+                                        print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
+                            if nroCaptahuellasConHuella == captahuella_actual:
+                                cursorlocal.execute('''INSERT INTO web_huellas (id_suprema, cedula, template)
+                                VALUES (%s, %s, %s)''', (id_suprema, cedula, template))
+                                connlocal.commit()
+                            elif captahuella_actual != nroCaptahuellasConHuella and nroCaptahuellasConHuella != 0:
+                                for captahuella in captahuellas:
+                                    try:
+                                        peticion = urllib.request.urlopen(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
+                                        if peticion.getcode() == 200:
+                                            pass
+                                    except:
+                                        print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
                     listahuellasheroku=[]
                     listahuellaslocal=[]
                 etapa=7
