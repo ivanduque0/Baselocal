@@ -334,7 +334,7 @@ while True:
                                         except:
                                             print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
                                 if nroCaptahuellasSinHuella == captahuella_actual:
-                                    cursorlocal.execute('DELETE FROM web_huellas WHERE template=%s', (templateEnLista,))
+                                    cursorlocal.execute('DELETE FROM web_huellas WHERE id_suprema=%s', (id_suprema,))
                                     connlocal.commit()
                                     HuellasBorradas=HuellasBorradas+1
                             if HuellasBorradas == HuellasPorBorrar:
