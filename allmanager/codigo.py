@@ -314,10 +314,35 @@ while True:
                         try:
                             listausuariosheroku.index(usuario)
                         except ValueError:
-                            cursorlocal.execute('DELETE FROM web_usuarios WHERE cedula=%s', (usuario,))
-                            cursorlocal.execute('DELETE FROM web_fotos WHERE cedula_id=%s', (usuario,))
-                            cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE cedula_id=%s', (usuario,))
-                            connlocal.commit()
+                            cursorlocal.execute('SELECT id_suprema FROM web_huellas where cedula=%s', (usuario,))
+                            huellas_local= cursorlocal.fetchall()
+                            HuellasPorBorrar=len(huellas_local)
+                            HuellasBorradas=0
+                            nroCaptahuellasSinHuella=0
+                            captahuella_actual=0
+                            for huella_local in huellas_local:
+                                id_suprema = huella_local[0]
+                                id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
+                                id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
+                                for captahuella in captahuellas:
+                                    if captahuella:
+                                        captahuella_actual=captahuella_actual+1
+                                        try:
+                                            peticion = urllib.request.urlopen(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
+                                            if peticion.getcode() == 200:
+                                                nroCaptahuellasSinHuella=nroCaptahuellasSinHuella+1
+                                        except:
+                                            print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
+                                if nroCaptahuellasSinHuella == captahuella_actual:
+                                    cursorlocal.execute('DELETE FROM web_huellas WHERE template=%s', (templateEnLista,))
+                                    connlocal.commit()
+                                    HuellasBorradas=HuellasBorradas+1
+                            if HuellasBorradas == HuellasPorBorrar:
+                                cursorlocal.execute('DELETE FROM web_usuarios WHERE cedula=%s', (usuario,))
+                                cursorlocal.execute('DELETE FROM web_fotos WHERE cedula_id=%s', (usuario,))
+                                cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE cedula_id=%s', (usuario,))
+                                connlocal.commit()
+                            
                     listausuariosheroku=[]
                     listausuarioslocal=[]
 
