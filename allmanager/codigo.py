@@ -132,7 +132,7 @@ while True:
                 cursorlocal.execute('SELECT * FROM web_usuarios')
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT cedula, nombre, telegram_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                 usuarios_heroku= cursorheroku.fetchall()
                 
                 for usuario in usuarios_local:
@@ -212,7 +212,7 @@ while True:
                 cursorlocal.execute('SELECT * FROM web_usuarios')
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT cedula, nombre, telegram_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                 usuarios_heroku= cursorheroku.fetchall()
 
 
@@ -224,7 +224,7 @@ while True:
                         listausuarioslocal.append(cedula)
                 
                 for usuario in listausuarioslocal:
-                    cursorheroku.execute('SELECT entrada, salida, cedula, dia FROM web_horariospermitidos WHERE cedula=%s and contrato_id=%s',(usuario,CONTRATO))
+                    cursorheroku.execute('SELECT entrada, salida, cedula, dia FROM web_horariospermitidos WHERE cedula=%s and (contrato_id=%s or contrato_id=%s)',(usuario,CONTRATO,'SEGURICEL'))
                     diasheroku= cursorheroku.fetchall()
                     
                     cursorlocal.execute('SELECT * FROM web_horariospermitidos WHERE cedula_id=%s',(usuario,))
@@ -262,10 +262,10 @@ while True:
 
             if etapa==3:
 
-                cursorlocal.execute('SELECT * FROM web_usuarios')
+                cursorlocal.execute('SELECT cedula, telegram_id FROM web_usuarios')
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT cedula, nombre, telegram_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula, telegram_id FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                 usuarios_heroku= cursorheroku.fetchall()
                 
                 nro_usu_local = len(usuarios_local)
@@ -277,7 +277,7 @@ while True:
                             usuarios_local.index(usuario)
                         except ValueError:
                             cedula=usuario[0]
-                            telegram_id=usuario[2]
+                            telegram_id=usuario[1]
                             cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s WHERE cedula=%s", (telegram_id,cedula))
                             connlocal.commit()
                 etapa=4
@@ -287,7 +287,7 @@ while True:
                 cursorlocal.execute('SELECT * FROM web_usuarios')
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT cedula, nombre, telegram_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                 usuarios_heroku= cursorheroku.fetchall()
 
                 nro_usu_local = len(usuarios_local)
@@ -342,7 +342,7 @@ while True:
                         try:
                             listausuarioslocal.index(usuario)
                         except ValueError:
-                            cursorheroku.execute('SELECT cedula, nombre, telegram_id, contrato_id FROM web_usuarios where cedula=%s and contrato_id=%s', (usuario,CONTRATO))
+                            cursorheroku.execute('SELECT cedula, nombre FROM web_usuarios where cedula=%s and (contrato_id=%s or contrato_id=%s)', (usuario, CONTRATO, 'SEGURICEL'))
                             usuario_heroku= cursorheroku.fetchall()
                             cedula=usuario_heroku[0][0]
                             nombre=usuario_heroku[0][1]
@@ -371,7 +371,7 @@ while True:
                 cursorlocal.execute('SELECT * FROM web_usuarios')
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT cedula, nombre, telegram_id FROM web_usuarios where contrato_id=%s', (CONTRATO,))
+                cursorheroku.execute('SELECT cedula FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                 usuarios_heroku= cursorheroku.fetchall()
                 
                 for usuario in usuarios_local:
