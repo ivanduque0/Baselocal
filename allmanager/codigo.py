@@ -19,6 +19,7 @@ listausuarioslocal=[]
 listausuariosheroku=[]
 listahuellasheroku=[]
 listahuellaslocal=[]
+listaempleadosseguricel=[]
 diaslocal=[]
 diasheroku=[]
 total=0
@@ -398,6 +399,9 @@ while True:
 
                 cursorheroku.execute('SELECT cedula FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                 usuarios_heroku= cursorheroku.fetchall()
+
+                cursorheroku.execute('SELECT cedula FROM web_usuarios where contrato_id=%s', ('SEGURICEL',))
+                empleados_seguricel= cursorheroku.fetchall()
                 
                 for usuario in usuarios_local:
                     cedula=usuario[0]
@@ -412,6 +416,13 @@ while True:
                         listausuariosheroku.index(cedula)
                     except ValueError:
                         listausuariosheroku.append(cedula)
+                
+                for empleado_seguricel in empleados_seguricel:
+                    cedula=empleado_seguricel[0]
+                    try:
+                        listaempleadosseguricel.index(cedula)
+                    except ValueError:
+                        listaempleadosseguricel.append(cedula)
                 
                 if len(usuarios_local) == len(usuarios_heroku):
 
@@ -495,17 +506,30 @@ while True:
                                     template=huella_heroku[0][2]
                                     nroCaptahuellasConHuella=0
                                     captahuella_actual=0
+                                    IdSupremaContador=0 #esto lo uso para ver si hay id de suprema disponibles
                                     if not id_suprema:
-                                        cursorlocal.execute('SELECT id_suprema FROM web_huellas ORDER BY id_suprema DESC LIMIT 1')
-                                        largest_id_suprema= cursorlocal.fetchall()
-                                        if not largest_id_suprema:
+                                        cursorlocal.execute('SELECT id_suprema FROM web_huellas ORDER BY id_suprema ASC')
+                                        ids_suprema_local= cursorlocal.fetchall()
+                                        nro_ids_suprema_local=len(ids_suprema_local)
+                                        if not ids_suprema_local:
                                             id_suprema = 1
-                                            cursorheroku.execute('UPDATE web_huellas SET id_suprema=%s WHERE template=%s', (id_suprema, template))
-                                            connheroku.commit()
+                                            if not cedula in listaempleadosseguricel:
+                                                cursorheroku.execute('UPDATE web_huellas SET id_suprema=%s WHERE template=%s', (id_suprema, template))
+                                                connheroku.commit()
                                         else:
-                                            id_suprema=largest_id_suprema[0][0]+1
-                                            cursorheroku.execute('UPDATE web_huellas SET id_suprema=%s WHERE template=%s', (id_suprema, template))
-                                            connheroku.commit()
+                                            for id_suprema_local in ids_suprema_local:
+                                                IdSupremaContador=IdSupremaContador+1
+                                                if not id_suprema_local[0] == IdSupremaContador:
+                                                    id_suprema=IdSupremaContador
+                                                    if not cedula in listaempleadosseguricel:
+                                                        cursorheroku.execute('UPDATE web_huellas SET id_suprema=%s WHERE template=%s', (id_suprema, template))
+                                                        connheroku.commit()
+                                                    break
+                                            if nro_ids_suprema_local == IdSupremaContador:
+                                                id_suprema=IdSupremaContador+1
+                                                if not cedula in listaempleadosseguricel:
+                                                    cursorheroku.execute('UPDATE web_huellas SET id_suprema=%s WHERE template=%s', (id_suprema, template))
+                                                    connheroku.commit()
                                     id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
                                     id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
                                     for captahuella in captahuellas:
@@ -534,6 +558,7 @@ while True:
                                                 print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
                             listahuellasheroku=[]
                             listahuellaslocal=[]
+                            listaempleadosseguricel=[]
                 etapa=7
 
             if etapa==7:
