@@ -329,6 +329,104 @@ class MyServer(BaseHTTPRequestHandler):
             else:
                 aperturadenegada(cursor, conn, acceso_solicitud)
 
+        if len(peticion) == 3 and peticion[2] == "seguricel_bluetooth_activo":
+            self.send_response(200)
+            self.send_header("Content-type", "utf-8")
+            self.end_headers()
+            # self.wfile.write(bytes(f"{self.path[1::]}", "utf-8"))
+
+            uuid_usuario, acceso_solicitud, _ = peticion
+            #print(id_usuario)
+            #print(acceso_solicitud)
+
+            diasusuario = []
+            etapadia=0
+            etapadiaapertura=0
+            cantidaddias = 0
+            contadoraux = 0
+            cursor.execute("SELECT * FROM web_usuarios where telegram_id=%s", (uuid_usuario,))
+            datosusuario = cursor.fetchall()
+            #print(datosusuario)
+            if len(datosusuario)!=0:
+                cedula=datosusuario[0][0]
+                nombre=datosusuario[0][1]
+                cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
+                horarios_permitidos = cursor.fetchall()
+                if horarios_permitidos != []:
+                    tz = pytz.timezone('America/Caracas')
+                    caracas_now = datetime.now(tz)
+                    dia = caracas_now.weekday()
+                    diahoy = dias_semana[dia]
+                    for entrada, salida, _, dia in horarios_permitidos:
+                        diasusuario.append(dia)
+                    cantidaddias = diasusuario.count(dia)
+                    for entrada, salida, _, dia in horarios_permitidos:
+                        if 'Siempre' in diasusuario:
+                            hora=str(caracas_now)[11:19]
+                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                            fecha=str(caracas_now)[:10]
+                            etapadia=1
+                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                            etapadiaapertura=1
+                        elif dia==diahoy and cantidaddias==1:
+                            hora=str(caracas_now)[11:19]
+                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                            fecha=str(caracas_now)[:10]
+                            etapadia=1
+                            if entrada<salida:
+                                if horahoy >= entrada and horahoy <= salida:
+                                    #print('entrada concedida')
+                                    aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                else:
+                                    aperturadenegada(cursor, conn, acceso_solicitud)
+                                    #print('fuera de horario')
+                            if entrada>salida:
+                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                    #print('entrada concedida')
+                                    aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                else:
+                                    aperturadenegada(cursor, conn, acceso_solicitud)
+                                    #print('fuera de horario')
+                        elif dia==diahoy and cantidaddias>1:
+                            hora=str(caracas_now)[11:19]
+                            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+                            fecha=str(caracas_now)[:10]
+                            etapadia=1
+                            if entrada<salida:
+                                if horahoy >= entrada and horahoy <= salida:
+                                    #print('entrada concedida')
+                                    aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                    contadoraux=0
+                                else:
+                                    contadoraux = contadoraux+1
+                                    if contadoraux == cantidaddias:
+                                        aperturadenegada(cursor, conn, acceso_solicitud)
+                                        contadoraux=0
+                            if entrada>salida:
+                                if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
+                                    #print('entrada concedida')
+                                    aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    etapadiaapertura=1
+                                    contadoraux=0
+                                else:
+                                    contadoraux = contadoraux+1
+                                    if contadoraux == cantidaddias:
+                                        aperturadenegada(cursor, conn, acceso_solicitud)
+                                        contadoraux=0
+                                    #print('fuera de horario')
+                    if etapadia==0 and etapadiaapertura==0:
+                        aperturadenegada(cursor, conn, acceso_solicitud)
+                        #print('Dia no permitido')
+                if horarios_permitidos == []:
+                    aperturadenegada(cursor, conn, acceso_solicitud)
+                    #print('este usuario no tiene horarios establecidos')
+                diasusuario=[]
+            else:
+                aperturadenegada(cursor, conn, acceso_solicitud)
+
         if len(peticion) == 3 and peticion[2] == "seguricel_rfid_activo":
             self.send_response(200)
             self.send_header("Content-type", "utf-8")
