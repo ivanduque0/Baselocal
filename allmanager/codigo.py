@@ -11,7 +11,7 @@ from datetime import datetime
 
 CONTRATO=os.environ.get("CONTRATO")
 maximo_dias_acumular=int(os.environ.get("DIAS_ACUMULAR"))
-connuri=int(os.environ.get("POSTGRES_URI"))
+connuri=os.environ.get("POSTGRES_URI")
 connlocal = None
 connheroku = None
 cursorheroku=None
