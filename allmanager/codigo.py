@@ -11,6 +11,7 @@ from datetime import datetime
 
 CONTRATO=os.environ.get("CONTRATO")
 maximo_dias_acumular=int(os.environ.get("DIAS_ACUMULAR"))
+connuri=int(os.environ.get("POSTGRES_URI"))
 connlocal = None
 connheroku = None
 cursorheroku=None
@@ -69,8 +70,10 @@ while True:
         )
         cursorlocal = connlocal.cursor()
         
-        conn_info = subprocess.run(["heroku", "config:get", "DATABASE_URL", "-a", 'tesis-reconocimiento-facial'], stdout = subprocess.PIPE)
-        connuri = conn_info.stdout.decode('utf-8').strip()
+        if not connuri:
+            conn_info = subprocess.run(["heroku", "config:get", "DATABASE_URL", "-a", 'tesis-reconocimiento-facial'], stdout = subprocess.PIPE)
+            connuri = conn_info.stdout.decode('utf-8').strip()
+
         connheroku = psycopg2.connect(connuri)
         cursorheroku = connheroku.cursor()
         
