@@ -55,15 +55,59 @@ spoofing=0
 conn = None
 cursor=None
 total=0
-acceso= os.environ.get("ACCESO")
-camara= os.environ.get("HOSTSNAPSHOOT")
+URL_CAMARA = os.environ.get("URL_CAMARA")
+URL_SNAPSHOOT = f"{URL_CAMARA}:8080/?action=snapshot"
 # acceso='1'
 # camara='http://192.168.21.126:8080/?action=snapshot'
+
+camara1=os.environ.get('URL_CAMARA1')
+camara2=os.environ.get('URL_CAMARA2')
+camara3=os.environ.get('URL_CAMARA3')
+camara4=os.environ.get('URL_CAMARA4')
+camara5=os.environ.get('URL_CAMARA5')
+camara6=os.environ.get('URL_CAMARA6')
+camara7=os.environ.get('URL_CAMARA7')
+camara8=os.environ.get('URL_CAMARA8')
+camara9=os.environ.get('URL_CAMARA9')
+camara10=os.environ.get('URL_CAMARA10')
+camara11=os.environ.get('URL_CAMARA11')
+camara12=os.environ.get('URL_CAMARA12')
+camara13=os.environ.get('URL_CAMARA13')
+camara14=os.environ.get('URL_CAMARA14')
+camara15=os.environ.get('URL_CAMARA15')
+camara16=os.environ.get('URL_CAMARA16')
+camara17=os.environ.get('URL_CAMARA17')
+camara18=os.environ.get('URL_CAMARA18')
+camara19=os.environ.get('URL_CAMARA19')
+camara20=os.environ.get('URL_CAMARA20')
+
+
+nro_camaras_dict= { camara1:"1", 
+                camara2:"2", 
+                camara3:"3", 
+                camara4:"4",
+                camara5:"5", 
+                camara6:"6", 
+                camara7:"7", 
+                camara8:"8",
+                camara9:"9", 
+                camara10:"10", 
+                camara11:"11", 
+                camara12:"12", 
+                camara13:"13", 
+                camara14:"14", 
+                camara15:"15", 
+                camara16:"16", 
+                camara17:"17", 
+                camara18:"18", 
+                camara19:"19", 
+                camara20:"20"
+                    }
 
 @torch.no_grad()
 def run(
         weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
-        source=camara,  # file/dir/URL/glob, 0 for webcam
+        source=URL_SNAPSHOOT,  # file/dir/URL/glob, 0 for webcam
         data='',  # dataset.yaml path
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
@@ -130,8 +174,8 @@ def run(
         # t2 = time_sync()
         # dt[0] += t2 - t1
 
-        #cursor.execute('SELECT * FROM sensor WHERE acceso=%s', (os.environ.get("ACCESO"),))
-        cursor.execute('SELECT * FROM sensor WHERE acceso=%s', (acceso, ))
+        #cursor.execute('SELECT * FROM sensor WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA],))
+        cursor.execute('SELECT * FROM sensor WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA], ))
         sensor_onoff = cursor.fetchall()
         #print(sensor_onoff)
         if sensor_onoff[0][0] == 1:
@@ -162,10 +206,10 @@ def run(
 
                 #spoofingdb=spoofingdb2
                 if spoofing ==1:
-                    cursor.execute('UPDATE antisp SET spoofing=1 WHERE acceso=%s', (acceso, ))
+                    cursor.execute('UPDATE antisp SET spoofing=1 WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA], ))
                     conn.commit()
                 else:
-                    cursor.execute('UPDATE antisp SET spoofing=0 WHERE acceso=%s', (acceso, ))
+                    cursor.execute('UPDATE antisp SET spoofing=0 WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA], ))
                     conn.commit()
         
 
@@ -173,7 +217,7 @@ def run(
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'yolov5s.pt', help='model path(s)')
-    parser.add_argument('--source', type=str, default=camara, help='file/dir/URL/glob, 0 for webcam')
+    parser.add_argument('--source', type=str, default=URL_SNAPSHOOT, help='file/dir/URL/glob, 0 for webcam')
     parser.add_argument('--data', type=str, default='', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
@@ -229,7 +273,7 @@ if __name__ == "__main__":
             )
             conn.autocommit = False
             cursor = conn.cursor()
-            cursor.execute('UPDATE antisp SET spoofing=0 WHERE acceso=%s', (acceso, ))
+            cursor.execute('UPDATE antisp SET spoofing=0 WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA], ))
             conn.commit()
             opt = parse_opt()
             main(opt)

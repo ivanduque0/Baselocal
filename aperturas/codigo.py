@@ -5,7 +5,7 @@ import pytz
 from datetime import datetime
 import urllib.request
 import requests
-# import requests # PARA USAR CUANDO SE USE UN SERVIDOR LOCAL
+
 dias_semana = ("Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo")
 ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
@@ -18,29 +18,54 @@ razon1=os.environ.get("RAZON_TELEFONO1")
 razon2=os.environ.get("RAZON_TELEFONO2")
 razon3=os.environ.get("RAZON_TELEFONO3")
 razon4=os.environ.get("RAZON_TELEFONO4")
+razon5=os.environ.get("RAZON_TELEFONO5")
+razon6=os.environ.get("RAZON_TELEFONO6")
+razon7=os.environ.get("RAZON_TELEFONO7")
+razon8=os.environ.get("RAZON_TELEFONO8")
+razon9=os.environ.get("RAZON_TELEFONO9")
+razon10=os.environ.get("RAZON_TELEFONO10")
+razon11=os.environ.get("RAZON_TELEFONO11")
+razon12=os.environ.get("RAZON_TELEFONO12")
+razon13=os.environ.get("RAZON_TELEFONO13")
+razon14=os.environ.get("RAZON_TELEFONO14")
+razon15=os.environ.get("RAZON_TELEFONO15")
+razon16=os.environ.get("RAZON_TELEFONO16")
+razon17=os.environ.get("RAZON_TELEFONO17")
+razon18=os.environ.get("RAZON_TELEFONO18")
+razon19=os.environ.get("RAZON_TELEFONO19")
+razon20=os.environ.get("RAZON_TELEFONO20")
+
 acceso1=os.environ.get('URL_ACCESO1')
 acceso2=os.environ.get('URL_ACCESO2')
 acceso3=os.environ.get('URL_ACCESO3')
 acceso4=os.environ.get('URL_ACCESO4')
+acceso5=os.environ.get('URL_ACCESO5')
+acceso6=os.environ.get('URL_ACCESO6')
+acceso7=os.environ.get('URL_ACCESO7')
+acceso8=os.environ.get('URL_ACCESO8')
+acceso9=os.environ.get('URL_ACCESO9')
+acceso10=os.environ.get('URL_ACCESO10')
+acceso11=os.environ.get('URL_ACCESO11')
+acceso12=os.environ.get('URL_ACCESO12')
+acceso13=os.environ.get('URL_ACCESO13')
+acceso14=os.environ.get('URL_ACCESO14')
+acceso15=os.environ.get('URL_ACCESO15')
+acceso16=os.environ.get('URL_ACCESO16')
+acceso17=os.environ.get('URL_ACCESO17')
+acceso18=os.environ.get('URL_ACCESO18')
+acceso19=os.environ.get('URL_ACCESO19')
+acceso20=os.environ.get('URL_ACCESO20')
 
-accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4}
-razondict = {'1':razon1, '2':razon2, '3':razon3, '4':razon4}
-# pulseaqui = [
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-#     'pulse aqui',
-    
-# ]
+accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4, '5':acceso5,
+                '6':acceso6, '7':acceso7, '8':acceso8, '9':acceso9, '10':acceso10,
+                '11':acceso11, '12':acceso12, '13':acceso13, '14':acceso14, '15':acceso15,
+                '16':acceso16, '17':acceso17, '18':acceso18, '19':acceso19, '20':acceso20
+                }
 
-# keyboard = Keyboa(items=pulseaqui)
+razondict = {'1':razon1, '2':razon2, '3':razon3, '4':razon4, '5':razon5,
+            '6':razon6, '7':razon7, '8':razon8, '9':razon9, '10':razon10,
+            '11':razon11, '12':razon12, '13':razon13, '14':razon14, '15':razon15,
+            '16':razon16, '17':razon17, '18':razon18, '19':razon19, '20':razon20}
 
 def aperturaconcedida(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
     
@@ -108,8 +133,7 @@ while True:
 
         while True:
 
-            resp = requests.get(url=URL)
-            aperturas_solicitadas = resp.json()
+            aperturas_solicitadas = requests.get(url=URL, auth=('BaseLocal_access', 'S3gur1c3l_local@')).json()
             if len(aperturas_solicitadas):
                 tz = pytz.timezone('America/Caracas')
                 caracas_now = datetime.now(tz)
@@ -256,5 +280,3 @@ while True:
             cursor.close()
             conn.close()
             total=0
-
-

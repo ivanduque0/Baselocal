@@ -31,7 +31,6 @@ d2old=0
 video=None
 vista_previargb = 0
 vista_previa = 0
-razon=os.environ.get("RAZON")
 t1=time.perf_counter()
 t2=0
 xref=0
@@ -52,6 +51,123 @@ totalrefrescar= 0
 t1refrescar = 0
 t2refrescar = 0
 REFRESCAR_CAMARA=int(os.environ.get('REFRESCAR_CAMARA'))
+URL_CAMARA=os.environ.get('URL_CAMARA')
+HOST_STREAM = f"{URL_CAMARA}:8080/?action=stream"
+
+ACCESO=os.environ.get("ACCESO")
+
+camara1=os.environ.get('URL_CAMARA1')
+camara2=os.environ.get('URL_CAMARA2')
+camara3=os.environ.get('URL_CAMARA3')
+camara4=os.environ.get('URL_CAMARA4')
+camara5=os.environ.get('URL_CAMARA5')
+camara6=os.environ.get('URL_CAMARA6')
+camara7=os.environ.get('URL_CAMARA7')
+camara8=os.environ.get('URL_CAMARA8')
+camara9=os.environ.get('URL_CAMARA9')
+camara10=os.environ.get('URL_CAMARA10')
+camara11=os.environ.get('URL_CAMARA11')
+camara12=os.environ.get('URL_CAMARA12')
+camara13=os.environ.get('URL_CAMARA13')
+camara14=os.environ.get('URL_CAMARA14')
+camara15=os.environ.get('URL_CAMARA15')
+camara16=os.environ.get('URL_CAMARA16')
+camara17=os.environ.get('URL_CAMARA17')
+camara18=os.environ.get('URL_CAMARA18')
+camara19=os.environ.get('URL_CAMARA19')
+camara20=os.environ.get('URL_CAMARA20')
+
+descripcion_camara1=os.environ.get('RAZON_CAM1')
+descripcion_camara2=os.environ.get('RAZON_CAM2')
+descripcion_camara3=os.environ.get('RAZON_CAM3')
+descripcion_camara4=os.environ.get('RAZON_CAM4')
+descripcion_camara5=os.environ.get('RAZON_CAM5')
+descripcion_camara6=os.environ.get('RAZON_CAM6')
+descripcion_camara7=os.environ.get('RAZON_CAM7')
+descripcion_camara8=os.environ.get('RAZON_CAM8')
+descripcion_camara9=os.environ.get('RAZON_CAM9')
+descripcion_camara10=os.environ.get('RAZON_CAM10')
+descripcion_camara11=os.environ.get('RAZON_CAM11')
+descripcion_camara12=os.environ.get('RAZON_CAM12')
+descripcion_camara13=os.environ.get('RAZON_CAM13')
+descripcion_camara14=os.environ.get('RAZON_CAM14')
+descripcion_camara15=os.environ.get('RAZON_CAM15')
+descripcion_camara16=os.environ.get('RAZON_CAM16')
+descripcion_camara17=os.environ.get('RAZON_CAM17')
+descripcion_camara18=os.environ.get('RAZON_CAM18')
+descripcion_camara19=os.environ.get('RAZON_CAM19')
+descripcion_camara20=os.environ.get('RAZON_CAM20')
+
+camaras_razon_dict= { camara1:descripcion_camara1, 
+                camara2:descripcion_camara2, 
+                camara3:descripcion_camara3, 
+                camara4:descripcion_camara4,
+                camara5:descripcion_camara5, 
+                camara6:descripcion_camara6, 
+                camara7:descripcion_camara7, 
+                camara8:descripcion_camara8,
+                camara9:descripcion_camara9, 
+                camara10:descripcion_camara10, 
+                camara11:descripcion_camara11, 
+                camara12:descripcion_camara12, 
+                camara13:descripcion_camara13, 
+                camara14:descripcion_camara14, 
+                camara15:descripcion_camara15, 
+                camara16:descripcion_camara16, 
+                camara17:descripcion_camara17, 
+                camara18:descripcion_camara18, 
+                camara19:descripcion_camara19, 
+                camara20:descripcion_camara20
+                    }
+
+acceso1=os.environ.get('URL_ACCESO1')
+acceso2=os.environ.get('URL_ACCESO2')
+acceso3=os.environ.get('URL_ACCESO3')
+acceso4=os.environ.get('URL_ACCESO4')
+acceso5=os.environ.get('URL_ACCESO5')
+acceso6=os.environ.get('URL_ACCESO6')
+acceso7=os.environ.get('URL_ACCESO7')
+acceso8=os.environ.get('URL_ACCESO8')
+acceso9=os.environ.get('URL_ACCESO9')
+acceso10=os.environ.get('URL_ACCESO10')
+acceso11=os.environ.get('URL_ACCESO11')
+acceso12=os.environ.get('URL_ACCESO12')
+acceso13=os.environ.get('URL_ACCESO13')
+acceso14=os.environ.get('URL_ACCESO14')
+acceso15=os.environ.get('URL_ACCESO15')
+acceso16=os.environ.get('URL_ACCESO16')
+acceso17=os.environ.get('URL_ACCESO17')
+acceso18=os.environ.get('URL_ACCESO18')
+acceso19=os.environ.get('URL_ACCESO19')
+acceso20=os.environ.get('URL_ACCESO20')
+
+accesodict = {'1':acceso1, '2':acceso2, '3':acceso3, '4':acceso4, '5':acceso5,
+                '6':acceso6, '7':acceso7, '8':acceso8, '9':acceso9, '10':acceso10,
+                '11':acceso11, '12':acceso12, '13':acceso13, '14':acceso14, '15':acceso15,
+                '16':acceso16, '17':acceso17, '18':acceso18, '19':acceso19, '20':acceso20
+                }
+
+nro_camaras_dict= { camara1:"1", 
+                camara2:"2", 
+                camara3:"3", 
+                camara4:"4",
+                camara5:"5", 
+                camara6:"6", 
+                camara7:"7", 
+                camara8:"8",
+                camara9:"9", 
+                camara10:"10", 
+                camara11:"11", 
+                camara12:"12", 
+                camara13:"13", 
+                camara14:"14", 
+                camara15:"15", 
+                camara16:"16", 
+                camara17:"17", 
+                camara18:"18", 
+                camara19:"19", 
+                camara20:"20"
+                    }
 
 # for imagen in imagenes:
 #     ruta=os.path.join(directorio,imagen)
@@ -69,7 +185,7 @@ REFRESCAR_CAMARA=int(os.environ.get('REFRESCAR_CAMARA'))
 def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursorf,connf):
     
     try:
-        urllib.request.urlopen(url=f'{os.environ.get("URL_ACCESO")}/on', timeout=3)
+        urllib.request.urlopen(url=f'{accesodict[ACCESO]}/on', timeout=3)
         cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
         VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razonf, contratof, cedulaf))
         #cursorf.execute('''UPDATE led SET onoff=1 WHERE acceso=%s;''', (os.environ.get("ACCESO"),))
@@ -91,7 +207,7 @@ def aperturaconcedida(nombref, fechaf, horaf, razonf, contratof, cedulaf, cursor
 
 def aperturadenegada():
     try:
-        urllib.request.urlopen(url=f'{os.environ.get("URL_ACCESO")}/off', timeout=3)
+        urllib.request.urlopen(url=f'{accesodict[ACCESO]}/off', timeout=3)
     except:
         print("fallo en peticion http")
     finally:
@@ -137,7 +253,7 @@ while True:
             min_tracking_confidence=0.75) as face_mesh:
                 #camara = cv2.VideoCapture("http://192.168.21.102:81/stream")
                 #camara = cv2.VideoCapture("http://192.168.20.102:8080/?action=stream")
-                camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
+                camara = cv2.VideoCapture(HOST_STREAM)
                 t1refrescar=time.perf_counter()
                 while True:
                     t2refrescar=time.perf_counter()
@@ -149,14 +265,14 @@ while True:
                     # Si se usa un sensor se deben descomentar estas lineas de abajo y se debe identar el resto del codigo
                     # cursor.execute('SELECT * FROM sensor')
                     # sensor_onoff = cursor.fetchall()
-                    cursor.execute('SELECT * FROM sensor WHERE acceso=%s', (os.environ.get("ACCESO"),))
+                    cursor.execute('SELECT * FROM sensor WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA],))
                     sensor_onoff = cursor.fetchall()
                     cursor.execute('SELECT * FROM cargar_fotos')
                     cargar_fotos = cursor.fetchall()
                     if sensor_onoff[0][0] == 1:
                         ret,video = camara.read()
                         if video is None:
-                            camara = cv2.VideoCapture(os.environ.get("HOST_STREAM"))
+                            camara = cv2.VideoCapture(HOST_STREAM)
                             ret,video = camara.read()
                         if video is not None:
                             sensorflag=0
@@ -305,7 +421,7 @@ while True:
                                                             cursor.execute('SELECT * FROM web_usuarios where cedula=%s', (cedula_id,))
                                                             nombrecedula = cursor.fetchall()
                                                             nombre=nombrecedula[0][1]
-                                                            cursor.execute('SELECT * FROM antisp WHERE acceso=%s', (os.environ.get("ACCESO"),))
+                                                            cursor.execute('SELECT * FROM antisp WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA],))
                                                             antispoofing = cursor.fetchall()
                                                             if antispoofing[0][0]:
                                                                 for entrada, salida, _, dia in horarios_permitidos:
@@ -317,7 +433,7 @@ while True:
                                                                         horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                                                         fecha=str(caracas_now)[:10]
                                                                         etapadia=1
-                                                                        aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                        aperturaconcedida(nombre, fecha, horahoy, camaras_razon_dict[URL_CAMARA], CONTRATO, cedula_id, cursor,conn)
                                                                         etapadiaapertura=1
                                                                     elif dia==diahoy and cantidaddias==1:
                                                                         hora=str(caracas_now)[11:19]
@@ -327,7 +443,7 @@ while True:
                                                                         if entrada<salida:
                                                                             if horahoy >= entrada and horahoy <= salida:
                                                                                 #print('entrada concedida')
-                                                                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                                aperturaconcedida(nombre, fecha, horahoy, camaras_razon_dict[URL_CAMARA], CONTRATO, cedula_id, cursor,conn)
                                                                                 etapadiaapertura=1
                                                                             else:
                                                                                 aperturadenegada()
@@ -335,7 +451,7 @@ while True:
                                                                         if entrada>salida:
                                                                             if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                                                                 #print('entrada concedida')
-                                                                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                                aperturaconcedida(nombre, fecha, horahoy, camaras_razon_dict[URL_CAMARA], CONTRATO, cedula_id, cursor,conn)
                                                                                 etapadiaapertura=1
                                                                             else:
                                                                                 aperturadenegada()
@@ -348,7 +464,7 @@ while True:
                                                                         if entrada<salida:
                                                                             if horahoy >= entrada and horahoy <= salida:
                                                                                 #print('entrada concedida')
-                                                                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                                aperturaconcedida(nombre, fecha, horahoy, camaras_razon_dict[URL_CAMARA], CONTRATO, cedula_id, cursor,conn)
                                                                                 etapadiaapertura=1
                                                                                 contadoraux=0
                                                                             else:
@@ -359,7 +475,7 @@ while True:
                                                                         if entrada>salida:
                                                                             if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                                                                 #print('entrada concedida')
-                                                                                aperturaconcedida(nombre, fecha, horahoy, razon, CONTRATO, cedula_id, cursor,conn)
+                                                                                aperturaconcedida(nombre, fecha, horahoy, camaras_razon_dict[URL_CAMARA], CONTRATO, cedula_id, cursor,conn)
                                                                                 etapadiaapertura=1
                                                                                 contadoraux=0
                                                                             else:

@@ -140,9 +140,9 @@ services:
       
       environment:
          #- DISPLAY=unix$DISPLAY
-         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
-         - RAZON=
-         - URL_ACCESO=
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
          - ACCESO=1
       
       restart: always
@@ -173,8 +173,9 @@ services:
       command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.5
       
       environment:
-         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
-         - ACCESO=1
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=1
          
       env_file:
          - .env.manager
@@ -193,9 +194,9 @@ services:
       
       environment:
          #- DISPLAY=unix$DISPLAY
-         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
-         - RAZON=
-         - URL_ACCESO=
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
          - ACCESO=2
       
       restart: always
@@ -220,8 +221,9 @@ services:
       command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
-         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
-         - ACCESO=2
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=2
          
       env_file:
          - .env.manager
@@ -240,9 +242,9 @@ services:
       
       environment:
          #- DISPLAY=unix$DISPLAY
-         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
-         - RAZON=
-         - URL_ACCESO=
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
          - ACCESO=3
       
       restart: always
@@ -272,8 +274,9 @@ services:
       command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
-         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
-         - ACCESO=3
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=3
          
       env_file:
          - .env.manager
@@ -292,9 +295,9 @@ services:
       
       environment:
          #- DISPLAY=unix$DISPLAY
-         - HOST_STREAM=http://192.168.21.117:8080/?action=stream
-         - RAZON=
-         - URL_ACCESO=
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
          - ACCESO=4
       
       restart: always
@@ -324,8 +327,9 @@ services:
       command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
       
       environment:
-         - HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
-         - ACCESO=4
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=4
          
       env_file:
          - .env.manager
@@ -335,6 +339,856 @@ services:
       
       depends_on:
          - postgres
+
+   facerecognition5:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition5
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=5
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing5:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing5
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=5
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition6:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition6
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=6
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing6:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing6
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=6
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition7:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition7
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=7
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing7:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing7
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=7
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition8:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition8
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=8
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing8:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing8
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=8
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition9:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition9
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=9
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing9:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing9
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=9
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition10:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition10
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=10
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing10:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing10
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=10
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition11:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition11
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=11
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing11:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing11
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=11
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition12:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition12
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=12
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing12:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing12
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=12
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition13:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition13
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=13
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing13:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing13
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=13
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition14:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition14
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=14
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing14:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing14
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=14
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition15:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition15
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=15
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing15:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing15
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=15
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition16:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition16
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=16
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing16:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing16
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=16
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition17:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition17
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=17
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing17:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing17
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=17
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition18:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition18
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=18
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing18:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing18
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=18
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition19:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition19
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=19
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing19:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing19
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=19
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   facerecognition20:
+
+      image: ivanduque0/dockermpfrpsy:v1
+
+      container_name: facerecognition20
+      
+      environment:
+         #- DISPLAY=unix$DISPLAY
+         #- HOST_STREAM=http://192.168.21.117:8080/?action=stream
+         - URL_CAMARA=
+         #- URL_ACCESO=
+         - ACCESO=20
+      
+      restart: always
+      
+      env_file:
+         - .env.recognition
+      
+      volumes:
+         - ./facerecognition:/app
+         - ./allmanager/media/personas:/app/personas
+         #- /tmp/.X11-unix:/tmp/.X11-unix
+         #- /tmp/.docker.xauth:/tmp/.docker.xauth
+         
+      privileged: true
+      
+      depends_on:
+         - postgres
+   
+   antispoofing20:
+   
+      image: ivanduque0/antispoofingyolo:V0.1
+
+      container_name: antispoofing20
+      
+      restart: always
+      
+      command: python3 codigo/detect2.py --weights modeloYOLOV5.pt --img 416 --conf 0.3
+      
+      environment:
+         #- HOSTSNAPSHOOT=http://192.168.21.117:8080/?action=snapshot
+         - URL_CAMARA=
+         #- ACCESO=20
+         
+      env_file:
+         - .env.manager
+
+      volumes:
+         - ./antispoofing:/usr/src/app/codigo
+      
+      depends_on:
+         - postgres
+
+   
 
 
    # dbmanagerfotos:
