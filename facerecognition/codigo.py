@@ -15,7 +15,7 @@ dias_semana = ("Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo
 ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 flaghorario = 0 #1 para dar acceso y 0 para denegarlo
-directorio=os.environ.get("DIRECTORIO")
+directorio=os.environ.get("DIRECTORIO_RECOGNITION")
 CONTRATO=os.environ.get("CONTRATO")
 DELAY_DETECCION=int(os.environ.get("DELAY_DETECCION"))
 imagenes = os.listdir(directorio)
@@ -235,11 +235,11 @@ while True:
     try:
 
         conn = psycopg2.connect(
-            database=os.environ.get("SQL_DATABASE"), 
-            user=os.environ.get("SQL_USER"), 
-            password=os.environ.get("SQL_PASSWORD"), 
-            host=os.environ.get("SQL_HOST"), 
-            port=os.environ.get("SQL_PORT")
+            database=os.environ.get("DATABASE"), 
+            user=os.environ.get("USERDB"), 
+            password=os.environ.get("PASSWORD"), 
+            host=os.environ.get("HOST"), 
+            port=os.environ.get("PORT")
         )
 
         conn.autocommit = False

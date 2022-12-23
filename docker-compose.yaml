@@ -148,8 +148,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
-         - .env.manager
          - .env.manager
       volumes:
          - ./facerecognition:/app
@@ -203,7 +201,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -252,7 +249,6 @@ services:
       restart: always
 
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -306,7 +302,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -360,7 +355,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -414,7 +408,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -468,7 +461,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -522,7 +514,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -576,7 +567,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -630,7 +620,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -684,7 +673,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -738,7 +726,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -792,7 +779,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -846,7 +832,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -900,7 +885,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -954,7 +938,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -1008,7 +991,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -1062,7 +1044,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -1116,7 +1097,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
@@ -1170,7 +1150,6 @@ services:
       restart: always
       
       env_file:
-         - .env.recognition
          - .env.manager
       
       volumes:
