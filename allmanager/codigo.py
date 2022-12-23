@@ -9,7 +9,6 @@ import requests
 import numpy as np
 import cv2
 import pytz
-from datetime import datetime
 
 CONTRATO=os.environ.get("CONTRATO")
 URL_API=os.environ.get("URL_API")
