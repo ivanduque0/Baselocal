@@ -3,7 +3,6 @@ import os
 import time as tm
 import pytz
 from datetime import datetime, date, time
-import time
 import cloudinary
 import urllib.request
 import requests
