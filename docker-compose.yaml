@@ -149,7 +149,8 @@ services:
       
       env_file:
          - .env.recognition
-      
+         - .env.manager
+         - .env.manager
       volumes:
          - ./facerecognition:/app
          #- ./dbmanagerfotos/media/personas:/app/personas
@@ -203,6 +204,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -251,6 +253,7 @@ services:
 
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -304,6 +307,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -357,6 +361,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -410,6 +415,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -463,6 +469,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -516,6 +523,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -569,6 +577,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -622,6 +631,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -675,6 +685,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -728,6 +739,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -781,6 +793,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -834,6 +847,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -887,6 +901,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -940,6 +955,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -993,6 +1009,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -1046,6 +1063,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -1099,6 +1117,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
@@ -1152,6 +1171,7 @@ services:
       
       env_file:
          - .env.recognition
+         - .env.manager
       
       volumes:
          - ./facerecognition:/app
