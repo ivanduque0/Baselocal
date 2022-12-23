@@ -421,7 +421,7 @@ while True:
                                 rfid=usuario_heroku[0][5]
                                 facial=usuario_heroku[0][6]
                                 cursorlocal.execute('''INSERT INTO web_usuarios (cedula, nombre,internet, wifi, captahuella, rfid, facial)
-                                VALUES (%s, %s)''', (cedula, nombre, internet, wifi, captahuella, rfid, facial))
+                                VALUES (%s, %s, %s, %s, %s, %s, %s)''', (cedula, nombre, internet, wifi, captahuella, rfid, facial))
                                 connlocal.commit()
                         listausuariosheroku=[]
                         listausuarioslocal=[]
