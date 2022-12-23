@@ -74,7 +74,7 @@ services:
    
    aperturas:
    
-      image: ivanduque0/telegrambot:V1.0
+      image: ivanduque0/dbmakermanager:V0.3
 
       container_name: aperturas
       
@@ -93,7 +93,7 @@ services:
 
    wifilocal:
    
-      image: ivanduque0/telegrambot:V1.0
+      image: ivanduque0/dbmakermanager:V0.3
 
       container_name: wifilocal
       
