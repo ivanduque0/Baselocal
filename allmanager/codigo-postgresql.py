@@ -293,10 +293,10 @@ while True:
 
             if etapa==3:
 
-                cursorlocal.execute('SELECT cedula, telegram_id FROM web_usuarios')
+                cursorlocal.execute('SELECT cedula, telegram_id, internet, wifi, captahuella, rfid, facial FROM web_usuarios')
                 usuarios_local= cursorlocal.fetchall()
 
-                cursorheroku.execute('SELECT cedula, telegram_id FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
+                cursorheroku.execute('SELECT cedula, telegram_id, telefonoInternet, telefonoWifi, captahuella, rfid, reconocimientoFacial FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                 usuarios_heroku= cursorheroku.fetchall()
                 
                 nro_usu_local = len(usuarios_local)
@@ -309,7 +309,12 @@ while True:
                         except ValueError:
                             cedula=usuario[0]
                             telegram_id=usuario[1]
-                            cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s WHERE cedula=%s", (telegram_id,cedula))
+                            internet=usuario[2]
+                            wifi=usuario[3]
+                            captahuella=usuario[4]
+                            rfid=usuario[5]
+                            facial=usuario[6]
+                            cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s, internet=%s, wifi=%s, captahuella=%s, rfid=%s, facial=%s WHERE cedula=%s", (telegram_id,internet,wifi,captahuella,rfid,facial,cedula))
                             connlocal.commit()
                 etapa=4
 
@@ -397,12 +402,17 @@ while True:
                         try:
                             listausuarioslocal.index(usuario)
                         except ValueError:
-                            cursorheroku.execute('SELECT cedula, nombre FROM web_usuarios where cedula=%s and (contrato_id=%s or contrato_id=%s)', (usuario, CONTRATO, 'SEGURICEL'))
+                            cursorheroku.execute('SELECT cedula, nombre, telefonoInternet, telefonoWifi, captahuella, rfid, reconocimientoFacial FROM web_usuarios where cedula=%s and (contrato_id=%s or contrato_id=%s)', (usuario, CONTRATO, 'SEGURICEL'))
                             usuario_heroku= cursorheroku.fetchall()
                             cedula=usuario_heroku[0][0]
                             nombre=usuario_heroku[0][1]
-                            cursorlocal.execute('''INSERT INTO web_usuarios (cedula, nombre)
-                            VALUES (%s, %s)''', (cedula, nombre))
+                            internet==usuario_heroku[0][2]
+                            wifi==usuario_heroku[0][3]
+                            captahuella==usuario_heroku[0][4]
+                            rfid==usuario_heroku[0][5]
+                            facial==usuario_heroku[0][6]
+                            cursorlocal.execute('''INSERT INTO web_usuarios (cedula, nombre,internet, wifi, captahuella, rfid, facial)
+                            VALUES (%s, %s)''', (cedula, nombre, internet, wifi, captahuella, rfid, facial))
                             connlocal.commit()
                     listausuariosheroku=[]
                     listausuarioslocal=[]

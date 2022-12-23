@@ -288,7 +288,7 @@ while True:
 
             if etapa==2:
                 try:
-                    cursorlocal.execute('SELECT cedula, telegram_id FROM web_usuarios')
+                    cursorlocal.execute('SELECT cedula, telegram_id, internet, wifi, captahuella, rfid, facial FROM web_usuarios')
                     usuarios_local= cursorlocal.fetchall()
 
                     # request_json = requests.get(url=f'{URL_API}obtenerusuariosapi/{CONTRATO}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
