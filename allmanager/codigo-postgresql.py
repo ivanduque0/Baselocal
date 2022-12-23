@@ -303,7 +303,7 @@ while True:
                     cursorlocal.execute('SELECT cedula, telegram_id, internet, wifi, captahuella, rfid, facial FROM web_usuarios')
                     usuarios_local= cursorlocal.fetchall()
 
-                    cursorheroku.execute('SELECT cedula, telegram_id, telefonoInternet, telefonoWifi, captahuella, rfid, reconocimientoFacial FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
+                    cursorheroku.execute('SELECT cedula, telegram_id, "telefonoInternet", "telefonoWifi", captahuella, rfid, "reconocimientoFacial" FROM web_usuarios where contrato_id=%s or contrato_id=%s', (CONTRATO,'SEGURICEL'))
                     usuarios_heroku= cursorheroku.fetchall()
                     
                     nro_usu_local = len(usuarios_local)
@@ -411,7 +411,7 @@ while True:
                             try:
                                 listausuarioslocal.index(usuario)
                             except ValueError:
-                                cursorheroku.execute('SELECT cedula, nombre, telefonoInternet, telefonoWifi, captahuella, rfid, reconocimientoFacial FROM web_usuarios where cedula=%s and (contrato_id=%s or contrato_id=%s)', (usuario, CONTRATO, 'SEGURICEL'))
+                                cursorheroku.execute('SELECT cedula, nombre, "telefonoInternet", "telefonoWifi", captahuella, rfid, "reconocimientoFacial" FROM web_usuarios where cedula=%s and (contrato_id=%s or contrato_id=%s)', (usuario, CONTRATO, 'SEGURICEL'))
                                 usuario_heroku= cursorheroku.fetchall()
                                 cedula=usuario_heroku[0][0]
                                 nombre=usuario_heroku[0][1]
