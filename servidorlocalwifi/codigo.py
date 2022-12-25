@@ -222,15 +222,16 @@ class MyServer(BaseHTTPRequestHandler):
             etapadiaapertura=0
             cantidaddias = 0
             contadoraux = 0
-            cursor.execute("SELECT * FROM web_usuarios where telegram_id=%s", (id_usuario,))
-            datosusuario = cursor.fetchall()
-            #print(datosusuario)
-            if len(datosusuario)!=0:
-                cedula=datosusuario[0][0]
-                nombre=datosusuario[0][1]
+            cursor.execute("SELECT cedula, nombre, wifi FROM web_usuarios where telegram_id=%s", (id_usuario,))
+            datosUsuario = cursor.fetchall()
+            #print(datosUsuario)
+            if len(datosUsuario)!=0:
+                cedula=datosUsuario[0][0]
+                nombre=datosUsuario[0][1]
+                permisoAperturaWifi = datosUsuario[0][2]
                 cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
                 horarios_permitidos = cursor.fetchall()
-                if horarios_permitidos != []:
+                if horarios_permitidos != [] and permisoAperturaWifi == True:
                     tz = pytz.timezone('America/Caracas')
                     caracas_now = datetime.now(tz)
                     dia = caracas_now.weekday()
@@ -320,12 +321,12 @@ class MyServer(BaseHTTPRequestHandler):
             etapadiaapertura=0
             cantidaddias = 0
             contadoraux = 0
-            cursor.execute("SELECT * FROM web_usuarios where telegram_id=%s", (uuid_usuario,))
-            datosusuario = cursor.fetchall()
-            #print(datosusuario)
-            if len(datosusuario)!=0:
-                cedula=datosusuario[0][0]
-                nombre=datosusuario[0][1]
+            cursor.execute("SELECT cedula, nombre, wifi, captahuella, rfid, facial  FROM web_usuarios where telegram_id=%s", (uuid_usuario,))
+            datosUsuario = cursor.fetchall()
+            #print(datosUsuario)
+            if len(datosUsuario)!=0:
+                cedula=datosUsuario[0][0]
+                nombre=datosUsuario[0][1]
                 cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
                 horarios_permitidos = cursor.fetchall()
                 if horarios_permitidos != []:
@@ -422,15 +423,16 @@ class MyServer(BaseHTTPRequestHandler):
             contadoraux = 0
             cursor.execute("SELECT cedula FROM web_huellas where id_suprema=%s", (id_suprema,))
             datosusuario_huella = cursor.fetchall()
-            #print(datosusuario)
+            #print(datosUsuario)
             if len(datosusuario_huella)!=0:
-                cursor.execute("SELECT * FROM web_usuarios where cedula=%s", (datosusuario_huella[0][0],))
-                datosusuario = cursor.fetchall()
-                cedula=datosusuario[0][0]
-                nombre=datosusuario[0][1]
+                cursor.execute("SELECT cedula, nombre, captahuella FROM web_usuarios where cedula=%s", (datosusuario_huella[0][0],))
+                datosUsuario = cursor.fetchall()
+                cedula=datosUsuario[0][0]
+                nombre=datosUsuario[0][1]
+                permisoAperturaHuella = datosUsuario[0][2]
                 cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
                 horarios_permitidos = cursor.fetchall()
-                if horarios_permitidos != []:
+                if horarios_permitidos != [] and permisoAperturaHuella == True:
                     tz = pytz.timezone('America/Caracas')
                     caracas_now = datetime.now(tz)
                     dia = caracas_now.weekday()
@@ -520,13 +522,14 @@ class MyServer(BaseHTTPRequestHandler):
             datosusuario_rfid = cursor.fetchall()
             #print(datosusuario)
             if len(datosusuario_rfid)!=0:
-                cursor.execute("SELECT * FROM web_usuarios where cedula=%s", (datosusuario_rfid[0][0],))
-                datosusuario = cursor.fetchall()
-                cedula=datosusuario[0][0]
-                nombre=datosusuario[0][1]
+                cursor.execute("SELECT cedula, nombre, rfid  FROM web_usuarios where cedula=%s", (datosusuario_rfid[0][0],))
+                datosUsuario = cursor.fetchall()
+                cedula=datosUsuario[0][0]
+                nombre=datosUsuario[0][1]
+                permisoAperturaRFID = datosUsuario[0][2]
                 cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
                 horarios_permitidos = cursor.fetchall()
-                if horarios_permitidos != []:
+                if horarios_permitidos != [] and permisoAperturaRFID == True:
                     tz = pytz.timezone('America/Caracas')
                     caracas_now = datetime.now(tz)
                     dia = caracas_now.weekday()

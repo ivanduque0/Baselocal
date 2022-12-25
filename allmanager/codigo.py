@@ -274,9 +274,9 @@ while True:
                                         rfid=consultajson['rfid']
                                         facial=consultajson['reconocimientoFacial']
                                     cursorlocal.execute('''INSERT INTO web_usuarios (cedula, nombre,internet, wifi, captahuella, rfid, facial)
-                                    VALUES (%s, %s)''', (cedula, nombre, internet, wifi, captahuella, rfid, facial))
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s)''', (cedula, nombre, internet, wifi, captahuella, rfid, facial))
                                     connlocal.commit()
-                            #listaUsuariosServidor=[]
+                            listaUsuariosServidor=[]
                             listaUsuariosLocal=[]
                     except requests.exceptions.ConnectionError:
                         print("fallo en la etapa 1")
@@ -291,24 +291,25 @@ while True:
 
                     # request_json = requests.get(url=f'{URL_API}obtenerusuariosapi/{CONTRATO}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
 
-                    # usuariosServidor=[]
-                    # for consultajson in request_json:
+                    #usuariosServidor=[]
+                    # for usuario in usuariosServidor:
+                    #     cedula=usuario[0]
                     #     try:
-                    #         listaUsuariosServidor.index(consultajson['cedula'])
+                    #         listaUsuariosServidor.index(cedula)
                     #     except ValueError:
-                    #         listaUsuariosServidor.append(consultajson['cedula'])
-                    listausuarioslocal = []
+                    #         listaUsuariosServidor.append(cedula)
+                    listaUsuariosLocal = []
                     for usuario in usuarios_local:
                         cedula=usuario[0]
                         try:
-                            listausuarioslocal.index(cedula)
+                            listaUsuariosLocal.index(cedula)
                         except ValueError:
-                            listausuarioslocal.append(cedula)
-                    
-                    if len(listausuarioslocal) == len(listaUsuariosServidor):
+                            listaUsuariosLocal.append(cedula)
+
+                    if len(usuarios_local) == len(usuariosServidor):
                     
 
-                        for usuario in listausuarioslocal:
+                        for usuario in listaUsuariosLocal:
                             cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (usuario,))
                             fotos_local= cursorlocal.fetchall()
                             try:
@@ -316,9 +317,10 @@ while True:
 
                                 listaFotosServidor=[]
                                 for consultajson in request_json:
-                                    tuplaFotoIndividual=(int(consultajson['id']),consultajson['foto'],int(consultajson['estado']),consultajson['cedula'],)
+                                    rutaFotoSinProcesar = consultajson['foto'][8:].split('/')
+                                    rutaFotoProcesada = f"{rutaFotoSinProcesar[-3]}/{rutaFotoSinProcesar[-2]}/{rutaFotoSinProcesar[-1]}"
+                                    tuplaFotoIndividual=(int(consultajson['id']),rutaFotoProcesada,int(consultajson['estado']),consultajson['cedula'],)
                                     listaFotosServidor.append(tuplaFotoIndividual)
-
                                 #identificar fotos que no fueron aprobadas
                                 #debido a que no funcionan para el reconocimiento
 
@@ -390,7 +392,7 @@ while True:
                             #         listaUsuariosLocal.index(cedula)
                             #     except ValueError:
                             #         listaUsuariosLocal.append(cedula)
-                            
+
                             for usuario in listaUsuariosLocal:
 
                                 request_json = requests.get(url=f'{URL_API}obtenerhorariosapi/{CONTRATO}/{usuario}', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()

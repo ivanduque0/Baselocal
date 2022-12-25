@@ -181,15 +181,16 @@ while True:
                     id_usuario = aperturalocal[1]
                     acceso_solicitud=aperturalocal[2]
                     id_solicitud=aperturalocal[0]
-                    cursor.execute("SELECT * FROM web_usuarios where telegram_id=%s", (id_usuario,))
-                    datosusuario = cursor.fetchall()
-                    #print(datosusuario)
-                    if len(datosusuario)!=0:
-                        cedula=datosusuario[0][0]
-                        nombre=datosusuario[0][1]
+                    cursor.execute("SELECT cedula, nombre, internet FROM web_usuarios where telegram_id=%s", (id_usuario,))
+                    datosUsuario = cursor.fetchall()
+                    #print(datosUsuario)
+                    if len(datosUsuario)!=0:
+                        cedula=datosUsuario[0][0]
+                        nombre=datosUsuario[0][1]
+                        permisoAperturaInternet = datosUsuario[0][2]
                         cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula,))
                         horarios_permitidos = cursor.fetchall()
-                        if horarios_permitidos != []:
+                        if horarios_permitidos != [] and permisoAperturaInternet == True:
                             tz = pytz.timezone('America/Caracas')
                             caracas_now = datetime.now(tz)
                             dia = caracas_now.weekday()

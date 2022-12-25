@@ -417,10 +417,11 @@ while True:
                                                         diahoy = dias_semana[dia]
                                                         cursor.execute('SELECT * FROM web_horariospermitidos where cedula_id=%s', (cedula_id,))
                                                         horarios_permitidos = cursor.fetchall()
-                                                        if horarios_permitidos != []:
-                                                            cursor.execute('SELECT * FROM web_usuarios where cedula=%s', (cedula_id,))
-                                                            nombrecedula = cursor.fetchall()
-                                                            nombre=nombrecedula[0][1]
+                                                        cursor.execute('SELECT nombre, facial FROM web_usuarios where cedula=%s', (cedula_id,))
+                                                        datosUsuario = cursor.fetchall()
+                                                        nombre=datosUsuario[0][0]
+                                                        permisoAperturaFacial = datosUsuario[0][1]
+                                                        if horarios_permitidos != [] and permisoAperturaFacial == True:
                                                             cursor.execute('SELECT * FROM antisp WHERE nro_camara=%s', (nro_camaras_dict[URL_CAMARA],))
                                                             antispoofing = cursor.fetchall()
                                                             if antispoofing[0][0]:
@@ -487,9 +488,11 @@ while True:
                                                                 if etapadia==0 and etapadiaapertura==0:
                                                                     aperturadenegada()
                                                                     #print('Dia no permitido')
-                                                        if horarios_permitidos == []:
+                                                        elif horarios_permitidos == []:
                                                             aperturadenegada() 
                                                             #print('este usuario no tiene horarios establecidos')
+                                                        else:
+                                                            aperturadenegada() 
                                                         diasusuario=[]    
                                                     if nombrefoto == []:
                                                         aperturadenegada()

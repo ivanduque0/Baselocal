@@ -353,7 +353,6 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS solicitud_aperturas (id integer, id_usuario varchar(150), acceso varchar(150), estado integer, peticionInternet boolean, feedback boolean)')
         #cursorlocal.execute('CREATE TABLE IF NOT EXISTS led (onoff integer, acceso integer)')
         connlocal.commit()
-        print('hizo commit')
         # cursorlocal.execute('SELECT*FROM led')
         # tablaled= cursorlocal.fetchall()
         cursorlocal.execute('SELECT*FROM sensor')
