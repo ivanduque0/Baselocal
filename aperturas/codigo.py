@@ -67,18 +67,35 @@ razondict = {'1':razon1, '2':razon2, '3':razon3, '4':razon4, '5':razon5,
             '11':razon11, '12':razon12, '13':razon13, '14':razon14, '15':razon15,
             '16':razon16, '17':razon17, '18':razon18, '19':razon19, '20':razon20}
 
-def aperturaconcedida(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
+def aperturaConcedidaInternet(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
     
     try:
         if accesodict[acceso]:
             urllib.request.urlopen(f'{accesodict[acceso]}/on')
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
-            VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondict[acceso], contratof, cedulaf))
+            VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f"{razondict[acceso]}-Internet", contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
             connf.commit()
     except:
         cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
-        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondict[acceso]}', contratof, cedulaf))
+        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondict[acceso]}-Internet', contratof, cedulaf))
+        #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+        connf.commit()
+    finally:
+        pass
+
+def aperturaConcedidaWifi(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso):
+    
+    try:
+        if accesodict[acceso]:
+            urllib.request.urlopen(f'{accesodict[acceso]}/on')
+            cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+            VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f"{razondict[acceso]}-Wifi", contratof, cedulaf))
+            #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
+            connf.commit()
+    except:
+        cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
+        VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondict[acceso]}-Wifi', contratof, cedulaf))
         #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
         connf.commit()
     finally:
@@ -155,8 +172,8 @@ while True:
                         cursor.execute('SELECT * FROM solicitud_aperturas WHERE id=%s',(solicitud_id,))
                         aperturas_local_existente= cursor.fetchall()
                         if not aperturas_local_existente:
-                            cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado)
-                                VALUES (%s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 0))
+                            cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado, peticionInternet, feedback)
+                                VALUES (%s, %s, %s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 0, 't', 'f'))
                             conn.commit()
                     else:
                         
@@ -165,7 +182,7 @@ while True:
                         conn.commit()
 
 
-            cursor.execute('SELECT id, id_usuario, acceso, estado FROM solicitud_aperturas')
+            cursor.execute('SELECT id, id_usuario, acceso, estado, peticionInternet FROM solicitud_aperturas')
             aperturas_local= cursor.fetchall()
 
             for aperturalocal in aperturas_local:
@@ -181,6 +198,7 @@ while True:
                     id_usuario = aperturalocal[1]
                     acceso_solicitud=aperturalocal[2]
                     id_solicitud=aperturalocal[0]
+                    peticion_internet=aperturalocal[4]
                     cursor.execute("SELECT cedula, nombre, internet FROM web_usuarios where telegram_id=%s", (id_usuario,))
                     datosUsuario = cursor.fetchall()
                     #print(datosUsuario)
@@ -204,7 +222,10 @@ while True:
                                     horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                     fecha=str(caracas_now)[:10]
                                     etapadia=1
-                                    aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    if peticion_internet:
+                                        aperturaConcedidaInternet(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                    else:
+                                        aperturaConcedidaWifi(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                     etapadiaapertura=1
                                 elif dia==diahoy and cantidaddias==1:
                                     hora=str(caracas_now)[11:19]
@@ -214,7 +235,10 @@ while True:
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            if peticion_internet:
+                                                aperturaConcedidaInternet(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            else:
+                                                aperturaConcedidaWifi(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                         else:
                                             aperturadenegada(cursor, conn, acceso_solicitud)
@@ -222,7 +246,10 @@ while True:
                                     if entrada>salida:
                                         if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            if peticion_internet:
+                                                aperturaConcedidaInternet(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            else:
+                                                aperturaConcedidaWifi(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                         else:
                                             aperturadenegada(cursor, conn, acceso_solicitud)
@@ -235,7 +262,10 @@ while True:
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            if peticion_internet:
+                                                aperturaConcedidaInternet(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            else:
+                                                aperturaConcedidaWifi(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                             contadoraux=0
                                         else:
@@ -246,7 +276,10 @@ while True:
                                     if entrada>salida:
                                         if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                             #print('entrada concedida')
-                                            aperturaconcedida(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            if peticion_internet:
+                                                aperturaConcedidaInternet(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
+                                            else:
+                                                aperturaConcedidaWifi(nombre, fecha, horahoy, CONTRATO, cedula, cursor, conn, acceso_solicitud)
                                             etapadiaapertura=1
                                             contadoraux=0
                                         else:

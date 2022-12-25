@@ -162,7 +162,7 @@ while True:
                             razon=None
                             cedula=None
                     except requests.exceptions.ConnectionError:
-                        print("fallo en la etapa 0")
+                        print("fallo consultando api en la etapa 0")
                 except Exception as e:
                     print(f"{e} - fallo total etapa 0")
                 etapa=1
@@ -279,7 +279,7 @@ while True:
                             listaUsuariosServidor=[]
                             listaUsuariosLocal=[]
                     except requests.exceptions.ConnectionError:
-                        print("fallo en la etapa 1")
+                        print("fallo consultando api en la etapa 1")
                 except Exception as e:
                     print(f"{e} - fallo total etapa 1")
                 etapa=2
@@ -367,7 +367,7 @@ while True:
                                             cv2.imwrite(f"{foto}.jpg",fotovisible)
                                 
                             except requests.exceptions.ConnectionError:
-                                print("fallo en la etapa 2")
+                                print("fallo consultando api en la etapa 2")
                 except Exception as e:
                     print(f"{e} - fallo total etapa 2")
                 etapa=3
@@ -436,7 +436,7 @@ while True:
                             #listaUsuariosServidor=[]
                             #listaUsuariosLocal=[]
                     except requests.exceptions.ConnectionError:
-                        print("fallo en la etapa 3")
+                        print("fallo consultando api en la etapa 3")
                 except Exception as e:
                     print(f"{e} - fallo total etapa 3")
                 etapa=4
@@ -472,7 +472,7 @@ while True:
                                     cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s, internet=%s, wifi=%s, captahuella=%s, rfid=%s, facial=%s WHERE cedula=%s", (telegram_id,internet,wifi,captahuella,rfid,facial,cedula))
                                     connlocal.commit()
                     except requests.exceptions.ConnectionError:
-                        print("fallo en la etapa 4")
+                        print("fallo consultando api en la etapa 4")
                 except Exception as e:
                     print(f"{e} - fallo total etapa 4")
                 etapa=5
@@ -538,7 +538,7 @@ while True:
                                     estado=dispositivolocal[2]
                                     requests.put(url=f'{URL_API}actualizardispositivosapi/{CONTRATO}/{dispositivo[7:]}/{estado}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                     except requests.exceptions.ConnectionError:
-                        print("fallo en la etapa 5")   
+                        print("fallo consultando api en la etapa 5")   
                 except Exception as e:
                     print(f"{e} - fallo total etapa 5")
                 etapa=6
@@ -725,7 +725,7 @@ while True:
                         listaUsuariosLocal=[]
                         listaempleadosseguricel=[]
                     except requests.exceptions.ConnectionError:
-                        print("fallo en la etapa 6")
+                        print("fallo consultando api en la etapa 6")
                 except Exception as e:
                     print(f"{e} - fallo total etapa 6")
                 etapa=7
@@ -767,28 +767,34 @@ while True:
                                     cursorlocal.execute('DELETE FROM web_tagsrfid WHERE epc=%s AND cedula=%s',(epc, cedula))
                                     connlocal.commit()
                     except requests.exceptions.ConnectionError:
-                        print("fallo en la etapa 7")
+                        print("fallo consultando api en la etapa 7")
                 except Exception as e:
                     print(f"{e} - fallo total etapa 7")
                 etapa=8
 
             if etapa==8:
                 try:
-                    cursorlocal.execute('SELECT id, estado FROM solicitud_aperturas')
+                    cursorlocal.execute('SELECT id, estado, peticionInternet, feedback FROM solicitud_aperturas')
                     aperturas_local= cursorlocal.fetchall()
                     if aperturas_local:
                         for aperturalocal in aperturas_local:
                             if aperturalocal[1] == 1:
                                 idapertura=aperturalocal[0]
-                                try:
-                                    request_json = requests.delete(url=f'{URL_API}eliminarsolicitudesaperturaapi/{idapertura}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                                    if request_json.status_code == 200 or request_json.status_code == 500:
-                                        cursorlocal.execute('DELETE FROM solicitud_aperturas WHERE id=%s', (idapertura,))
-                                        connlocal.commit()
-                                except requests.exceptions.ConnectionError:
-                                    print("fallo en la etapa 8")
+                                peticionDesdeInternet=aperturalocal[2]
+                                feedbackPeticion=aperturalocal[3]
+                                if peticionDesdeInternet and feedbackPeticion:
+                                    try:
+                                        request_json = requests.delete(url=f'{URL_API}eliminarsolicitudesaperturaapi/{idapertura}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                                        if request_json.status_code == 200 or request_json.status_code == 500:
+                                            cursorlocal.execute('DELETE FROM solicitud_aperturas WHERE id=%s', (idapertura,))
+                                            connlocal.commit()
+                                    except requests.exceptions.ConnectionError:
+                                        print("fallo consultando api en la etapa 8")
+                                elif not peticionDesdeInternet and feedbackPeticion:
+                                    cursorlocal.execute('DELETE FROM solicitud_aperturas WHERE id=%s', (idapertura,))
+                                    connlocal.commit()
                 except Exception as e:
-                    print(f"{e} - fallo total etapa 0")
+                    print(f"{e} - fallo total etapa 8")
                 etapa=0
 
     except (Exception, psycopg2.Error) as error:
