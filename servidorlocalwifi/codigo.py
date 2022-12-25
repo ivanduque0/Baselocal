@@ -140,6 +140,21 @@ razondictrfids = {'1':razonrfid1, '2':razonrfid2, '3':razonrfid3, '4':razonrfid4
 
 def aperturaconcedida(id_usuariof, cursorf, connf, acceso):
 
+    IdContador=0
+    cursorf.execute('SELECT id FROM solicitud_aperturas ORDER BY id ASC')
+    ids_peticiones_local= cursorf.fetchall()
+    nro_ids_peticiones_local=len(ids_peticiones_local)
+    if not ids_peticiones_local:
+        idPeticion = 1
+    else:
+        for id_peticion_local in ids_peticiones_local:
+            IdContador=IdContador+1
+            if not id_peticion_local[0] == IdContador:
+                idPeticion=IdContador
+                break
+        if nro_ids_peticiones_local == IdContador:
+            idPeticion=IdContador+1
+
     if accesodict[acceso]:
         cursorf.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado, peticionInternet, feedback)
         VALUES (%s, %s, %s, %s, %s, %s);''', (idPeticion, id_usuariof, acceso, 0, 'f', 'f'))
