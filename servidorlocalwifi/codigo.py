@@ -139,7 +139,6 @@ razondictrfids = {'1':razonrfid1, '2':razonrfid2, '3':razonrfid3, '4':razonrfid4
 #         pass
 
 def aperturaconcedida(id_usuariof, cursorf, connf, acceso):
-
     IdContador=0
     cursorf.execute('SELECT id FROM solicitud_aperturas ORDER BY id ASC')
     ids_peticiones_local= cursorf.fetchall()
@@ -165,7 +164,7 @@ def aperturaconcedidahuella(nombref, fechaf, horaf, contratof, cedulaf, cursorf,
 
     try:
         if accesodict[acceso]:
-            urllib.request.urlopen(url=f'{accesodict[acceso]}/on', timeout=3)
+            urllib.request.urlopen(url=f'{accesodict[acceso]}/onrh', timeout=3)
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
             VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondicthuellas[acceso], contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
@@ -182,7 +181,7 @@ def aperturaconcedidarfid(nombref, fechaf, horaf, contratof, cedulaf, cursorf, c
 
     try:
         if accesodict[acceso]:
-            urllib.request.urlopen(url=f'{accesodict[acceso]}/on', timeout=3)
+            urllib.request.urlopen(url=f'{accesodict[acceso]}/onrh', timeout=3)
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
             VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondictrfids[acceso], contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
@@ -328,9 +327,11 @@ class MyServer(BaseHTTPRequestHandler):
                     if etapadia==0 and etapadiaapertura==0:
                         aperturadenegada(cursor, conn, acceso_solicitud)
                         #print('Dia no permitido')
-                if horarios_permitidos == []:
+                else:
                     aperturadenegada(cursor, conn, acceso_solicitud)
-                    #print('este usuario no tiene horarios establecidos')
+                # if horarios_permitidos == []:
+                #     aperturadenegada(cursor, conn, acceso_solicitud)
+                #     #print('este usuario no tiene horarios establecidos')
                 diasusuario=[]
             else:
                 aperturadenegada(cursor, conn, acceso_solicitud)
@@ -535,9 +536,11 @@ class MyServer(BaseHTTPRequestHandler):
                     if etapadia==0 and etapadiaapertura==0:
                         aperturadenegada(cursor, conn, acceso_solicitud)
                         #print('Dia no permitido')
-                if horarios_permitidos == []:
+                else:
                     aperturadenegada(cursor, conn, acceso_solicitud)
-                    #print('este usuario no tiene horarios establecidos')
+                # if horarios_permitidos == []:
+                #     aperturadenegada(cursor, conn, acceso_solicitud)
+                #     #print('este usuario no tiene horarios establecidos')
                 diasusuario=[]
             else:
                 aperturadenegada(cursor, conn, acceso_solicitud)
@@ -632,9 +635,11 @@ class MyServer(BaseHTTPRequestHandler):
                     if etapadia==0 and etapadiaapertura==0:
                         aperturadenegada(cursor, conn, acceso_solicitud)
                         #print('Dia no permitido')
-                if horarios_permitidos == []:
-                    aperturadenegada(cursor, conn, acceso_solicitud)
-                    #print('este usuario no tiene horarios establecidos')
+                else:
+                    aperturadenegada(cursor, conn, acceso_solicitud)    
+                # if horarios_permitidos == []:
+                #     aperturadenegada(cursor, conn, acceso_solicitud)
+                #     #print('este usuario no tiene horarios establecidos')
                 diasusuario=[]
             else:
                 aperturadenegada(cursor, conn, acceso_solicitud)
