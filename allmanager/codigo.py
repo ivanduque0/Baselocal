@@ -110,6 +110,7 @@ while True:
                     if tablaCambiada == 'Usuarios':
                         try:
                             try:
+                                banderaUsuario=True
                                 cursorlocal.execute('SELECT cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial FROM web_usuarios WHERE cedula=%s',(cedulaUsuario,))
                                 usuario_local= cursorlocal.fetchall()
 
@@ -135,6 +136,7 @@ while True:
                                                     nroCaptahuellasSinHuella=nroCaptahuellasSinHuella+1
                                                 except:
                                                     print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
+                                                    banderaUsuario=False
                                         if nroCaptahuellasSinHuella == captahuella_actual:
                                             cursorlocal.execute('DELETE FROM web_huellas WHERE id_suprema=%s', (id_suprema,))
                                             connlocal.commit()
@@ -143,7 +145,6 @@ while True:
                                         cursorlocal.execute('DELETE FROM web_usuarios WHERE cedula=%s', (cedulaUsuario,))
                                         cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE cedula_id=%s', (cedulaUsuario,))
                                         connlocal.commit()
-                                    request_json_usuario = requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                                 elif not usuarioLocal and usuarioServidor: 
                                     for consultajson in request_json_usuario:
                                         cedula=consultajson['cedula']
@@ -157,7 +158,6 @@ while True:
                                     cursorlocal.execute('''INSERT INTO web_usuarios (cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial)
                                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', (cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial))
                                     connlocal.commit()
-                                    request_json_usuario = requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                                 elif usuarioLocal and usuarioServidor:
                                     for consultajson in request_json_usuario:
                                         cedula=consultajson['cedula']
@@ -169,14 +169,18 @@ while True:
                                         facial=consultajson['reconocimientoFacial']
                                     cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s, internet=%s, wifi=%s, captahuella=%s, rfid=%s, facial=%s WHERE cedula=%s", (telegram_id,internet,wifi,captahuella,rfid,facial,cedula))
                                     connlocal.commit()
-                                    request_json_usuario = requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                             except requests.exceptions.ConnectionError:
                                 print("fallo consultando api en usuarios")
+                                banderaUsuario=False
                         except Exception as e:
                             print(f"{e} - fallo total usuarios")
+                            banderaUsuario=False
+                        if banderaUsuario:
+                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                     elif tablaCambiada == 'Horarios':
                         try:
                             try:
+                                banderaHorario=True
                                 request_json_horarios = requests.get(url=f'{URL_API}obtenerhorariosindividualapi/{CONTRATO}/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
                                         
                                 horariosServidor=[]
@@ -190,9 +194,6 @@ while True:
                                 horariosLocal= cursorlocal.fetchall()
 
                                 for horario in horariosServidor:
-                                    # try:
-                                    #     horariosLocal.index(horario)
-                                    # except ValueError:
                                     if not horario in horariosLocal:
                                         entrada=horario[0]
                                         salida=horario[1]
@@ -203,9 +204,6 @@ while True:
                                         connlocal.commit()
 
                                 for horariosLocaliterar in horariosLocal:
-                                    # try:
-                                    #     horariosServidor.index(horariosLocaliterar)
-                                    # except ValueError:
                                     if not horariosLocaliterar in horariosServidor:
                                         entrada=horariosLocaliterar[0]
                                         salida=horariosLocaliterar[1]
@@ -213,11 +211,14 @@ while True:
                                         dia=horariosLocaliterar[3]
                                         cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE entrada=%s AND salida=%s AND cedula_id=%s AND dia=%s',(entrada, salida, cedula, dia))
                                         connlocal.commit()
-                                request_json_horarios = requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                             except requests.exceptions.ConnectionError:
-                                    print("fallo consultando api en horarios")
+                                print("fallo consultando api en horarios")
+                                banderaHorario=False
                         except Exception as e:
                             print(f"{e} - fallo total horarios")
+                            banderaHorario=False
+                        if banderaHorario:
+                            request_json_horarios = requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                     elif tablaCambiada == 'Huellas':
                         try:
                             try:
@@ -303,15 +304,18 @@ while True:
                                                     requests.get(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
                                                 except:
                                                     print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
-                                if banderaHuella:
-                                    requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                             except requests.exceptions.ConnectionError:
-                                    print("fallo consultando api en huellas")
+                                print("fallo consultando api en huellas")
+                                banderaHuella=False
                         except Exception as e:
                             print(f"{e} - fallo total huellas")
+                            banderaHuella=False
+                        if banderaHuella:
+                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                     elif tablaCambiada == 'Tags':
                         try:
                             try:
+                                banderaTag=True
                                 cursorlocal.execute('SELECT epc, cedula FROM web_tagsrfid WHERE cedula=%s', (cedulaUsuario,))
                                 tags_local= cursorlocal.fetchall()
                                 
@@ -325,9 +329,6 @@ while True:
                                 nro_tags_servidor = len(tagsServidor)
 
                                 for tagServidor in tagsServidor:
-                                    # try:
-                                    #     tags_local.index(tagServidor)
-                                    # except ValueError:
                                     if not tagServidor in tags_local:
                                         epc=tagServidor[0]
                                         cedula=tagServidor[1]
@@ -336,24 +337,25 @@ while True:
                                         connlocal.commit()
 
                                 for taglocaliterar in tags_local:
-                                    # try:
-                                    #     tagsServidor.index(taglocaliterar)
-                                    # except ValueError:
                                     if not taglocaliterar in tagsServidor:
                                         epc=taglocaliterar[0]
                                         cedula=taglocaliterar[1]
                                         cursorlocal.execute('DELETE FROM web_tagsrfid WHERE epc=%s AND cedula=%s',(epc, cedula))
                                         connlocal.commit()
-                                request_json_usuario = requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                             except requests.exceptions.ConnectionError:
-                                    print("fallo consultando api en tags")
+                                print("fallo consultando api en tags")
+                                banderaTag=False
                         except Exception as e:
                             print(f"{e} - fallo total tags")
+                            banderaTag=False
+                        if banderaTag:
+                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                     elif tablaCambiada == 'Fotos':
                         try:
-                            cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (cedulaUsuario,))
-                            fotos_local= cursorlocal.fetchall()
                             try:
+                                banderaFoto=True
+                                cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (cedulaUsuario,))
+                                fotos_local= cursorlocal.fetchall()
                                 request_json = requests.get(url=f'{URL_API}obtenerfotosapi/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
                                 listaFotosServidor=[]
                                 for consultajson in request_json:
@@ -376,6 +378,7 @@ while True:
                                             connlocal.commit()
                                         except Exception as e:
                                             print(f"{e} - fallo borrando foto: {foto}")
+                                            banderaFoto=False
 
                                 #agregar fotos que no estan en la base de datos local pero que si estan en la de heroku
                                 for fotoServidor in listaFotosServidor:
@@ -399,13 +402,18 @@ while True:
                                             VALUES (%s, %s, %s, %s);''', (id, foto, estado, cedula))
                                             connlocal.commit()
                                         except Exception as e:
-                                            print(f"{e} - fallo trayendo foto del usuario: {cedula}")   
+                                            print(f"{e} - fallo trayendo foto del usuario: {cedula}")
+                                            banderaFoto=False
                             except requests.exceptions.ConnectionError:
                                 print("fallo consultando api de fotos")
+                                banderaFoto=False
                         except Exception as e:
                             print(f"{e} - fallo total fotos")
+                            banderaFoto=False
+                        if banderaFoto:
+                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                     else:
-                        equests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                        requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                 t1_cambios=tm.perf_counter()
             
             if total_log > TIEMPO_LOG:
@@ -450,9 +458,6 @@ while True:
                         if nro_int_local != nro_int_servidor:
 
                             for interaccion in interacciones_local:
-                                # try:
-                                #     listaLogsServidor.index(interaccion)
-                                # except ValueError:
                                 if not interaccion in listaLogsServidor:
                                     nombre=interaccion[0]
                                     fecha=interaccion[1]
