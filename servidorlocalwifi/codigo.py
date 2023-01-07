@@ -4,7 +4,7 @@ import psycopg2
 import os
 import pytz
 from datetime import datetime
-import urllib.request
+import requests
 
 hostName = '0.0.0.0'
 serverPort = 43157
@@ -125,7 +125,7 @@ razondictrfids = {'1':razonrfid1, '2':razonrfid2, '3':razonrfid3, '4':razonrfid4
 
 #     try:
 #         if accesodict[acceso]:
-#             urllib.request.urlopen(url=f'{accesodict[acceso]}/on', timeout=3)
+#             requests.get(url=f'{accesodict[acceso]}/on', timeout=3)
 #             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
 #             VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondict[acceso], contratof, cedulaf))
 #             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
@@ -164,7 +164,7 @@ def aperturaconcedidahuella(nombref, fechaf, horaf, contratof, cedulaf, cursorf,
 
     try:
         if accesodict[acceso]:
-            urllib.request.urlopen(url=f'{accesodict[acceso]}/onrh', timeout=3)
+            requests.get(url=f'{accesodict[acceso]}/onrh', timeout=3)
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
             VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondicthuellas[acceso], contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
@@ -181,7 +181,7 @@ def aperturaconcedidarfid(nombref, fechaf, horaf, contratof, cedulaf, cursorf, c
 
     try:
         if accesodict[acceso]:
-            urllib.request.urlopen(url=f'{accesodict[acceso]}/onrh', timeout=3)
+            requests.get(url=f'{accesodict[acceso]}/onrh', timeout=3)
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
             VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, razondictrfids[acceso], contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
@@ -198,7 +198,7 @@ def aperturadenegada(cursorf, connf, acceso):
     # cursorf.execute('''UPDATE led SET onoff=2 WHERE onoff=0;''')
     # connf.commit()
     try:
-        urllib.request.urlopen(url=f'{accesodict[acceso]}/off', timeout=3)
+        requests.get(url=f'{accesodict[acceso]}/off', timeout=3)
     except:
         print("fallo en peticion http")
     finally:

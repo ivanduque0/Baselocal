@@ -218,7 +218,7 @@ while True:
                             print(f"{e} - fallo total horarios")
                             banderaHorario=False
                         if banderaHorario:
-                            request_json_horarios = requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                     elif tablaCambiada == 'Huellas':
                         try:
                             try:
