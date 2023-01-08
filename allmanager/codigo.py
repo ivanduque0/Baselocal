@@ -497,7 +497,7 @@ while True:
                                 idapertura=aperturalocal[0]
                                 peticionDesdeInternet=aperturalocal[2]
                                 feedbackPeticion=aperturalocal[3]
-                                if peticionDesdeInternet:# and feedbackPeticion:
+                                if peticionDesdeInternet and feedbackPeticion:
                                     try:
                                         request_json = requests.delete(url=f'{URL_API}eliminarsolicitudesaperturaapi/{idapertura}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
                                         if request_json.status_code == 200 or request_json.status_code == 500:

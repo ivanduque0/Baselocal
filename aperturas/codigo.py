@@ -10,7 +10,7 @@ ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 total=0
 CONTRATO=os.environ.get("CONTRATO")
-URL = os.environ.get("URL")
+URL_API = os.environ.get("URL_API")
 conn=None
 cursor=None
 
@@ -75,17 +75,18 @@ def aperturaConcedidaInternet(nombref, fechaf, horaf, contratof, cedulaf, cursor
             cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
             VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f"{razondict[acceso]}-Internet", contratof, cedulaf))
             #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
-            connf.commit()
+            # connf.commit()
             cursorf.execute('UPDATE solicitud_aperturas SET estado=%s WHERE id=%s;', (1, id_solicitud))
             connf.commit()
-    except:
-        pass
+            requests.put(url=f'{URL_API}aperturasusuarioapi/{id_solicitud}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'))
+    except Exception as e:
+        print(f"{e} - fallo intentando aperturar desde internet en la peticion con id {id_solicitud}")
         # cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
         # VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondict[acceso]}-Internet', contratof, cedulaf))
         # #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
         # connf.commit()
-    finally:
-        pass
+    # finally:
+    #     pass
 
 def aperturaConcedidaWifi(nombref, fechaf, horaf, contratof, cedulaf, cursorf, connf, acceso, id_solicitud):
     
@@ -98,14 +99,14 @@ def aperturaConcedidaWifi(nombref, fechaf, horaf, contratof, cedulaf, cursorf, c
             connf.commit()
             cursorf.execute('UPDATE solicitud_aperturas SET estado=%s WHERE id=%s;', (1, id_solicitud))
             connf.commit()
-    except:
-        pass
+    except Exception as e:
+        print(f"{e} - fallo intentando aperturar desde wifi en la peticion con id {id_solicitud}")
         # cursorf.execute('''INSERT INTO web_interacciones (nombre, fecha, hora, razon, contrato, cedula_id)
         # VALUES (%s, %s, %s, %s, %s, %s);''', (nombref, fechaf, horaf, f'fallo_{razondict[acceso]}-Wifi', contratof, cedulaf))
         # #cursorf.execute('''UPDATE led SET onoff=1 WHERE onoff=0;''')
         # connf.commit()
-    finally:
-        pass
+    # finally:
+    #     pass
 	
     # EN CASO DE USAR UN SERVIDOR LOCAL COMUN Y QUERER ACTIVAR CON SOLO UN ESP8266 EN CAMPO Y VARIOS ESP01, SE DEBE USAR ESTO
     # url = "http://tesis-reconocimiento-facial.herokuapp.com/apertura/"
@@ -132,10 +133,10 @@ def aperturadenegada(cursorf, connf, acceso, id_solicitud):
         requests.get(f'{accesodict[acceso]}/off')
         cursorf.execute('UPDATE solicitud_aperturas SET estado=%s WHERE id=%s;', (1, id_solicitud))
         connf.commit()
-    except:
-        print("fallo en peticion http")
-    finally:
-        pass  
+    except Exception as e:
+        print(f"{e} - fallo en peticion para denegar apertura")
+    # finally:
+    #     pass  
 
 while True:
     
@@ -158,7 +159,7 @@ while True:
 
         while True:
 
-            aperturas_solicitadas = requests.get(url=URL, auth=('BaseLocal_access', 'S3gur1c3l_local@')).json()
+            aperturas_solicitadas = requests.get(url=f'{URL_API}aperturascontratoapi/{CONTRATO}/', auth=('BaseLocal_access', 'S3gur1c3l_local@')).json()
             if len(aperturas_solicitadas):
                 tz = pytz.timezone('America/Caracas')
                 caracas_now = datetime.now(tz)
@@ -176,10 +177,11 @@ while True:
                     solicitud_id=apertura['id']
                     id_usuario = apertura['id_usuario']
                     solicitud_acceso=apertura['acceso']
+                    feedbackPeticion=apertura['feedback']
                     cursor.execute('SELECT * FROM solicitud_aperturas WHERE id=%s',(solicitud_id,))
                     aperturas_local_existente= cursor.fetchall()
                     if not aperturas_local_existente:
-                        if apertura['contrato'] == CONTRATO and apertura['fecha'] == fecha and diferencia_horas==0 and (diferencia_minutos >= -1 or diferencia_minutos <= 2):
+                        if apertura['fecha'] == fecha and diferencia_horas==0 and (diferencia_minutos >= -1 or diferencia_minutos <= 2):
                                 cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado, peticionInternet, feedback)
                                     VALUES (%s, %s, %s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 0, 't', 'f'))
                                 conn.commit()
@@ -187,6 +189,10 @@ while True:
                             cursor.execute('''INSERT INTO solicitud_aperturas (id, id_usuario, acceso, estado, peticionInternet, feedback)
                                 VALUES (%s, %s, %s, %s, %s, %s)''', (solicitud_id, id_usuario, solicitud_acceso, 1, 't', 't'))
                             conn.commit()
+                    elif aperturas_local_existente and feedbackPeticion:
+                        cursor.execute('UPDATE solicitud_aperturas SET feedback=%s WHERE id=%s', ('t',solicitud_id))
+                        conn.commit()
+
 
 
             cursor.execute('SELECT id, id_usuario, acceso, estado, peticionInternet FROM solicitud_aperturas')
