@@ -238,7 +238,7 @@ try:
                         # try:
                         #     listaempleadosseguricel.index(cedula)
                         # except ValueError:
-                        if not cedula in listaempleadosseguricel
+                        if not cedula in listaempleadosseguricel:
                             listaempleadosseguricel.append(cedula)
                     banderaHuellas=True
 
@@ -464,7 +464,7 @@ try:
                         # try:
                         #     listaFotosServidor.index(fotolocal)
                         # except ValueError:
-                        if not fotolocal in listaFotosServidor
+                        if not fotolocal in listaFotosServidor:
                             try:
                                 id=fotolocal[0]
                                 foto=fotolocal[1]
@@ -483,7 +483,7 @@ try:
                         contador=contador+1
                         print(contador)
                         print(fotoServidor)
-                        if not fotoServidor in fotos_local
+                        if not fotoServidor in fotos_local:
                             id=fotoServidor[0]
                             foto=fotoServidor[1]
                             estado=fotoServidor[2]
