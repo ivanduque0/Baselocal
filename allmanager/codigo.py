@@ -23,6 +23,8 @@ dias_acumulados=[]
 nroCaptahuellasConHuella=0
 nroCaptahuellasSinHuella=0
 captahuella_actual=0
+TIEMPO_CAMBIOS=int(os.environ.get('TIEMPO_CAMBIOS'))
+TIEMPO_LOG=int(os.environ.get('TIEMPO_LOG'))
 DIRECTORIO=os.environ.get("DIRECTORIO", "media/personas")
 cambiarEstadoFotos=True
 BorrarPeticionesListas=True
@@ -96,325 +98,326 @@ while True:
 
 
             if total_cambios > TIEMPO_CAMBIOS:
-                request_json = requests.get(url=f'{URL_API}vercambiosapi/{CONTRATO}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
+                try:
+                    request_json = requests.get(url=f'{URL_API}vercambiosapi/{CONTRATO}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
 
-                for consultajson in request_json:
-                    idCambio=consultajson['id']
-                    tablaCambiada=consultajson['tabla']
-                    cedulaUsuario=consultajson['cedula']
+                    for consultajson in request_json:
+                        idCambio=consultajson['id']
+                        tablaCambiada=consultajson['tabla']
+                        cedulaUsuario=consultajson['cedula']
 
-                    # print(f'idCambio:{idCambio}')
-                    # print(f'tablaCambiada:{tablaCambiada}')
-                    # print(f'cedulaUsuario:{cedulaUsuario}')
+                        # print(f'idCambio:{idCambio}')
+                        # print(f'tablaCambiada:{tablaCambiada}')
+                        # print(f'cedulaUsuario:{cedulaUsuario}')
 
-                    if tablaCambiada == 'Usuarios':
-                        try:
+                        if tablaCambiada == 'Usuarios':
                             try:
-                                banderaUsuario=True
-                                cursorlocal.execute('SELECT cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial FROM web_usuarios WHERE cedula=%s',(cedulaUsuario,))
-                                usuario_local= cursorlocal.fetchall()
+                                try:
+                                    banderaUsuario=True
+                                    cursorlocal.execute('SELECT cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial FROM web_usuarios WHERE cedula=%s',(cedulaUsuario,))
+                                    usuario_local= cursorlocal.fetchall()
 
-                                request_json_usuario = requests.get(url=f'{URL_API}usuarioindividualapi/{CONTRATO}/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
-                                usuarioLocal=len(usuario_local)
-                                usuarioServidor=len(request_json_usuario)
-                                if usuarioLocal and not usuarioServidor:
-                                    cursorlocal.execute('SELECT id_suprema FROM web_huellas where cedula=%s', (cedulaUsuario,))
-                                    huellas_local= cursorlocal.fetchall()
-                                    HuellasPorBorrar=len(huellas_local)
-                                    HuellasBorradas=0
-                                    nroCaptahuellasSinHuella=0
-                                    captahuella_actual=0
-                                    for huella_local in huellas_local:
-                                        id_suprema = huella_local[0]
-                                        id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
-                                        id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
-                                        for captahuella in captahuellas:
-                                            if captahuella:
-                                                captahuella_actual=captahuella_actual+1
-                                                try:
-                                                    requests.get(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
-                                                    nroCaptahuellasSinHuella=nroCaptahuellasSinHuella+1
-                                                except:
-                                                    print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
-                                                    banderaUsuario=False
-                                        if nroCaptahuellasSinHuella == captahuella_actual:
-                                            cursorlocal.execute('DELETE FROM web_huellas WHERE id_suprema=%s', (id_suprema,))
-                                            connlocal.commit()
-                                            HuellasBorradas=HuellasBorradas+1
-                                    if HuellasBorradas == HuellasPorBorrar:
-                                        cursorlocal.execute('DELETE FROM web_usuarios WHERE cedula=%s', (cedulaUsuario,))
-                                        cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE cedula_id=%s', (cedulaUsuario,))
-                                        connlocal.commit()
-                                elif not usuarioLocal and usuarioServidor: 
-                                    for consultajson in request_json_usuario:
-                                        cedula=consultajson['cedula']
-                                        nombre=consultajson['nombre']
-                                        telegram_id=consultajson['telegram_id']
-                                        internet=consultajson['telefonoInternet']
-                                        wifi=consultajson['telefonoWifi']
-                                        captahuella=consultajson['captahuella']
-                                        rfid=consultajson['rfid']
-                                        facial=consultajson['reconocimientoFacial']
-                                    cursorlocal.execute('''INSERT INTO web_usuarios (cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial)
-                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', (cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial))
-                                    connlocal.commit()
-                                elif usuarioLocal and usuarioServidor:
-                                    for consultajson in request_json_usuario:
-                                        cedula=consultajson['cedula']
-                                        telegram_id=consultajson['telegram_id']
-                                        internet=consultajson['telefonoInternet']
-                                        wifi=consultajson['telefonoWifi']
-                                        captahuella=consultajson['captahuella']
-                                        rfid=consultajson['rfid']
-                                        facial=consultajson['reconocimientoFacial']
-                                    cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s, internet=%s, wifi=%s, captahuella=%s, rfid=%s, facial=%s WHERE cedula=%s", (telegram_id,internet,wifi,captahuella,rfid,facial,cedula))
-                                    connlocal.commit()
-                            except requests.exceptions.ConnectionError:
-                                print("fallo consultando api en usuarios")
-                                banderaUsuario=False
-                        except Exception as e:
-                            print(f"{e} - fallo total usuarios")
-                            banderaUsuario=False
-                        if banderaUsuario:
-                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                    elif tablaCambiada == 'Horarios':
-                        try:
-                            try:
-                                banderaHorario=True
-                                request_json_horarios = requests.get(url=f'{URL_API}obtenerhorariosindividualapi/{CONTRATO}/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
-                                        
-                                horariosServidor=[]
-                                for consultajson in request_json_horarios:
-                                    entradaObjetohora=time.fromisoformat(consultajson['entrada'])
-                                    salidaObjetohora=time.fromisoformat(consultajson['salida'])
-                                    TuplaHorarioIndividual=(entradaObjetohora,salidaObjetohora,consultajson['cedula'],consultajson['dia'],)
-                                    horariosServidor.append(TuplaHorarioIndividual)
-                                
-                                cursorlocal.execute('SELECT * FROM web_horariospermitidos WHERE cedula_id=%s',(cedulaUsuario,))
-                                horariosLocal= cursorlocal.fetchall()
-
-                                for horario in horariosServidor:
-                                    if not horario in horariosLocal:
-                                        entrada=horario[0]
-                                        salida=horario[1]
-                                        cedula=horario[2]
-                                        dia=horario[3]
-                                        cursorlocal.execute('''INSERT INTO web_horariospermitidos (entrada, salida, cedula_id, dia)
-                                        VALUES (%s, %s, %s, %s);''', (entrada, salida, cedula, dia))
-                                        connlocal.commit()
-
-                                for horariosLocaliterar in horariosLocal:
-                                    if not horariosLocaliterar in horariosServidor:
-                                        entrada=horariosLocaliterar[0]
-                                        salida=horariosLocaliterar[1]
-                                        cedula=horariosLocaliterar[2]
-                                        dia=horariosLocaliterar[3]
-                                        cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE entrada=%s AND salida=%s AND cedula_id=%s AND dia=%s',(entrada, salida, cedula, dia))
-                                        connlocal.commit()
-                            except requests.exceptions.ConnectionError:
-                                print("fallo consultando api en horarios")
-                                banderaHorario=False
-                        except Exception as e:
-                            print(f"{e} - fallo total horarios")
-                            banderaHorario=False
-                        if banderaHorario:
-                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                    elif tablaCambiada == 'Huellas':
-                        try:
-                            try:
-                                banderaHuella = True
-                                cursorlocal.execute('SELECT template, id_suprema, cedula FROM web_huellas where cedula=%s', (cedulaUsuario,))
-                                huellas_local= cursorlocal.fetchall()
-
-                                request_json = requests.get(url=f'{URL_API}obtenerhuellasapi/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
-
-                                huellasServidor=[]
-                                for consultajson in request_json:
-                                    tuplaHuellaIndividual=(consultajson['template'], consultajson['id_suprema'], consultajson['cedula'],)
-                                    huellasServidor.append(tuplaHuellaIndividual)
-
-                                for huella in huellas_local:
-                                    if not huella in huellasServidor:
+                                    request_json_usuario = requests.get(url=f'{URL_API}usuarioindividualapi/{CONTRATO}/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
+                                    usuarioLocal=len(usuario_local)
+                                    usuarioServidor=len(request_json_usuario)
+                                    if usuarioLocal and not usuarioServidor:
+                                        cursorlocal.execute('SELECT id_suprema FROM web_huellas where cedula=%s', (cedulaUsuario,))
+                                        huellas_local= cursorlocal.fetchall()
+                                        HuellasPorBorrar=len(huellas_local)
+                                        HuellasBorradas=0
                                         nroCaptahuellasSinHuella=0
                                         captahuella_actual=0
-                                        template=huella[0]
-                                        id_suprema = huella[1]
-                                        id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
-                                        id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
-                                        for captahuella in captahuellas:
-                                            if captahuella:
-                                                captahuella_actual=captahuella_actual+1
-                                                try:
-                                                    requests.get(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
-                                                    nroCaptahuellasSinHuella=nroCaptahuellasSinHuella+1
-                                                except:
-                                                    print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")  
-                                        if nroCaptahuellasSinHuella == captahuella_actual:
-                                            cursorlocal.execute('DELETE FROM web_huellas WHERE template=%s', (template,))
+                                        for huella_local in huellas_local:
+                                            id_suprema = huella_local[0]
+                                            id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
+                                            id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
+                                            for captahuella in captahuellas:
+                                                if captahuella:
+                                                    captahuella_actual=captahuella_actual+1
+                                                    try:
+                                                        requests.get(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
+                                                        nroCaptahuellasSinHuella=nroCaptahuellasSinHuella+1
+                                                    except:
+                                                        print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
+                                                        banderaUsuario=False
+                                            if nroCaptahuellasSinHuella == captahuella_actual:
+                                                cursorlocal.execute('DELETE FROM web_huellas WHERE id_suprema=%s', (id_suprema,))
+                                                connlocal.commit()
+                                                HuellasBorradas=HuellasBorradas+1
+                                        if HuellasBorradas == HuellasPorBorrar:
+                                            cursorlocal.execute('DELETE FROM web_usuarios WHERE cedula=%s', (cedulaUsuario,))
+                                            cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE cedula_id=%s', (cedulaUsuario,))
                                             connlocal.commit()
-                                        else:
-                                            banderaHuella = False  
+                                    elif not usuarioLocal and usuarioServidor: 
+                                        for consultajson in request_json_usuario:
+                                            cedula=consultajson['cedula']
+                                            nombre=consultajson['nombre']
+                                            telegram_id=consultajson['telegram_id']
+                                            internet=consultajson['telefonoInternet']
+                                            wifi=consultajson['telefonoWifi']
+                                            captahuella=consultajson['captahuella']
+                                            rfid=consultajson['rfid']
+                                            facial=consultajson['reconocimientoFacial']
+                                        cursorlocal.execute('''INSERT INTO web_usuarios (cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial)
+                                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', (cedula, nombre, telegram_id, internet, wifi, captahuella, rfid, facial))
+                                        connlocal.commit()
+                                    elif usuarioLocal and usuarioServidor:
+                                        for consultajson in request_json_usuario:
+                                            cedula=consultajson['cedula']
+                                            telegram_id=consultajson['telegram_id']
+                                            internet=consultajson['telefonoInternet']
+                                            wifi=consultajson['telefonoWifi']
+                                            captahuella=consultajson['captahuella']
+                                            rfid=consultajson['rfid']
+                                            facial=consultajson['reconocimientoFacial']
+                                        cursorlocal.execute("UPDATE web_usuarios SET telegram_id=%s, internet=%s, wifi=%s, captahuella=%s, rfid=%s, facial=%s WHERE cedula=%s", (telegram_id,internet,wifi,captahuella,rfid,facial,cedula))
+                                        connlocal.commit()
+                                except requests.exceptions.ConnectionError:
+                                    print("fallo consultando api en usuarios")
+                                    banderaUsuario=False
+                            except Exception as e:
+                                print(f"{e} - fallo total usuarios")
+                                banderaUsuario=False
+                            if banderaUsuario:
+                                requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                        elif tablaCambiada == 'Horarios':
+                            try:
+                                try:
+                                    banderaHorario=True
+                                    request_json_horarios = requests.get(url=f'{URL_API}obtenerhorariosindividualapi/{CONTRATO}/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
+                                            
+                                    horariosServidor=[]
+                                    for consultajson in request_json_horarios:
+                                        entradaObjetohora=time.fromisoformat(consultajson['entrada'])
+                                        salidaObjetohora=time.fromisoformat(consultajson['salida'])
+                                        TuplaHorarioIndividual=(entradaObjetohora,salidaObjetohora,consultajson['cedula'],consultajson['dia'],)
+                                        horariosServidor.append(TuplaHorarioIndividual)
+                                    
+                                    cursorlocal.execute('SELECT * FROM web_horariospermitidos WHERE cedula_id=%s',(cedulaUsuario,))
+                                    horariosLocal= cursorlocal.fetchall()
 
-                                for huella in huellasServidor:
-                                    if not huella in huellas_local:
-                                        id_suprema=huella[1]
-                                        cedula=huella[2]
-                                        template=huella[0]
-                                        nroCaptahuellasConHuella=0
-                                        captahuella_actual=0
-                                        IdSupremaContador=0 #esto lo uso para ver si hay id de suprema disponibles
-                                        if not id_suprema:
-                                            cursorlocal.execute('SELECT id_suprema FROM web_huellas ORDER BY id_suprema ASC')
-                                            ids_suprema_local= cursorlocal.fetchall()
-                                            nro_ids_suprema_local=len(ids_suprema_local)
-                                            if not ids_suprema_local:
-                                                id_suprema = 1
-                                                if not cedula in listaempleadosseguricel:
-                                                    requests.put(url=f'{URL_API}agregaridsupremaportemplateapi/{template}/{id_suprema}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                                    for horario in horariosServidor:
+                                        if not horario in horariosLocal:
+                                            entrada=horario[0]
+                                            salida=horario[1]
+                                            cedula=horario[2]
+                                            dia=horario[3]
+                                            cursorlocal.execute('''INSERT INTO web_horariospermitidos (entrada, salida, cedula_id, dia)
+                                            VALUES (%s, %s, %s, %s);''', (entrada, salida, cedula, dia))
+                                            connlocal.commit()
+
+                                    for horariosLocaliterar in horariosLocal:
+                                        if not horariosLocaliterar in horariosServidor:
+                                            entrada=horariosLocaliterar[0]
+                                            salida=horariosLocaliterar[1]
+                                            cedula=horariosLocaliterar[2]
+                                            dia=horariosLocaliterar[3]
+                                            cursorlocal.execute('DELETE FROM web_horariospermitidos WHERE entrada=%s AND salida=%s AND cedula_id=%s AND dia=%s',(entrada, salida, cedula, dia))
+                                            connlocal.commit()
+                                except requests.exceptions.ConnectionError:
+                                    print("fallo consultando api en horarios")
+                                    banderaHorario=False
+                            except Exception as e:
+                                print(f"{e} - fallo total horarios")
+                                banderaHorario=False
+                            if banderaHorario:
+                                requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                        elif tablaCambiada == 'Huellas':
+                            try:
+                                try:
+                                    banderaHuella = True
+                                    cursorlocal.execute('SELECT template, id_suprema, cedula FROM web_huellas where cedula=%s', (cedulaUsuario,))
+                                    huellas_local= cursorlocal.fetchall()
+
+                                    request_json = requests.get(url=f'{URL_API}obtenerhuellasapi/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
+
+                                    huellasServidor=[]
+                                    for consultajson in request_json:
+                                        tuplaHuellaIndividual=(consultajson['template'], consultajson['id_suprema'], consultajson['cedula'],)
+                                        huellasServidor.append(tuplaHuellaIndividual)
+
+                                    for huella in huellas_local:
+                                        if not huella in huellasServidor:
+                                            nroCaptahuellasSinHuella=0
+                                            captahuella_actual=0
+                                            template=huella[0]
+                                            id_suprema = huella[1]
+                                            id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
+                                            id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
+                                            for captahuella in captahuellas:
+                                                if captahuella:
+                                                    captahuella_actual=captahuella_actual+1
+                                                    try:
+                                                        requests.get(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
+                                                        nroCaptahuellasSinHuella=nroCaptahuellasSinHuella+1
+                                                    except:
+                                                        print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")  
+                                            if nroCaptahuellasSinHuella == captahuella_actual:
+                                                cursorlocal.execute('DELETE FROM web_huellas WHERE template=%s', (template,))
+                                                connlocal.commit()
                                             else:
-                                                for id_suprema_local in ids_suprema_local:
-                                                    IdSupremaContador=IdSupremaContador+1
-                                                    if not id_suprema_local[0] == IdSupremaContador:
-                                                        id_suprema=IdSupremaContador
-                                                        if not cedula in listaempleadosseguricel:
-                                                            requests.put(url=f'{URL_API}agregaridsupremaportemplateapi/{template}/{id_suprema}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                                                        break
-                                                if nro_ids_suprema_local == IdSupremaContador:
-                                                    id_suprema=IdSupremaContador+1
+                                                banderaHuella = False  
+
+                                    for huella in huellasServidor:
+                                        if not huella in huellas_local:
+                                            id_suprema=huella[1]
+                                            cedula=huella[2]
+                                            template=huella[0]
+                                            nroCaptahuellasConHuella=0
+                                            captahuella_actual=0
+                                            IdSupremaContador=0 #esto lo uso para ver si hay id de suprema disponibles
+                                            if not id_suprema:
+                                                cursorlocal.execute('SELECT id_suprema FROM web_huellas ORDER BY id_suprema ASC')
+                                                ids_suprema_local= cursorlocal.fetchall()
+                                                nro_ids_suprema_local=len(ids_suprema_local)
+                                                if not ids_suprema_local:
+                                                    id_suprema = 1
                                                     if not cedula in listaempleadosseguricel:
                                                         requests.put(url=f'{URL_API}agregaridsupremaportemplateapi/{template}/{id_suprema}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                                        id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
-                                        id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
-                                        for captahuella in captahuellas:
-                                            if captahuella:
-                                                captahuella_actual=captahuella_actual+1
-                                                try:
-                                                    requests.get(url=f'{captahuella}/anadir/{id_suprema_hex}/{template}0A', timeout=3)
-                                                    nroCaptahuellasConHuella=nroCaptahuellasConHuella+1
-                                                except:
-                                                    print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
-                                        if nroCaptahuellasConHuella == captahuella_actual and captahuella_actual != 0:
-                                            cursorlocal.execute('''INSERT INTO web_huellas (id_suprema, cedula, template)
-                                            VALUES (%s, %s, %s)''', (id_suprema, cedula, template))
-                                            connlocal.commit()
-                                        elif captahuella_actual != nroCaptahuellasConHuella and nroCaptahuellasConHuella != 0:
-                                            banderaHuella = False  
+                                                else:
+                                                    for id_suprema_local in ids_suprema_local:
+                                                        IdSupremaContador=IdSupremaContador+1
+                                                        if not id_suprema_local[0] == IdSupremaContador:
+                                                            id_suprema=IdSupremaContador
+                                                            if not cedula in listaempleadosseguricel:
+                                                                requests.put(url=f'{URL_API}agregaridsupremaportemplateapi/{template}/{id_suprema}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                                                            break
+                                                    if nro_ids_suprema_local == IdSupremaContador:
+                                                        id_suprema=IdSupremaContador+1
+                                                        if not cedula in listaempleadosseguricel:
+                                                            requests.put(url=f'{URL_API}agregaridsupremaportemplateapi/{template}/{id_suprema}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                                            id_suprema_hex = (id_suprema).to_bytes(4, byteorder='big').hex()
+                                            id_suprema_hex = id_suprema_hex[6:]+id_suprema_hex[4:6]+id_suprema_hex[2:4]+id_suprema_hex[0:2]
                                             for captahuella in captahuellas:
-                                                try:
-                                                    requests.get(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
-                                                except:
-                                                    print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
-                            except requests.exceptions.ConnectionError:
-                                print("fallo consultando api en huellas")
+                                                if captahuella:
+                                                    captahuella_actual=captahuella_actual+1
+                                                    try:
+                                                        requests.get(url=f'{captahuella}/anadir/{id_suprema_hex}/{template}0A', timeout=3)
+                                                        nroCaptahuellasConHuella=nroCaptahuellasConHuella+1
+                                                    except:
+                                                        print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
+                                            if nroCaptahuellasConHuella == captahuella_actual and captahuella_actual != 0:
+                                                cursorlocal.execute('''INSERT INTO web_huellas (id_suprema, cedula, template)
+                                                VALUES (%s, %s, %s)''', (id_suprema, cedula, template))
+                                                connlocal.commit()
+                                            elif captahuella_actual != nroCaptahuellasConHuella and nroCaptahuellasConHuella != 0:
+                                                banderaHuella = False  
+                                                for captahuella in captahuellas:
+                                                    try:
+                                                        requests.get(url=f'{captahuella}/quitar/{id_suprema_hex}', timeout=3)
+                                                    except:
+                                                        print(f"fallo al conectar con la esp8266 con la ip:{captahuella}")
+                                except requests.exceptions.ConnectionError:
+                                    print("fallo consultando api en huellas")
+                                    banderaHuella=False
+                            except Exception as e:
+                                print(f"{e} - fallo total huellas")
                                 banderaHuella=False
-                        except Exception as e:
-                            print(f"{e} - fallo total huellas")
-                            banderaHuella=False
-                        if banderaHuella:
-                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                    elif tablaCambiada == 'Tags':
-                        try:
+                            if banderaHuella:
+                                requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                        elif tablaCambiada == 'Tags':
                             try:
-                                banderaTag=True
-                                cursorlocal.execute('SELECT epc, cedula FROM web_tagsrfid WHERE cedula=%s', (cedulaUsuario,))
-                                tags_local= cursorlocal.fetchall()
-                                
-                                request_json = requests.get(url=f'{URL_API}obtenertagsrfidindividualapi/{CONTRATO}/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
-                                tagsServidor=[]
-                                for consultajson in request_json:
-                                    tuplaTagIndividual=(consultajson['epc'],consultajson['cedula'],)
-                                    tagsServidor.append(tuplaTagIndividual)
+                                try:
+                                    banderaTag=True
+                                    cursorlocal.execute('SELECT epc, cedula FROM web_tagsrfid WHERE cedula=%s', (cedulaUsuario,))
+                                    tags_local= cursorlocal.fetchall()
+                                    
+                                    request_json = requests.get(url=f'{URL_API}obtenertagsrfidindividualapi/{CONTRATO}/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
+                                    tagsServidor=[]
+                                    for consultajson in request_json:
+                                        tuplaTagIndividual=(consultajson['epc'],consultajson['cedula'],)
+                                        tagsServidor.append(tuplaTagIndividual)
 
-                                nro_tags_local = len(tags_local)
-                                nro_tags_servidor = len(tagsServidor)
+                                    nro_tags_local = len(tags_local)
+                                    nro_tags_servidor = len(tagsServidor)
 
-                                for tagServidor in tagsServidor:
-                                    if not tagServidor in tags_local:
-                                        epc=tagServidor[0]
-                                        cedula=tagServidor[1]
-                                        cursorlocal.execute('''INSERT INTO web_tagsrfid (epc, cedula)
-                                        VALUES (%s, %s);''', (epc, cedula))
-                                        connlocal.commit()
+                                    for tagServidor in tagsServidor:
+                                        if not tagServidor in tags_local:
+                                            epc=tagServidor[0]
+                                            cedula=tagServidor[1]
+                                            cursorlocal.execute('''INSERT INTO web_tagsrfid (epc, cedula)
+                                            VALUES (%s, %s);''', (epc, cedula))
+                                            connlocal.commit()
 
-                                for taglocaliterar in tags_local:
-                                    if not taglocaliterar in tagsServidor:
-                                        epc=taglocaliterar[0]
-                                        cedula=taglocaliterar[1]
-                                        cursorlocal.execute('DELETE FROM web_tagsrfid WHERE epc=%s AND cedula=%s',(epc, cedula))
-                                        connlocal.commit()
-                            except requests.exceptions.ConnectionError:
-                                print("fallo consultando api en tags")
+                                    for taglocaliterar in tags_local:
+                                        if not taglocaliterar in tagsServidor:
+                                            epc=taglocaliterar[0]
+                                            cedula=taglocaliterar[1]
+                                            cursorlocal.execute('DELETE FROM web_tagsrfid WHERE epc=%s AND cedula=%s',(epc, cedula))
+                                            connlocal.commit()
+                                except requests.exceptions.ConnectionError:
+                                    print("fallo consultando api en tags")
+                                    banderaTag=False
+                            except Exception as e:
+                                print(f"{e} - fallo total tags")
                                 banderaTag=False
-                        except Exception as e:
-                            print(f"{e} - fallo total tags")
-                            banderaTag=False
-                        if banderaTag:
-                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                    elif tablaCambiada == 'Fotos':
-                        try:
+                            if banderaTag:
+                                requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                        elif tablaCambiada == 'Fotos':
                             try:
-                                banderaFoto=True
-                                cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (cedulaUsuario,))
-                                fotos_local= cursorlocal.fetchall()
-                                request_json = requests.get(url=f'{URL_API}obtenerfotosapi/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
-                                listaFotosServidor=[]
-                                for consultajson in request_json:
-                                    rutaFotoSinProcesar = consultajson['foto'][8:].split('/')
-                                    rutaFotoProcesada = f"{rutaFotoSinProcesar[-3]}/{rutaFotoSinProcesar[-2]}/{rutaFotoSinProcesar[-1]}"
-                                    tuplaFotoIndividual=(int(consultajson['id']),rutaFotoProcesada,int(consultajson['estado']),consultajson['cedula'],)
-                                    listaFotosServidor.append(tuplaFotoIndividual)
-                                      
-                                #eliminar fotos de la base de datos local que no esten en la base de datos de heroku
-                                for fotolocal in fotos_local:
-                                    id=fotolocal[0]
-                                    foto=fotolocal[1]
-                                    # try:
-                                    #     listaFotosServidor.index(fotolocal)
-                                    # except ValueError:
-                                    if not fotolocal in listaFotosServidor
-                                        try:
-                                            os.remove(f'{foto}.jpg')
-                                            cursorlocal.execute('DELETE FROM web_fotos where id=%s', (id,))
-                                            connlocal.commit()
-                                        except Exception as e:
-                                            print(f"{e} - fallo borrando foto: {foto}")
-                                            banderaFoto=False
+                                try:
+                                    banderaFoto=True
+                                    cursorlocal.execute('SELECT * FROM web_fotos where cedula_id=%s', (cedulaUsuario,))
+                                    fotos_local= cursorlocal.fetchall()
+                                    request_json = requests.get(url=f'{URL_API}obtenerfotosapi/{cedulaUsuario}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3).json()
+                                    listaFotosServidor=[]
+                                    for consultajson in request_json:
+                                        rutaFotoSinProcesar = consultajson['foto'][8:].split('/')
+                                        rutaFotoProcesada = f"{rutaFotoSinProcesar[-3]}/{rutaFotoSinProcesar[-2]}/{rutaFotoSinProcesar[-1]}"
+                                        tuplaFotoIndividual=(int(consultajson['id']),rutaFotoProcesada,int(consultajson['estado']),consultajson['cedula'],)
+                                        listaFotosServidor.append(tuplaFotoIndividual)
+                                        
+                                    #eliminar fotos de la base de datos local que no esten en la base de datos de heroku
+                                    for fotolocal in fotos_local:
+                                        id=fotolocal[0]
+                                        foto=fotolocal[1]
+                                        # try:
+                                        #     listaFotosServidor.index(fotolocal)
+                                        # except ValueError:
+                                        if not fotolocal in listaFotosServidor:
+                                            try:
+                                                os.remove(f'{foto}.jpg')
+                                                cursorlocal.execute('DELETE FROM web_fotos where id=%s', (id,))
+                                                connlocal.commit()
+                                            except Exception as e:
+                                                print(f"{e} - fallo borrando foto: {foto}")
+                                                banderaFoto=False
 
-                                #agregar fotos que no estan en la base de datos local pero que si estan en la de heroku
-                                for fotoServidor in listaFotosServidor:
-                                    # try:
-                                    #     fotos_local.index(fotoServidor)
-                                    # except ValueError:
-                                    if not fotoServidor in fotos_local
-                                        id=fotoServidor[0]
-                                        foto=fotoServidor[1]
-                                        estado=fotoServidor[2]
-                                        cedula=fotoServidor[3]
-                                        try:
-                                            urlFoto = cloudinary.utils.cloudinary_url(foto)
-                                            urlFoto=urlFoto[0]
-                                            #imagenurl = urllib.request.urlopen (url) #abrimos el URL
-                                            imagenurl = requests.get(url=urlFoto, timeout=3)
-                                            imagenarray = np.array(bytearray(imagenurl.read()),dtype=np.uint8)
-                                            fotovisible = cv2.imdecode (imagenarray,-1)
-                                            cv2.imwrite(f"{foto}.jpg",fotovisible)
-                                            cursorlocal.execute('''INSERT INTO web_fotos (id, foto, estado, cedula_id)
-                                            VALUES (%s, %s, %s, %s);''', (id, foto, estado, cedula))
-                                            connlocal.commit()
-                                        except Exception as e:
-                                            print(f"{e} - fallo trayendo foto del usuario: {cedula}")
-                                            banderaFoto=False
-                            except requests.exceptions.ConnectionError:
-                                print("fallo consultando api de fotos")
+                                    #agregar fotos que no estan en la base de datos local pero que si estan en la de heroku
+                                    for fotoServidor in listaFotosServidor:
+                                        # try:
+                                        #     fotos_local.index(fotoServidor)
+                                        # except ValueError:
+                                        if not fotoServidor in fotos_local:
+                                            id=fotoServidor[0]
+                                            foto=fotoServidor[1]
+                                            estado=fotoServidor[2]
+                                            cedula=fotoServidor[3]
+                                            try:
+                                                urlFoto = cloudinary.utils.cloudinary_url(foto)
+                                                urlFoto=urlFoto[0]
+                                                #imagenurl = urllib.request.urlopen (url) #abrimos el URL
+                                                imagenurl = requests.get(url=urlFoto, timeout=3)
+                                                imagenarray = np.array(bytearray(imagenurl.read()),dtype=np.uint8)
+                                                fotovisible = cv2.imdecode (imagenarray,-1)
+                                                cv2.imwrite(f"{foto}.jpg",fotovisible)
+                                                cursorlocal.execute('''INSERT INTO web_fotos (id, foto, estado, cedula_id)
+                                                VALUES (%s, %s, %s, %s);''', (id, foto, estado, cedula))
+                                                connlocal.commit()
+                                            except Exception as e:
+                                                print(f"{e} - fallo trayendo foto del usuario: {cedula}")
+                                                banderaFoto=False
+                                except requests.exceptions.ConnectionError:
+                                    print("fallo consultando api de fotos")
+                                    banderaFoto=False
+                            except Exception as e:
+                                print(f"{e} - fallo total fotos")
                                 banderaFoto=False
-                        except Exception as e:
-                            print(f"{e} - fallo total fotos")
-                            banderaFoto=False
-                        if banderaFoto:
-                            requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                    else:
-                        requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                t1_cambios=tm.perf_counter()
+                            if banderaFoto:
+                                requests.delete(url=f'{URL_API}eliminarcambioapi/{idCambio}/', auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
+                    t1_cambios=tm.perf_counter()
+                except Exception as e:
+                    print(f"{e} - fallo total en los cambios")
             
             if total_log > TIEMPO_LOG:
                 try:
@@ -474,12 +477,6 @@ while True:
                                     }
                                     requests.post(url=f'{URL_API}registrarinteraccionesapi/', 
                                     json=anadirLogJson, auth=('BaseLocal_access', 'S3gur1c3l_local@'), timeout=3)
-                            
-                            nombre=None
-                            fecha=None
-                            hora=None
-                            razon=None
-                            cedula=None
                     except requests.exceptions.ConnectionError:
                         print("fallo consultando api de logs")
                 except Exception as e:
@@ -532,7 +529,7 @@ while True:
                     print(f"{e} - fallo total cambiando estados de fotos")           
 
     except (Exception, psycopg2.Error) as error:
-        print("fallo en hacer las consultas")
+        print(f"{error} - fallo en hacer las consultas en base de datos de managerall")
         if connlocal:
             cursorlocal.close()
             connlocal.close()

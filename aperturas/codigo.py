@@ -366,7 +366,7 @@ while True:
                         else:
                             aperturadenegada(cursor, conn, acceso_solicitud, id_solicitud) 
     except (Exception, psycopg2.Error) as error:
-        print("fallo en hacer las consultas")
+        print(f"{error} - fallo en hacer las consultas en base de datos de aperturas")
         total=0
 
     finally:
