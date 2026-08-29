@@ -1,2 +1,4 @@
-allmanager/media
 postgresdata
+.env
+__pycache__/
+*.pyc
