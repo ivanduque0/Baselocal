@@ -15,7 +15,7 @@ try:
 
     dispositivos_api = []
     for consultajson in dispositivos_api_json:
-        tuplaDispositivoIndividual = (consultajson['id'], consultajson['dispositivo'], consultajson['descripcion'], consultajson['acceso'], consultajson.get('tipo_dispositivo'), consultajson.get('sistema'), consultajson.get('tipo_acceso'))
+        tuplaDispositivoIndividual = (consultajson['id'], consultajson['dispositivo'], consultajson['descripcion'], consultajson['acceso'], consultajson.get('tipo_dispositivo'), consultajson.get('sistema'), consultajson.get('tipo_acceso'), consultajson.get('apertura'))
         dispositivos_api.append(tuplaDispositivoIndividual)
 
     connlocal = psycopg2.connect(
@@ -27,18 +27,19 @@ try:
     )
     cursorlocal = connlocal.cursor()
 
-    for id_dispositivo, dispositivo, descripcion, acceso, tipo_dispositivo, sistema, tipo_acceso in dispositivos_api:
+    for id_dispositivo, dispositivo, descripcion, acceso, tipo_dispositivo, sistema, tipo_acceso, apertura in dispositivos_api:
         cursorlocal.execute('''
-            INSERT INTO dispositivos_informacion (id, dispositivo, descripcion, acceso, tipo_dispositivo, sistema, tipo_acceso)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO dispositivos_informacion (id, dispositivo, descripcion, acceso, tipo_dispositivo, sistema, tipo_acceso, apertura)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE SET
                 dispositivo = EXCLUDED.dispositivo,
                 descripcion = EXCLUDED.descripcion,
                 acceso = EXCLUDED.acceso,
                 tipo_dispositivo = EXCLUDED.tipo_dispositivo,
                 sistema = EXCLUDED.sistema,
-                tipo_acceso = EXCLUDED.tipo_acceso
-        ''', (id_dispositivo, dispositivo, descripcion, acceso, tipo_dispositivo, sistema, tipo_acceso))
+                tipo_acceso = EXCLUDED.tipo_acceso,
+                apertura = EXCLUDED.apertura
+        ''', (id_dispositivo, dispositivo, descripcion, acceso, tipo_dispositivo, sistema, tipo_acceso, apertura))
 
     ids_api = tuple(dispositivo[0] for dispositivo in dispositivos_api)
     if ids_api:
