@@ -23,7 +23,7 @@ def aperturaconcedidarfid(tag_idf, fechaf, horaf, cursorf, connf, acceso, razon_
     dispositivo = obtener_dispositivo_rfid(cursorf, acceso)
     tipo_acceso = dispositivo[2] if dispositivo and dispositivo[2] is not None else razon_apertura
     tipo_dispositivo = dispositivo[3] if dispositivo else None
-    razon = f'{dispositivo[1]}({dispositivo[4]})-{tipo_acceso}' if dispositivo else None
+    razon = f'{dispositivo[1]}({dispositivo[4]})-{tipo_acceso}' if dispositivo else f'SIN_DISPOSITIVO_DE_APERTURA-{tipo_acceso}'
     try:
         if dispositivo:
             requests.get(url=f'{dispositivo[0]}/on', timeout=3)

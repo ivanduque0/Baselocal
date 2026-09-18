@@ -48,7 +48,7 @@ try:
                 url=f'{URL_API}registrarlogsrfidapi/{CONTRATO}/',
                 auth=(API_AUTH_USER, API_AUTH_PASSWORD),
                 json=lote_json,
-                timeout=5
+                timeout=20
             ).raise_for_status()
         except requests.exceptions.ConnectionError:
             print("fallo consultando api de logs, se detiene el envio")
