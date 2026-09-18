@@ -10,6 +10,7 @@ TABLAS = [
     {"tabla": "horarios_horarioseinvitaciones", "horas_env": "HORAS_ACTUALIZAR_HORARIOS", "script": "/app/horarios.py"},
     {"tabla": "vehiculos_informacion", "horas_env": "HORAS_ACTUALIZAR_VEHICULOS_INFORMACION", "script": "/app/vehiculos.py"},
     {"tabla": "vehiculos_tags_rfid", "horas_env": "HORAS_ACTUALIZAR_VEHICULOS_TAGS_RFID", "script": "/app/tags.py"},
+    {"tabla": "logs_rfid", "horas_env": "HORAS_ENVIAR_LOGS_TAGS_RFID", "script": "/app/logs.py"},
 ]
 
 
