@@ -15,7 +15,7 @@ try:
 
     tags_api = []
     for consultajson in tags_api_json:
-        tuplaTagIndividual = (consultajson['id'], consultajson['epc'], consultajson.get('activo', True))
+        tuplaTagIndividual = (consultajson['id'], consultajson['epc'], consultajson.get('codigo'), consultajson.get('activo', True))
         tags_api.append(tuplaTagIndividual)
 
     connlocal = psycopg2.connect(
@@ -27,14 +27,15 @@ try:
     )
     cursorlocal = connlocal.cursor()
 
-    for id_tag, epc, activo in tags_api:
+    for id_tag, epc, codigo, activo in tags_api:
         cursorlocal.execute('''
-            INSERT INTO vehiculos_tags_rfid (id, epc, activo)
-            VALUES (%s, %s, %s)
+            INSERT INTO vehiculos_tags_rfid (id, epc, codigo, activo)
+            VALUES (%s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE SET
                 epc = EXCLUDED.epc,
+                codigo = EXCLUDED.codigo,
                 activo = EXCLUDED.activo
-        ''', (id_tag, epc, activo))
+        ''', (id_tag, epc, codigo, activo))
 
     ids_api = tuple(tag[0] for tag in tags_api)
     if ids_api:

@@ -22,7 +22,7 @@ try:
     cursorlocal = connlocal.cursor()
 
     cursorlocal.execute('''
-        SELECT ctid, tag_id, fecha, hora, razon, tipo_acceso, tipo_dispositivo, denegado
+        SELECT ctid, tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo, denegado
         FROM logs_rfid
         ORDER BY fecha, hora
     ''')
@@ -33,14 +33,15 @@ try:
         lote_json = [
             {
                 'tag_id': tag_id,
+                'tag_codigo': tag_codigo,
                 'fecha': fecha.isoformat(),
                 'hora': hora.isoformat(),
-                'razon': razon,
+                'descripcion': descripcion,
                 'tipo_acceso': tipo_acceso,
                 'tipo_dispositivo': tipo_dispositivo,
                 'denegado': denegado,
             }
-            for _, tag_id, fecha, hora, razon, tipo_acceso, tipo_dispositivo, denegado in lote
+            for _, tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo, denegado in lote
         ]
 
         try:
