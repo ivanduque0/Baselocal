@@ -21,14 +21,16 @@ def obtener_dispositivo_rfid(cursorf, acceso):
 
 def aperturaconcedidarfid(tag_idf, fechaf, horaf, cursorf, connf, acceso, descripcion_apertura, tag_codigof=None):
     dispositivo = obtener_dispositivo_rfid(cursorf, acceso)
+    if not dispositivo:
+        print(f"DEBUG: no se encontro dispositivo de apertura para acceso={acceso}")
     tipo_acceso = dispositivo[2] if dispositivo and dispositivo[2] is not None else descripcion_apertura
     tipo_dispositivo = dispositivo[3] if dispositivo else None
     descripcion = dispositivo[1] if dispositivo else 'SIN_DISPOSITIVO_DE_APERTURA'
     try:
         if dispositivo:
             requests.get(url=f'{dispositivo[0]}/on', timeout=3)
-    except:
-        print("fallo en peticion http")
+    except Exception as error_http:
+        print(f"fallo en peticion http a {dispositivo[0]}/on: {error_http}")
         descripcion = f'Fallo al aperturar {descripcion}'
     finally:
         cursorf.execute('''INSERT INTO logs_rfid (tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo)
@@ -41,24 +43,25 @@ def aperturadenegada(cursorf, connf, acceso, tag_idf=None, descripcion=None, epc
     if tag_idf is None:
         return
     dispositivo = obtener_dispositivo_rfid(cursorf, acceso)
+    if not dispositivo:
+        print(f"DEBUG: no se encontro dispositivo de apertura para acceso={acceso}")
     tipo_acceso = dispositivo[2] if dispositivo and dispositivo[2] is not None else descripcion_apertura
     tipo_dispositivo = dispositivo[3] if dispositivo else None
     descripcion_completa = f'{dispositivo[1]}-{descripcion}' if dispositivo else descripcion
     try:
         if dispositivo:
             requests.get(url=f'{dispositivo[0]}/off', timeout=3)
-    except:
-        print("fallo en peticion http")
+    except Exception as error_http:
+        print(f"fallo en peticion http a {dispositivo[0]}/off: {error_http}")
     finally:
-        if descripcion and tipo_acceso:
-            tz = pytz.timezone('America/Caracas')
-            caracas_now = datetime.now(tz)
-            hora=str(caracas_now)[11:19]
-            horahoy = datetime.strptime(hora, '%H:%M:%S').time()
-            fecha=str(caracas_now)[:10]
-            cursorf.execute('''INSERT INTO logs_rfid (tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo, denegado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, TRUE);''', (tag_idf, tag_codigof, fecha, horahoy, descripcion_completa, tipo_acceso, tipo_dispositivo))
-            connf.commit()
+        tz = pytz.timezone('America/Caracas')
+        caracas_now = datetime.now(tz)
+        hora=str(caracas_now)[11:19]
+        horahoy = datetime.strptime(hora, '%H:%M:%S').time()
+        fecha=str(caracas_now)[:10]
+        cursorf.execute('''INSERT INTO logs_rfid (tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo, denegado)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, TRUE);''', (tag_idf, tag_codigof, fecha, horahoy, descripcion_completa, tipo_acceso, tipo_dispositivo))
+        connf.commit()
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -182,6 +185,7 @@ class MyServer(BaseHTTPRequestHandler):
                                                 contadoraux=0
                                             #print('fuera de horario')
                             if etapadia==0 and etapadiaapertura==0:
+                                print(f"DEBUG: sin coincidencia de horario para tag_id={tag_id}, dia_hoy={diahoy}, horarios_permitidos={horarios_permitidos}")
                                 aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                                 #print('Dia no permitido')
                     diasusuario=[]
