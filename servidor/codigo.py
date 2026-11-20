@@ -126,7 +126,7 @@ class MyServer(BaseHTTPRequestHandler):
                             diahoy = dias_semana[dia]
                             for entrada, salida, dia in horarios_permitidos:
                                 diasusuario.append(dia)
-                            cantidaddias = diasusuario.count(dia)
+                            cantidaddias = diasusuario.count(diahoy)
                             for entrada, salida, dia in horarios_permitidos:
                                 if 'Siempre' in diasusuario:
                                     hora=str(caracas_now)[11:19]
@@ -135,6 +135,7 @@ class MyServer(BaseHTTPRequestHandler):
                                     etapadia=1
                                     aperturaconcedidarfid(tag_id, fecha, horahoy, cursor, conn, acceso_solicitud, descripcion_apertura, tag_codigof=tag_codigo)
                                     etapadiaapertura=1
+                                    break
                                 elif dia==diahoy and cantidaddias==1:
                                     hora=str(caracas_now)[11:19]
                                     horahoy = datetime.strptime(hora, '%H:%M:%S').time()
@@ -167,6 +168,7 @@ class MyServer(BaseHTTPRequestHandler):
                                             aperturaconcedidarfid(tag_id, fecha, horahoy, cursor, conn, acceso_solicitud, descripcion_apertura, tag_codigof=tag_codigo)
                                             etapadiaapertura=1
                                             contadoraux=0
+                                            break
                                         else:
                                             contadoraux = contadoraux+1
                                             if contadoraux == cantidaddias:
@@ -178,6 +180,7 @@ class MyServer(BaseHTTPRequestHandler):
                                             aperturaconcedidarfid(tag_id, fecha, horahoy, cursor, conn, acceso_solicitud, descripcion_apertura, tag_codigof=tag_codigo)
                                             etapadiaapertura=1
                                             contadoraux=0
+                                            break
                                         else:
                                             contadoraux = contadoraux+1
                                             if contadoraux == cantidaddias:
