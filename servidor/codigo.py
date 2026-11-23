@@ -15,14 +15,18 @@ ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 total=0
 
-def obtener_dispositivo_rfid(cursorf, acceso):
-    cursorf.execute("SELECT dispositivo, descripcion, tipo_acceso, tipo_dispositivo, sistema FROM dispositivos_informacion WHERE acceso=%s AND apertura=true", (acceso,))
+def obtener_dispositivo_rfid(cursorf, dispositivo_id):
+    # The antenna identifies the relay it opens by dispositivos_informacion.id.
+    # A non-numeric id would make Postgres raise and leave the transaction aborted.
+    if not dispositivo_id.isdigit():
+        return None
+    cursorf.execute("SELECT dispositivo, descripcion, tipo_acceso, tipo_dispositivo, sistema FROM dispositivos_informacion WHERE id=%s AND apertura=true", (int(dispositivo_id),))
     return cursorf.fetchone()
 
-def aperturaconcedidarfid(tag_idf, fechaf, horaf, cursorf, connf, acceso, descripcion_apertura, tag_codigof=None):
-    dispositivo = obtener_dispositivo_rfid(cursorf, acceso)
+def aperturaconcedidarfid(tag_idf, fechaf, horaf, cursorf, connf, dispositivo_id, descripcion_apertura, tag_codigof=None):
+    dispositivo = obtener_dispositivo_rfid(cursorf, dispositivo_id)
     if not dispositivo:
-        print(f"DEBUG: no se encontro dispositivo de apertura para acceso={acceso}")
+        print(f"DEBUG: no se encontro dispositivo de apertura con id={dispositivo_id}")
     tipo_acceso = dispositivo[2] if dispositivo and dispositivo[2] is not None else descripcion_apertura
     tipo_dispositivo = dispositivo[3] if dispositivo else None
     descripcion = dispositivo[1] if dispositivo else 'SIN_DISPOSITIVO_DE_APERTURA'
@@ -37,14 +41,14 @@ def aperturaconcedidarfid(tag_idf, fechaf, horaf, cursorf, connf, acceso, descri
         VALUES (%s, %s, %s, %s, %s, %s, %s);''', (tag_idf, tag_codigof, fechaf, horaf, descripcion, tipo_acceso, tipo_dispositivo))
         connf.commit()
 
-def aperturadenegada(cursorf, connf, acceso, tag_idf=None, descripcion=None, epc=None, descripcion_apertura=None, tag_codigof=None):
+def aperturadenegada(cursorf, connf, dispositivo_id, tag_idf=None, descripcion=None, epc=None, descripcion_apertura=None, tag_codigof=None):
     if descripcion:
         print(f'{epc} - {descripcion}')
     if tag_idf is None:
         return
-    dispositivo = obtener_dispositivo_rfid(cursorf, acceso)
+    dispositivo = obtener_dispositivo_rfid(cursorf, dispositivo_id)
     if not dispositivo:
-        print(f"DEBUG: no se encontro dispositivo de apertura para acceso={acceso}")
+        print(f"DEBUG: no se encontro dispositivo de apertura con id={dispositivo_id}")
     tipo_acceso = dispositivo[2] if dispositivo and dispositivo[2] is not None else descripcion_apertura
     tipo_dispositivo = dispositivo[3] if dispositivo else None
     descripcion_completa = f'{dispositivo[1]}-{descripcion}' if dispositivo else descripcion
@@ -73,7 +77,13 @@ class MyServer(BaseHTTPRequestHandler):
     def do_POST(self):
         peticion=self.path[1::].split("/")
 
+        # Routes: POST /{dispositivo_id}/noregistrado
+        #         POST /{epc}/{dispositivo_id}/{descripcion}/seguricel_rfid_activo
         if len(peticion) == 2 and peticion[1] == "noregistrado":
+            # Answer the antenna right away, as the ESP32 node does; nothing else happens for an unknown tag.
+            self.send_response(200)
+            self.send_header("Content-type", "utf-8")
+            self.end_headers()
             acceso_solicitud, _ = peticion
             aperturadenegada(cursor, conn, acceso_solicitud)
 
@@ -141,6 +151,9 @@ class MyServer(BaseHTTPRequestHandler):
                                     horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                     fecha=str(caracas_now)[:10]
                                     etapadia=1
+                                    # entrada == salida is a loading error: it never matches (L14).
+                                    if entrada==salida:
+                                        aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
                                             #print('entrada concedida')
@@ -162,6 +175,12 @@ class MyServer(BaseHTTPRequestHandler):
                                     horahoy = datetime.strptime(hora, '%H:%M:%S').time()
                                     fecha=str(caracas_now)[:10]
                                     etapadia=1
+                                    # entrada == salida never matches (L14): it counts as one more non-matching window.
+                                    if entrada==salida:
+                                        contadoraux = contadoraux+1
+                                        if contadoraux == cantidaddias:
+                                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                            contadoraux=0
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
                                             #print('entrada concedida')
