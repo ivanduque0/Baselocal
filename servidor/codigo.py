@@ -24,10 +24,13 @@ def obtener_dispositivo_rfid(cursorf, dispositivo_id):
     return cursorf.fetchone()
 
 def sentido_de(dispositivo, descripcion_apertura):
-    # S12: the relay's tipo_acceso; without it, the antenna's URL segment only when it is a valid direction.
-    if dispositivo and dispositivo[2] is not None:
+    # S12 (L56): the direction belongs to the antenna (inside or outside the gate), so its URL segment wins when it
+    # is a valid direction; otherwise the relay's tipo_acceso.
+    if descripcion_apertura in ('entrada', 'salida'):
+        return descripcion_apertura
+    if dispositivo and dispositivo[2] in ('entrada', 'salida'):
         return dispositivo[2]
-    return descripcion_apertura if descripcion_apertura in ('entrada', 'salida') else None
+    return None
 
 def registrar_log(cursorf, connf, tag_idf, tag_codigof, fechaf, horaf, dispositivo_id, dispositivo, descripcion_apertura, resultado, motivo):
     # S12 fields: acceso_id is the relay's dispositivos_informacion.id (null without a relay),
