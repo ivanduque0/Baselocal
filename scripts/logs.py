@@ -22,7 +22,7 @@ try:
     cursorlocal = connlocal.cursor()
 
     cursorlocal.execute('''
-        SELECT ctid, tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo, denegado
+        SELECT ctid, tag_id, tag_codigo, fecha, hora, acceso_id, sentido, resultado, motivo
         FROM logs_rfid
         ORDER BY fecha, hora
     ''')
@@ -30,18 +30,20 @@ try:
 
     for inicio in range(0, len(pendientes), TAMANO_BATCH):
         lote = pendientes[inicio:inicio + TAMANO_BATCH]
+        # S12 batch format; the backend fills acceso_nombre and tipo_dispositivo from the device
+        # and user/unit/vehicle from the tag. evento_id is optional for the mini PC and not sent.
         lote_json = [
             {
                 'tag_id': tag_id,
                 'tag_codigo': tag_codigo,
                 'fecha': fecha.isoformat(),
                 'hora': hora.isoformat(),
-                'descripcion': descripcion,
-                'tipo_acceso': tipo_acceso,
-                'tipo_dispositivo': tipo_dispositivo,
-                'denegado': denegado,
+                'acceso_id': acceso_id,
+                'sentido': sentido,
+                'resultado': resultado,
+                'motivo': motivo,
             }
-            for _, tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo, denegado in lote
+            for _, tag_id, tag_codigo, fecha, hora, acceso_id, sentido, resultado, motivo in lote
         ]
 
         try:

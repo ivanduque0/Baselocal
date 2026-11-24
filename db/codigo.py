@@ -21,7 +21,8 @@ while True:
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS dispositivos_informacion (id BIGINT PRIMARY KEY, dispositivo varchar(150), descripcion varchar(150), acceso varchar(150), tipo_dispositivo varchar(150), sistema varchar(150), tipo_acceso varchar(150), apertura BOOLEAN DEFAULT FALSE)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS vehiculos_informacion (id BIGINT PRIMARY KEY, usuario_id BIGINT, tag_id BIGINT)')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS vehiculos_tags_rfid (id BIGINT PRIMARY KEY, epc text, codigo varchar(10), activo BOOLEAN DEFAULT TRUE)')
-        cursorlocal.execute('CREATE TABLE IF NOT EXISTS logs_rfid (tag_id BIGINT, tag_codigo varchar(10), fecha DATE, hora time without time zone, descripcion varchar(150), tipo_acceso varchar(150), tipo_dispositivo varchar(150), denegado BOOLEAN DEFAULT FALSE)')
+        # S12 shape (homologated with the backend's other opening logs).
+        cursorlocal.execute('CREATE TABLE IF NOT EXISTS logs_rfid (tag_id BIGINT, tag_codigo varchar(10), fecha DATE, hora time without time zone, acceso_id BIGINT, acceso_nombre varchar(255), sentido varchar(50), resultado varchar(20), motivo varchar(100), tipo_dispositivo varchar(150))')
         cursorlocal.execute('CREATE TABLE IF NOT EXISTS ultimas_actualizaciones (tabla varchar(150) PRIMARY KEY, fecha_hora TIMESTAMP)')
         connlocal.commit()
         print("tablas creadas correctamente")

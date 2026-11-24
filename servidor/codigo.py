@@ -23,35 +23,46 @@ def obtener_dispositivo_rfid(cursorf, dispositivo_id):
     cursorf.execute("SELECT dispositivo, descripcion, tipo_acceso, tipo_dispositivo, sistema FROM dispositivos_informacion WHERE id=%s AND apertura=true", (int(dispositivo_id),))
     return cursorf.fetchone()
 
+def sentido_de(dispositivo, descripcion_apertura):
+    # S12: the relay's tipo_acceso; without it, the antenna's URL segment only when it is a valid direction.
+    if dispositivo and dispositivo[2] is not None:
+        return dispositivo[2]
+    return descripcion_apertura if descripcion_apertura in ('entrada', 'salida') else None
+
+def registrar_log(cursorf, connf, tag_idf, tag_codigof, fechaf, horaf, dispositivo_id, dispositivo, descripcion_apertura, resultado, motivo):
+    # S12 fields: acceso_id is the relay's dispositivos_informacion.id (null without a relay),
+    # acceso_nombre its descripcion at this moment.
+    acceso_id = int(dispositivo_id) if dispositivo else None
+    acceso_nombre = dispositivo[1] if dispositivo else None
+    tipo_dispositivo = dispositivo[3] if dispositivo else None
+    cursorf.execute('''INSERT INTO logs_rfid (tag_id, tag_codigo, fecha, hora, acceso_id, acceso_nombre, sentido, resultado, motivo, tipo_dispositivo)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);''', (tag_idf, tag_codigof, fechaf, horaf, acceso_id, acceso_nombre,
+                                                         sentido_de(dispositivo, descripcion_apertura), resultado, motivo, tipo_dispositivo))
+    connf.commit()
+
 def aperturaconcedidarfid(tag_idf, fechaf, horaf, cursorf, connf, dispositivo_id, descripcion_apertura, tag_codigof=None):
     dispositivo = obtener_dispositivo_rfid(cursorf, dispositivo_id)
     if not dispositivo:
         print(f"DEBUG: no se encontro dispositivo de apertura con id={dispositivo_id}")
-    tipo_acceso = dispositivo[2] if dispositivo and dispositivo[2] is not None else descripcion_apertura
-    tipo_dispositivo = dispositivo[3] if dispositivo else None
-    descripcion = dispositivo[1] if dispositivo else 'SIN_DISPOSITIVO_DE_APERTURA'
+    resultado, motivo = ('abierto', None) if dispositivo else ('fallido', 'sin_dispositivo')
     try:
         if dispositivo:
             requests.get(url=f'{dispositivo[0]}/on', timeout=3)
     except Exception as error_http:
         print(f"fallo en peticion http a {dispositivo[0]}/on: {error_http}")
-        descripcion = f'Fallo al aperturar {descripcion}'
+        resultado, motivo = 'fallido', 'sin_respuesta'
     finally:
-        cursorf.execute('''INSERT INTO logs_rfid (tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo)
-        VALUES (%s, %s, %s, %s, %s, %s, %s);''', (tag_idf, tag_codigof, fechaf, horaf, descripcion, tipo_acceso, tipo_dispositivo))
-        connf.commit()
+        registrar_log(cursorf, connf, tag_idf, tag_codigof, fechaf, horaf, dispositivo_id, dispositivo, descripcion_apertura, resultado, motivo)
 
-def aperturadenegada(cursorf, connf, dispositivo_id, tag_idf=None, descripcion=None, epc=None, descripcion_apertura=None, tag_codigof=None):
-    if descripcion:
-        print(f'{epc} - {descripcion}')
+def aperturadenegada(cursorf, connf, dispositivo_id, tag_idf=None, motivo=None, epc=None, descripcion_apertura=None, tag_codigof=None):
+    # motivo is the S12 code (tag_inactivo, sin_permiso_rfid, fuera_de_horario).
+    if motivo:
+        print(f'{epc} - {motivo}')
     if tag_idf is None:
         return
     dispositivo = obtener_dispositivo_rfid(cursorf, dispositivo_id)
     if not dispositivo:
         print(f"DEBUG: no se encontro dispositivo de apertura con id={dispositivo_id}")
-    tipo_acceso = dispositivo[2] if dispositivo and dispositivo[2] is not None else descripcion_apertura
-    tipo_dispositivo = dispositivo[3] if dispositivo else None
-    descripcion_completa = f'{dispositivo[1]}-{descripcion}' if dispositivo else descripcion
     try:
         if dispositivo:
             requests.get(url=f'{dispositivo[0]}/off', timeout=3)
@@ -63,9 +74,7 @@ def aperturadenegada(cursorf, connf, dispositivo_id, tag_idf=None, descripcion=N
         hora=str(caracas_now)[11:19]
         horahoy = datetime.strptime(hora, '%H:%M:%S').time()
         fecha=str(caracas_now)[:10]
-        cursorf.execute('''INSERT INTO logs_rfid (tag_id, tag_codigo, fecha, hora, descripcion, tipo_acceso, tipo_dispositivo, denegado)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, TRUE);''', (tag_idf, tag_codigof, fecha, horahoy, descripcion_completa, tipo_acceso, tipo_dispositivo))
-        connf.commit()
+        registrar_log(cursorf, connf, tag_idf, tag_codigof, fecha, horahoy, dispositivo_id, dispositivo, descripcion_apertura, 'denegado', motivo)
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -102,9 +111,9 @@ class MyServer(BaseHTTPRequestHandler):
             #print(datostag_rfid)
 
             if len(datostag_rfid)==0:
-                aperturadenegada(cursor, conn, acceso_solicitud, None, 'tag no encontrado', None, descripcion_apertura)
+                aperturadenegada(cursor, conn, acceso_solicitud, None, 'tag_no_encontrado', None, descripcion_apertura)
             elif datostag_rfid[0][1] != True:
-                aperturadenegada(cursor, conn, acceso_solicitud, datostag_rfid[0][0], 'tag inactivo', epc, descripcion_apertura, tag_codigof=datostag_rfid[0][2])
+                aperturadenegada(cursor, conn, acceso_solicitud, datostag_rfid[0][0], 'tag_inactivo', epc, descripcion_apertura, tag_codigof=datostag_rfid[0][2])
             else:
                 tag_id = datostag_rfid[0][0]
                 tag_codigo = datostag_rfid[0][2]
@@ -116,7 +125,7 @@ class MyServer(BaseHTTPRequestHandler):
                     permisoAperturaRFID = datosUsuario[0][0]
                     rol = datosUsuario[0][1]
                     if permisoAperturaRFID != True:
-                        aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'usuario sin permisos de RFID', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                        aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'sin_permiso_rfid', epc, descripcion_apertura, tag_codigof=tag_codigo)
                     elif rol == 'Propietario':
                         tz = pytz.timezone('America/Caracas')
                         caracas_now = datetime.now(tz)
@@ -128,7 +137,7 @@ class MyServer(BaseHTTPRequestHandler):
                         cursor.execute('SELECT entrada, salida, dia FROM horarios_horarioseinvitaciones where usuario_id=%s', (datosusuario_rfid[0][0],))
                         horarios_permitidos = cursor.fetchall()
                         if horarios_permitidos == []:
-                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                         else:
                             tz = pytz.timezone('America/Caracas')
                             caracas_now = datetime.now(tz)
@@ -153,23 +162,23 @@ class MyServer(BaseHTTPRequestHandler):
                                     etapadia=1
                                     # entrada == salida is a loading error: it never matches (L14).
                                     if entrada==salida:
-                                        aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                        aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
                                             #print('entrada concedida')
                                             aperturaconcedidarfid(tag_id, fecha, horahoy, cursor, conn, acceso_solicitud, descripcion_apertura, tag_codigof=tag_codigo)
                                             etapadiaapertura=1
                                         else:
-                                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
-                                            #print('fuera de horario')
+                                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                            #print('fuera_de_horario')
                                     if entrada>salida:
                                         if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
                                             #print('entrada concedida')
                                             aperturaconcedidarfid(tag_id, fecha, horahoy, cursor, conn, acceso_solicitud, descripcion_apertura, tag_codigof=tag_codigo)
                                             etapadiaapertura=1
                                         else:
-                                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
-                                            #print('fuera de horario')
+                                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                            #print('fuera_de_horario')
                                 elif dia==diahoy and cantidaddias>1:
                                     hora=str(caracas_now)[11:19]
                                     horahoy = datetime.strptime(hora, '%H:%M:%S').time()
@@ -179,7 +188,7 @@ class MyServer(BaseHTTPRequestHandler):
                                     if entrada==salida:
                                         contadoraux = contadoraux+1
                                         if contadoraux == cantidaddias:
-                                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                            aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                                             contadoraux=0
                                     if entrada<salida:
                                         if horahoy >= entrada and horahoy <= salida:
@@ -191,7 +200,7 @@ class MyServer(BaseHTTPRequestHandler):
                                         else:
                                             contadoraux = contadoraux+1
                                             if contadoraux == cantidaddias:
-                                                aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                                aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                                                 contadoraux=0
                                     if entrada>salida:
                                         if (horahoy>=entrada and horahoy <=ultimahora) or (horahoy>=primerahora and horahoy <= salida):
@@ -203,12 +212,12 @@ class MyServer(BaseHTTPRequestHandler):
                                         else:
                                             contadoraux = contadoraux+1
                                             if contadoraux == cantidaddias:
-                                                aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                                aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                                                 contadoraux=0
-                                            #print('fuera de horario')
+                                            #print('fuera_de_horario')
                             if etapadia==0 and etapadiaapertura==0:
                                 print(f"DEBUG: sin coincidencia de horario para tag_id={tag_id}, dia_hoy={diahoy}, horarios_permitidos={horarios_permitidos}")
-                                aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera de horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
+                                aperturadenegada(cursor, conn, acceso_solicitud, tag_id, 'fuera_de_horario', epc, descripcion_apertura, tag_codigof=tag_codigo)
                                 #print('Dia no permitido')
                     diasusuario=[]
                 else:
