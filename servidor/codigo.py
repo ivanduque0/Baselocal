@@ -5,6 +5,7 @@ import os
 import pytz
 from datetime import datetime
 import requests
+import ipaddress
 
 hostName = '0.0.0.0'
 serverPort = 43157
@@ -15,13 +16,27 @@ ultimahora = datetime.strptime('23:59:59', '%H:%M:%S').time()
 primerahora = datetime.strptime('00:00:00', '%H:%M:%S').time()
 total=0
 
+def ip_del_actuador(valor):
+    # L74: dispositivos_informacion.dispositivo holds the actuator's IP; None if it is not an IPv4 (or is 0.0.0.0).
+    try:
+        ip = ipaddress.IPv4Address(valor or '')
+    except ValueError:
+        return None
+    return None if ip.is_unspecified else str(ip)
+
 def obtener_dispositivo_rfid(cursorf, dispositivo_id):
-    # The antenna identifies the relay it opens by dispositivos_informacion.id.
+    # The antenna identifies the actuator it opens by dispositivos_informacion.id.
     # A non-numeric id would make Postgres raise and leave the transaction aborted.
     if not dispositivo_id.isdigit():
         return None
     cursorf.execute("SELECT dispositivo, descripcion, tipo_acceso, tipo_dispositivo, sistema FROM dispositivos_informacion WHERE id=%s AND apertura=true", (int(dispositivo_id),))
-    return cursorf.fetchone()
+    fila = cursorf.fetchone()
+    if not fila:
+        return None
+    # Without an IPv4 the actuator can't be called: same as no device, like the RFID server, which leaves it out of
+    # its list (S10). The first column becomes the bare IP; the URL is built where it is called.
+    ip = ip_del_actuador(fila[0])
+    return (ip,) + tuple(fila[1:]) if ip else None
 
 def sentido_de(dispositivo, descripcion_apertura):
     # S12 (L56): the direction belongs to the antenna (inside or outside the gate), so its URL segment wins when it
@@ -50,9 +65,9 @@ def aperturaconcedidarfid(tag_idf, fechaf, horaf, cursorf, connf, dispositivo_id
     resultado, motivo = ('abierto', None) if dispositivo else ('fallido', 'sin_dispositivo')
     try:
         if dispositivo:
-            requests.get(url=f'{dispositivo[0]}/on', timeout=3)
+            requests.get(url=f'http://{dispositivo[0]}/on', timeout=3)
     except Exception as error_http:
-        print(f"fallo en peticion http a {dispositivo[0]}/on: {error_http}")
+        print(f"fallo en peticion http a http://{dispositivo[0]}/on: {error_http}")
         resultado, motivo = 'fallido', 'sin_respuesta'
     finally:
         registrar_log(cursorf, connf, tag_idf, tag_codigof, fechaf, horaf, dispositivo_id, dispositivo, descripcion_apertura, resultado, motivo)
@@ -68,9 +83,9 @@ def aperturadenegada(cursorf, connf, dispositivo_id, tag_idf=None, motivo=None, 
         print(f"DEBUG: no se encontro dispositivo de apertura con id={dispositivo_id}")
     try:
         if dispositivo:
-            requests.get(url=f'{dispositivo[0]}/off', timeout=3)
+            requests.get(url=f'http://{dispositivo[0]}/off', timeout=3)
     except Exception as error_http:
-        print(f"fallo en peticion http a {dispositivo[0]}/off: {error_http}")
+        print(f"fallo en peticion http a http://{dispositivo[0]}/off: {error_http}")
     finally:
         tz = pytz.timezone('America/Caracas')
         caracas_now = datetime.now(tz)
